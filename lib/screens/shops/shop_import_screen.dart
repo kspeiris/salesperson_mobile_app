@@ -32,7 +32,8 @@ class _ShopImportScreenState extends State<ShopImportScreen> {
               children: [
                 Text('CSV header example:'),
                 SizedBox(height: 8),
-                SelectableText('name,owner_contact,area,phone,credit_limit,balance'),
+                SelectableText(
+                    'name,owner_contact,area,phone,credit_limit,balance'),
               ],
             ),
           ),
@@ -41,7 +42,8 @@ class _ShopImportScreenState extends State<ShopImportScreen> {
             value: _replaceExisting,
             contentPadding: EdgeInsets.zero,
             title: const Text('Replace existing shop records'),
-            subtitle: const Text('Deletes current shop master data before import.'),
+            subtitle:
+                const Text('Deletes current shop master data before import.'),
             onChanged: (value) => setState(() => _replaceExisting = value),
           ),
           const SizedBox(height: 12),
@@ -60,6 +62,7 @@ class _ShopImportScreenState extends State<ShopImportScreen> {
   }
 
   Future<void> _pickAndImport() async {
+    final controller = context.read<AppController>();
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['csv', 'txt'],
@@ -67,9 +70,9 @@ class _ShopImportScreenState extends State<ShopImportScreen> {
     );
     final path = result?.files.single.path;
     if (path == null) return;
-
     setState(() => _working = true);
-    final importResult = await context.read<AppController>().importShopsFromFile(path, replaceExisting: _replaceExisting);
+    final importResult = await controller.importShopsFromFile(path,
+        replaceExisting: _replaceExisting);
     if (!mounted) return;
     setState(() {
       _working = false;
@@ -91,10 +94,12 @@ class _ImportSummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(result.summary, style: const TextStyle(fontWeight: FontWeight.w800)),
+            Text(result.summary,
+                style: const TextStyle(fontWeight: FontWeight.w800)),
             if (result.errors.isNotEmpty) ...[
               const SizedBox(height: 12),
-              const Text('Issues', style: TextStyle(fontWeight: FontWeight.w700)),
+              const Text('Issues',
+                  style: TextStyle(fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               ...result.errors.take(10).map((entry) => Padding(
                     padding: const EdgeInsets.only(bottom: 6),

@@ -42,24 +42,41 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
     final controller = context.read<AppController>();
 
     return FutureBuilder<List<dynamic>>(
-      future: Future.wait<dynamic>([controller.fetchShops(), controller.fetchProducts()]),
+      future: Future.wait<dynamic>(
+          [controller.fetchShops(), controller.fetchProducts()]),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+              body: Center(child: CircularProgressIndicator()));
         }
 
-        final shops = snapshot.data![0] as List<Shop>;
+        final shops = _distinctShops(snapshot.data![0] as List<Shop>);
         final products = snapshot.data![1] as List<Product>;
+
+        Shop? selectedShop;
+        if (_selectedShop != null) {
+          for (final shop in shops) {
+            if (shop.id == _selectedShop!.id) {
+              selectedShop = shop;
+              break;
+            }
+          }
+        }
 
         return AppShell(
           title: 'New Sale',
-          subtitle: 'Create an item-based sale, keep it offline, and include all details needed for end-of-day reporting.',
+          subtitle:
+              'Create an item-based sale, keep it offline, and include all details needed for end-of-day reporting.',
           header: Wrap(
             spacing: 10,
             runSpacing: 10,
             children: [
-              _InfoChip(icon: Icons.schedule_outlined, label: AppFormatters.dateTime(DateTime.now())),
-              _InfoChip(icon: Icons.shopping_bag_outlined, label: '${_lines.length} line items'),
+              _InfoChip(
+                  icon: Icons.schedule_outlined,
+                  label: AppFormatters.dateTime(DateTime.now())),
+              _InfoChip(
+                  icon: Icons.shopping_bag_outlined,
+                  label: '${_lines.length} line items'),
               _InfoChip(icon: Icons.payments_outlined, label: _paymentType),
             ],
           ),
@@ -72,30 +89,37 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                   child: Column(
                     children: [
                       DropdownButtonFormField<Shop>(
-                        value: _selectedShop,
+                        initialValue: selectedShop,
                         isExpanded: true,
                         items: shops
-                            .map((shop) => DropdownMenuItem<Shop>(value: shop, child: Text('${shop.name} - ${shop.area}')))
+                            .map((shop) => DropdownMenuItem<Shop>(
+                                value: shop,
+                                child: Text('${shop.name} - ${shop.area}')))
                             .toList(),
                         decoration: const InputDecoration(
                           labelText: 'Shop',
                           prefixIcon: Icon(Icons.storefront_outlined),
                         ),
-                        onChanged: (value) => setState(() => _selectedShop = value),
-                        validator: (value) => value == null ? 'Select a shop.' : null,
+                        onChanged: (value) =>
+                            setState(() => _selectedShop = value),
+                        validator: (value) =>
+                            value == null ? 'Select a shop.' : null,
                       ),
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
-                        value: _paymentType,
+                        initialValue: _paymentType,
                         items: const [
                           DropdownMenuItem(value: 'Cash', child: Text('Cash')),
-                          DropdownMenuItem(value: 'Credit', child: Text('Credit')),
+                          DropdownMenuItem(
+                              value: 'Credit', child: Text('Credit')),
                         ],
                         decoration: const InputDecoration(
                           labelText: 'Payment type',
-                          prefixIcon: Icon(Icons.account_balance_wallet_outlined),
+                          prefixIcon:
+                              Icon(Icons.account_balance_wallet_outlined),
                         ),
-                        onChanged: (value) => setState(() => _paymentType = value ?? 'Cash'),
+                        onChanged: (value) =>
+                            setState(() => _paymentType = value ?? 'Cash'),
                       ),
                       const SizedBox(height: 14),
                       TextFormField(
@@ -122,7 +146,8 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                         label: const Text('Scan'),
                       ),
                       TextButton.icon(
-                        onPressed: () => setState(() => _lines.add(_LineDraft())),
+                        onPressed: () =>
+                            setState(() => _lines.add(_LineDraft())),
                         icon: const Icon(Icons.add_rounded),
                         label: const Text('Add item'),
                       ),
@@ -145,7 +170,8 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                                   });
                                 },
                         ),
-                        if (index < _lines.length - 1) const SizedBox(height: 12),
+                        if (index < _lines.length - 1)
+                          const SizedBox(height: 12),
                       ],
                     ],
                   ),
@@ -160,23 +186,31 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                         const SizedBox(height: 12),
                         TextFormField(
                           controller: _discountController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
                           decoration: const InputDecoration(
                             labelText: 'Discount',
                             prefixIcon: Icon(Icons.sell_outlined),
                           ),
                           onChanged: (_) => setState(() {}),
                           validator: (value) {
-                            final discount = double.tryParse((value ?? '').trim());
-                            if (discount == null || discount < 0) return 'Enter a valid discount.';
-                            if (discount > _subtotal) return 'Discount cannot exceed subtotal.';
+                            final discount =
+                                double.tryParse((value ?? '').trim());
+                            if (discount == null || discount < 0) {
+                              return 'Enter a valid discount.';
+                            }
+                            if (discount > _subtotal) {
+                              return 'Discount cannot exceed subtotal.';
+                            }
                             return null;
                           },
                         ),
                         const SizedBox(height: 12),
                         _summary('Payment type', _paymentType),
                         const Divider(height: 28),
-                        _summary('Grand total', AppFormatters.currency(_grandTotal), strong: true),
+                        _summary(
+                            'Grand total', AppFormatters.currency(_grandTotal),
+                            strong: true),
                       ],
                     ),
                   ),
@@ -196,16 +230,20 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
   }
 
   Future<void> _scanAndAttachProduct(List<Product> products) async {
+    final controller = context.read<AppController>();
+    final messenger = ScaffoldMessenger.of(context);
+
     final scannedValue = await Navigator.push<String>(
       context,
       MaterialPageRoute(builder: (_) => const BarcodeScannerScreen()),
     );
     if (scannedValue == null || scannedValue.trim().isEmpty) return;
 
-    final product = await context.read<AppController>().findProductByBarcode(scannedValue.trim());
+    final product = await controller.findProductByBarcode(scannedValue.trim());
     if (!mounted) return;
     if (product == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No active product found for barcode $scannedValue')));
+      messenger.showSnackBar(SnackBar(
+          content: Text('No active product found for barcode $scannedValue')));
       return;
     }
 
@@ -218,12 +256,15 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
         }
       }
       target ??= _createAdditionalLine();
-      target!.product = product;
-      target!.qtyController.text = target!.qtyController.text.trim().isEmpty ? '1' : target!.qtyController.text;
-      target!.priceController.text = product.unitPrice.toStringAsFixed(2);
+      target.product = product;
+      target.qtyController.text = target.qtyController.text.trim().isEmpty
+          ? '1'
+          : target.qtyController.text;
+      target.priceController.text = product.unitPrice.toStringAsFixed(2);
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${product.name} added from barcode scan.')));
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${product.name} added from barcode scan.')));
   }
 
   _LineDraft _createAdditionalLine() {
@@ -233,13 +274,18 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
   }
 
   Future<void> _saveSale(List<Product> products) async {
+    final messenger = ScaffoldMessenger.of(context);
+
     if (!_formKey.currentState!.validate()) return;
     if (_selectedShop == null) return;
 
-    final validLines = _lines.where((line) => line.product != null && line.quantity > 0).toList();
+    final validLines = _lines
+        .where((line) => line.product != null && line.quantity > 0)
+        .toList();
     if (validLines.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Add at least one item with quantity above zero.')),
+      messenger.showSnackBar(
+        const SnackBar(
+            content: Text('Add at least one item with quantity above zero.')),
       );
       return;
     }
@@ -269,9 +315,12 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
       items: items,
     );
 
-    await context.read<AppController>().createSale(sale);
+    final controller = context.read<AppController>();
+
+    await controller.createSale(sale);
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sale saved offline.')));
+    messenger
+        .showSnackBar(const SnackBar(content: Text('Sale saved offline.')));
     Navigator.pop(context);
   }
 
@@ -281,11 +330,27 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
         Expanded(child: Text(label)),
         Text(
           value,
-          style: TextStyle(fontWeight: strong ? FontWeight.w800 : FontWeight.w600, fontSize: strong ? 18 : 14),
+          style: TextStyle(
+              fontWeight: strong ? FontWeight.w800 : FontWeight.w600,
+              fontSize: strong ? 18 : 14),
         ),
       ],
     );
   }
+}
+
+List<Shop> _distinctShops(List<Shop> shops) {
+  final seen = <String>{};
+  final unique = <Shop>[];
+
+  for (final shop in shops) {
+    final key = '${shop.id ?? 'null'}|${shop.name}|${shop.area}';
+    if (seen.add(key)) {
+      unique.add(shop);
+    }
+  }
+
+  return unique;
 }
 
 class _SaleLineCard extends StatelessWidget {
@@ -316,15 +381,22 @@ class _SaleLineCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: Text('Item ${index + 1}', style: const TextStyle(fontWeight: FontWeight.w700))),
-              if (onRemove != null) IconButton(onPressed: onRemove, icon: const Icon(Icons.delete_outline_rounded)),
+              Expanded(
+                  child: Text('Item ${index + 1}',
+                      style: const TextStyle(fontWeight: FontWeight.w700))),
+              if (onRemove != null)
+                IconButton(
+                    onPressed: onRemove,
+                    icon: const Icon(Icons.delete_outline_rounded)),
             ],
           ),
           DropdownButtonFormField<Product>(
-            value: line.product,
+            initialValue: line.product,
             isExpanded: true,
             items: products
-                .map((product) => DropdownMenuItem<Product>(value: product, child: Text('${product.name} - ${product.sku}')))
+                .map((product) => DropdownMenuItem<Product>(
+                    value: product,
+                    child: Text('${product.name} - ${product.sku}')))
                 .toList(),
             decoration: const InputDecoration(
               labelText: 'Product',
@@ -362,7 +434,8 @@ class _SaleLineCard extends StatelessWidget {
               Expanded(
                 child: TextFormField(
                   controller: line.priceController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   decoration: const InputDecoration(
                     labelText: 'Unit price',
                     prefixIcon: Icon(Icons.currency_exchange_outlined),
@@ -380,7 +453,8 @@ class _SaleLineCard extends StatelessWidget {
           const SizedBox(height: 12),
           Align(
             alignment: Alignment.centerRight,
-            child: Text('Line total: ${AppFormatters.currency(line.total)}', style: const TextStyle(fontWeight: FontWeight.w700)),
+            child: Text('Line total: ${AppFormatters.currency(line.total)}',
+                style: const TextStyle(fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -412,7 +486,9 @@ class _InfoChip extends StatelessWidget {
         children: [
           Icon(icon, size: 18, color: scheme.primary),
           const SizedBox(width: 8),
-          Text(label, style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w700)),
+          Text(label,
+              style: TextStyle(
+                  color: scheme.primary, fontWeight: FontWeight.w700)),
         ],
       ),
     );

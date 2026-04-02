@@ -23,6 +23,18 @@ class Shop {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Shop &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name &&
+          area == other.area;
+
+  @override
+  int get hashCode => id.hashCode ^ name.hashCode ^ area.hashCode;
+
   Shop copyWith({
     int? id,
     String? name,
@@ -102,6 +114,17 @@ class Product {
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Product &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          sku == other.sku;
+
+  @override
+  int get hashCode => id.hashCode ^ sku.hashCode;
 
   Product copyWith({
     int? id,

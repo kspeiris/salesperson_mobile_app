@@ -27,17 +27,19 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
-    final start = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final start =
+        DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
     final end = start.add(const Duration(days: 1));
 
     return FutureBuilder<List<Shop>>(
       future: controller.fetchShops(),
       builder: (context, shopSnapshot) {
-        final shops = shopSnapshot.data ?? const <Shop>[];
+        final shops = _distinctShops(shopSnapshot.data ?? const <Shop>[]);
 
         return AppShell(
           title: 'Sales History',
-          subtitle: 'Review recorded sales by day, filter by shop, and void incorrect entries with an audit reason.',
+          subtitle:
+              'Review recorded sales by day, filter by shop, and void incorrect entries with an audit reason.',
           child: Column(
             children: [
               Row(
@@ -58,15 +60,17 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: DropdownButtonFormField<int?>(
-                      value: _shopId,
+                      initialValue: _shopId,
                       isExpanded: true,
                       decoration: const InputDecoration(
                         prefixIcon: Icon(Icons.storefront_outlined),
                         labelText: 'Shop filter',
                       ),
                       items: [
-                        const DropdownMenuItem<int?>(value: null, child: Text('All shops')),
-                        ...shops.map((shop) => DropdownMenuItem<int?>(value: shop.id, child: Text(shop.name))),
+                        const DropdownMenuItem<int?>(
+                            value: null, child: Text('All shops')),
+                        ...shops.map((shop) => DropdownMenuItem<int?>(
+                            value: shop.id, child: Text(shop.name))),
                       ],
                       onChanged: (value) => setState(() => _shopId = value),
                     ),
@@ -76,7 +80,8 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
               const SizedBox(height: 16),
               Expanded(
                 child: FutureBuilder<List<SaleRecord>>(
-                  future: controller.fetchSales(start: start, end: end, shopId: _shopId),
+                  future: controller.fetchSales(
+                      start: start, end: end, shopId: _shopId),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(child: CircularProgressIndicator());
@@ -87,7 +92,8 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                       return const EmptyState(
                         icon: Icons.receipt_long_outlined,
                         title: 'No sales recorded',
-                        message: 'Sales for the selected date will appear here.',
+                        message:
+                            'Sales for the selected date will appear here.',
                       );
                     }
 
@@ -106,33 +112,52 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                                   width: 48,
                                   height: 48,
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.10),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withValues(alpha: 0.10),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
-                                  child: const Icon(Icons.point_of_sale_rounded),
+                                  child:
+                                      const Icon(Icons.point_of_sale_rounded),
                                 ),
                                 const SizedBox(width: 14),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
                                           Expanded(
-                                            child: Text(sale.shopName, style: const TextStyle(fontWeight: FontWeight.w700)),
+                                            child: Text(sale.shopName,
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w700)),
                                           ),
-                                          _StatusChip(label: sale.isVoided ? 'Voided' : sale.paymentType),
+                                          _StatusChip(
+                                              label: sale.isVoided
+                                                  ? 'Voided'
+                                                  : sale.paymentType),
                                         ],
                                       ),
                                       const SizedBox(height: 6),
-                                      Text('${AppFormatters.time(sale.createdAt)} - ${sale.items.length} items'),
+                                      Text(
+                                          '${AppFormatters.time(sale.createdAt)} - ${sale.items.length} items'),
                                       if (sale.note.isNotEmpty) ...[
                                         const SizedBox(height: 6),
-                                        Text(sale.note, style: Theme.of(context).textTheme.bodySmall),
+                                        Text(sale.note,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall),
                                       ],
-                                      if (sale.voidReason != null && sale.voidReason!.isNotEmpty) ...[
+                                      if (sale.voidReason != null &&
+                                          sale.voidReason!.isNotEmpty) ...[
                                         const SizedBox(height: 6),
-                                        Text('Reason: ${sale.voidReason}', style: Theme.of(context).textTheme.bodySmall),
+                                        Text('Reason: ${sale.voidReason}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall),
                                       ],
                                     ],
                                   ),
@@ -141,7 +166,9 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text(AppFormatters.currency(sale.total), style: const TextStyle(fontWeight: FontWeight.w800)),
+                                    Text(AppFormatters.currency(sale.total),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w800)),
                                     const SizedBox(height: 8),
                                     PopupMenuButton<String>(
                                       enabled: !sale.isVoided,
@@ -149,7 +176,9 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                                         if (value == 'void') _voidSale(sale);
                                       },
                                       itemBuilder: (_) => const [
-                                        PopupMenuItem(value: 'void', child: Text('Void sale')),
+                                        PopupMenuItem(
+                                            value: 'void',
+                                            child: Text('Void sale')),
                                       ],
                                     ),
                                   ],
@@ -184,6 +213,8 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
 
   Future<void> _voidSale(SaleRecord sale) async {
     final reasonController = TextEditingController();
+    final controller = context.read<AppController>();
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -193,18 +224,38 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
           decoration: const InputDecoration(labelText: 'Reason'),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Void')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel')),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Void')),
         ],
       ),
     );
     if (confirmed == true && sale.id != null) {
-      final reason = reasonController.text.trim().isEmpty ? 'Manual void' : reasonController.text.trim();
-      await context.read<AppController>().voidSale(sale.id!, reason);
+      final reason = reasonController.text.trim().isEmpty
+          ? 'Manual void'
+          : reasonController.text.trim();
+      await controller.voidSale(sale.id!, reason);
       if (mounted) setState(() {});
     }
     reasonController.dispose();
   }
+}
+
+List<Shop> _distinctShops(List<Shop> shops) {
+  final seen = <String>{};
+  final unique = <Shop>[];
+
+  for (final shop in shops) {
+    final key = '${shop.id ?? 'null'}|${shop.name}|${shop.area}';
+    if (seen.add(key)) {
+      unique.add(shop);
+    }
+  }
+
+  return unique;
 }
 
 class _StatusChip extends StatelessWidget {
@@ -220,7 +271,11 @@ class _StatusChip extends StatelessWidget {
         color: const Color(0xFFF1ECE3),
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
+      child: Text(label,
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall
+              ?.copyWith(fontWeight: FontWeight.w700)),
     );
   }
 }

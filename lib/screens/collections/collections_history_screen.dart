@@ -11,7 +11,8 @@ class CollectionsHistoryScreen extends StatefulWidget {
   const CollectionsHistoryScreen({super.key});
 
   @override
-  State<CollectionsHistoryScreen> createState() => _CollectionsHistoryScreenState();
+  State<CollectionsHistoryScreen> createState() =>
+      _CollectionsHistoryScreenState();
 }
 
 class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
@@ -27,7 +28,8 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
-    final start = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final start =
+        DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
     final end = start.add(const Duration(days: 1));
 
     return FutureBuilder<List<Shop>>(
@@ -36,7 +38,8 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
         final shops = shopSnapshot.data ?? const <Shop>[];
         return AppShell(
           title: 'Collections History',
-          subtitle: 'Track every payment received from shops, review the payment method used, and void incorrect entries when needed.',
+          subtitle:
+              'Track every payment received from shops, review the payment method used, and void incorrect entries when needed.',
           child: Column(
             children: [
               Row(
@@ -57,15 +60,17 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: DropdownButtonFormField<int?>(
-                      value: _shopId,
+                      initialValue: _shopId,
                       isExpanded: true,
                       decoration: const InputDecoration(
                         prefixIcon: Icon(Icons.storefront_outlined),
                         labelText: 'Shop filter',
                       ),
                       items: [
-                        const DropdownMenuItem<int?>(value: null, child: Text('All shops')),
-                        ...shops.map((shop) => DropdownMenuItem<int?>(value: shop.id, child: Text(shop.name))),
+                        const DropdownMenuItem<int?>(
+                            value: null, child: Text('All shops')),
+                        ...shops.map((shop) => DropdownMenuItem<int?>(
+                            value: shop.id, child: Text(shop.name))),
                       ],
                       onChanged: (value) => setState(() => _shopId = value),
                     ),
@@ -75,7 +80,8 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
               const SizedBox(height: 16),
               Expanded(
                 child: FutureBuilder<List<CollectionRecord>>(
-                  future: controller.fetchCollections(start: start, end: end, shopId: _shopId),
+                  future: controller.fetchCollections(
+                      start: start, end: end, shopId: _shopId),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(child: CircularProgressIndicator());
@@ -86,7 +92,8 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                       return const EmptyState(
                         icon: Icons.receipt_long_outlined,
                         title: 'No collections recorded',
-                        message: 'Collections for the selected date will appear here.',
+                        message:
+                            'Collections for the selected date will appear here.',
                       );
                     }
 
@@ -105,33 +112,53 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                                   width: 48,
                                   height: 48,
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.12),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary
+                                        .withValues(alpha: 0.12),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
-                                  child: Icon(Icons.request_quote_outlined, color: Theme.of(context).colorScheme.secondary),
+                                  child: Icon(Icons.request_quote_outlined,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
                                 ),
                                 const SizedBox(width: 14),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
                                           Expanded(
-                                            child: Text(entry.shopName, style: const TextStyle(fontWeight: FontWeight.w700)),
+                                            child: Text(entry.shopName,
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w700)),
                                           ),
-                                          _HistoryChip(label: entry.isVoided ? 'Voided' : entry.paymentMethod),
+                                          _HistoryChip(
+                                              label: entry.isVoided
+                                                  ? 'Voided'
+                                                  : entry.paymentMethod),
                                         ],
                                       ),
                                       const SizedBox(height: 6),
                                       Text(AppFormatters.time(entry.createdAt)),
                                       if (entry.referenceNote.isNotEmpty) ...[
                                         const SizedBox(height: 6),
-                                        Text(entry.referenceNote, style: Theme.of(context).textTheme.bodySmall),
+                                        Text(entry.referenceNote,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall),
                                       ],
-                                      if (entry.voidReason != null && entry.voidReason!.isNotEmpty) ...[
+                                      if (entry.voidReason != null &&
+                                          entry.voidReason!.isNotEmpty) ...[
                                         const SizedBox(height: 6),
-                                        Text('Reason: ${entry.voidReason}', style: Theme.of(context).textTheme.bodySmall),
+                                        Text('Reason: ${entry.voidReason}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall),
                                       ],
                                     ],
                                   ),
@@ -140,15 +167,21 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text(AppFormatters.currency(entry.amount), style: const TextStyle(fontWeight: FontWeight.w800)),
+                                    Text(AppFormatters.currency(entry.amount),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w800)),
                                     const SizedBox(height: 8),
                                     PopupMenuButton<String>(
                                       enabled: !entry.isVoided,
                                       onSelected: (value) {
-                                        if (value == 'void') _voidCollection(entry);
+                                        if (value == 'void') {
+                                          _voidCollection(entry);
+                                        }
                                       },
                                       itemBuilder: (_) => const [
-                                        PopupMenuItem(value: 'void', child: Text('Void collection')),
+                                        PopupMenuItem(
+                                            value: 'void',
+                                            child: Text('Void collection')),
                                       ],
                                     ),
                                   ],
@@ -182,6 +215,7 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
   }
 
   Future<void> _voidCollection(CollectionRecord entry) async {
+    final controller = context.read<AppController>();
     final reasonController = TextEditingController();
     final confirmed = await showDialog<bool>(
       context: context,
@@ -192,14 +226,21 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
           decoration: const InputDecoration(labelText: 'Reason'),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Void')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel')),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Void')),
         ],
       ),
     );
+
     if (confirmed == true && entry.id != null) {
-      final reason = reasonController.text.trim().isEmpty ? 'Manual void' : reasonController.text.trim();
-      await context.read<AppController>().voidCollection(entry.id!, reason);
+      final reason = reasonController.text.trim().isEmpty
+          ? 'Manual void'
+          : reasonController.text.trim();
+      await controller.voidCollection(entry.id!, reason);
       if (mounted) setState(() {});
     }
     reasonController.dispose();
@@ -219,7 +260,11 @@ class _HistoryChip extends StatelessWidget {
         color: const Color(0xFFF1ECE3),
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
+      child: Text(label,
+          style: Theme.of(context)
+              .textTheme
+              .bodySmall
+              ?.copyWith(fontWeight: FontWeight.w700)),
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -33,8 +32,10 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
               children: [
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: const CircleAvatar(child: Icon(Icons.upload_file_outlined)),
-                  title: const Text('CSV / JSON export', style: TextStyle(fontWeight: FontWeight.w700)),
+                  leading: const CircleAvatar(
+                      child: Icon(Icons.upload_file_outlined)),
+                  title: const Text('CSV / JSON export',
+                      style: TextStyle(fontWeight: FontWeight.w700)),
                   subtitle: Text(controller.lastExportBundle == null
                       ? 'Generate from Reports screen for manual desktop import.'
                       : 'Last files are ready for sharing or saving.'),
@@ -48,17 +49,25 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
                       runSpacing: 8,
                       children: [
                         OutlinedButton.icon(
-                          onPressed: _working ? null : () => controller.shareExportBundle(),
+                          onPressed: _working
+                              ? null
+                              : () => controller.shareExportBundle(),
                           icon: const Icon(Icons.share_outlined),
                           label: const Text('Share Files'),
                         ),
                         OutlinedButton.icon(
-                          onPressed: _working ? null : () => _saveExport(controller.lastExportBundle!.csvFile),
+                          onPressed: _working
+                              ? null
+                              : () => _saveExport(
+                                  controller.lastExportBundle!.csvFile),
                           icon: const Icon(Icons.save_alt_outlined),
                           label: const Text('Save CSV'),
                         ),
                         OutlinedButton.icon(
-                          onPressed: _working ? null : () => _saveExport(controller.lastExportBundle!.jsonFile),
+                          onPressed: _working
+                              ? null
+                              : () => _saveExport(
+                                  controller.lastExportBundle!.jsonFile),
                           icon: const Icon(Icons.code_outlined),
                           label: const Text('Save JSON'),
                         ),
@@ -76,8 +85,10 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
               children: [
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: const CircleAvatar(child: Icon(Icons.backup_outlined)),
-                  title: const Text('Create SQLite backup', style: TextStyle(fontWeight: FontWeight.w700)),
+                  leading:
+                      const CircleAvatar(child: Icon(Icons.backup_outlined)),
+                  title: const Text('Create SQLite backup',
+                      style: TextStyle(fontWeight: FontWeight.w700)),
                   subtitle: Text(controller.lastBackupPath == null
                       ? 'Create a local .db file copy of the app database.'
                       : 'Last backup saved locally at ${controller.lastBackupPath!.split('/').last}'),
@@ -93,7 +104,9 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
                     ),
                     if (controller.lastBackupPath != null)
                       OutlinedButton.icon(
-                        onPressed: _working ? null : () => _saveBackup(controller.lastBackupPath!),
+                        onPressed: _working
+                            ? null
+                            : () => _saveBackup(controller.lastBackupPath!),
                         icon: const Icon(Icons.save_alt_outlined),
                         label: const Text('Save Backup Copy'),
                       ),
@@ -114,19 +127,31 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
               children: [
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: const CircleAvatar(child: Icon(Icons.storefront_outlined)),
-                  title: const Text('Import Shops', style: TextStyle(fontWeight: FontWeight.w700)),
-                  subtitle: const Text('Load CSV or JSON-like text files for offline shop master data.'),
+                  leading: const CircleAvatar(
+                      child: Icon(Icons.storefront_outlined)),
+                  title: const Text('Import Shops',
+                      style: TextStyle(fontWeight: FontWeight.w700)),
+                  subtitle: const Text(
+                      'Load CSV or JSON-like text files for offline shop master data.'),
                   trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ShopImportScreen())),
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const ShopImportScreen())),
                 ),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: const CircleAvatar(child: Icon(Icons.inventory_2_outlined)),
-                  title: const Text('Import Products', style: TextStyle(fontWeight: FontWeight.w700)),
-                  subtitle: const Text('Load SKU, pricing, description, and barcode master data.'),
+                  leading: const CircleAvatar(
+                      child: Icon(Icons.inventory_2_outlined)),
+                  title: const Text('Import Products',
+                      style: TextStyle(fontWeight: FontWeight.w700)),
+                  subtitle: const Text(
+                      'Load SKU, pricing, description, and barcode master data.'),
                   trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductImportScreen())),
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const ProductImportScreen())),
                 ),
               ],
             ),
@@ -142,7 +167,9 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
     if (!mounted) return;
     setState(() => _working = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(savedPath == null ? 'Save cancelled.' : 'Saved to $savedPath')),
+      SnackBar(
+          content: Text(
+              savedPath == null ? 'Save cancelled.' : 'Saved to $savedPath')),
     );
   }
 
@@ -152,7 +179,10 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
     if (!mounted) return;
     setState(() => _working = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(backupPath == null ? 'Backup failed.' : 'Backup created at $backupPath')),
+      SnackBar(
+          content: Text(backupPath == null
+              ? 'Backup failed.'
+              : 'Backup created at $backupPath')),
     );
   }
 
@@ -162,33 +192,46 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
     if (!mounted) return;
     setState(() => _working = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(savedPath == null ? 'Save cancelled.' : 'Backup copy saved to $savedPath')),
+      SnackBar(
+          content: Text(savedPath == null
+              ? 'Save cancelled.'
+              : 'Backup copy saved to $savedPath')),
     );
   }
 
   Future<void> _restoreBackup() async {
+    final controller = context.read<AppController>();
+    final messenger = ScaffoldMessenger.of(context);
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Restore database backup?'),
-        content: const Text('This replaces the current local SQLite database with the selected backup file.'),
+        content: const Text(
+            'This replaces the current local SQLite database with the selected backup file.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Continue')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel')),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Continue')),
         ],
       ),
     );
     if (confirm != true) return;
 
-    final backupPath = await context.read<AppController>().pickBackupFile();
+    final backupPath = await controller.pickBackupFile();
     if (backupPath == null) return;
 
     setState(() => _working = true);
-    await context.read<AppController>().restoreBackup(backupPath);
+    await controller.restoreBackup(backupPath);
     if (!mounted) return;
     setState(() => _working = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Backup restored from ${File(backupPath).uri.pathSegments.last}')),
+    messenger.showSnackBar(
+      SnackBar(
+          content: Text(
+              'Backup restored from ${File(backupPath).uri.pathSegments.last}')),
     );
   }
 }
