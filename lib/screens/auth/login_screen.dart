@@ -249,9 +249,6 @@ class _IntroPanel extends StatelessWidget {
                     _Badge(
                         icon: Icons.wifi_off_rounded, label: 'Offline-First'),
                     _Badge(icon: Icons.insights_rounded, label: 'Insights'),
-                    _Badge(
-                        icon: Icons.verified_user_outlined,
-                        label: 'Enterprise'),
                   ],
                 ),
               ],

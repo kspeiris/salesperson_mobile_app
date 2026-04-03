@@ -524,9 +524,10 @@ class _HeroPanel extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final width = MediaQuery.of(context).size.width;
     final compact = width < 620;
+    final greeting = _greetingForHour(DateTime.now().hour);
 
     return Container(
-      constraints: BoxConstraints(minHeight: compact ? 394 : 424),
+      constraints: BoxConstraints(minHeight: compact ? 346 : 400),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(26),
         image: const DecorationImage(
@@ -561,41 +562,43 @@ class _HeroPanel extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Flexible(
-                    child: BrandLogo(
-                      height: compact ? 30 : 34,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 10),
-                      showPlate: true,
-                      alignment: Alignment.centerLeft,
-                      plateDecoration: BoxDecoration(
-                        color: const Color(0xFFF7FBF4),
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.75),
-                        ),
-                        boxShadow: const [
-                          BoxShadow(
-                            blurRadius: 16,
-                            offset: Offset(0, 6),
-                            color: Color(0x16000000),
-                          ),
-                        ],
+                  BrandLogo(
+                    height: compact ? 26 : 34,
+                    padding: EdgeInsets.symmetric(
+                        horizontal: compact ? 12 : 14,
+                        vertical: compact ? 8 : 10),
+                    showPlate: true,
+                    alignment: Alignment.centerLeft,
+                    plateDecoration: BoxDecoration(
+                      color: const Color(0xFFF7FBF4),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.75),
                       ),
+                      boxShadow: const [
+                        BoxShadow(
+                          blurRadius: 16,
+                          offset: Offset(0, 6),
+                          color: Color(0x16000000),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 12),
                   _HeroDateChip(
-                      label: AppFormatters.date(selectedDate),
-                      onTap: onDateTap),
+                    label: AppFormatters.date(selectedDate),
+                    onTap: onDateTap,
+                    compact: compact,
+                  ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Text(
-                'Good morning, $salesperson',
+                '$greeting, $salesperson',
                 style: (compact
                         ? textTheme.headlineSmall
                         : textTheme.headlineMedium)
@@ -618,62 +621,54 @@ class _HeroPanel extends StatelessWidget {
                 style: textTheme.bodyMedium?.copyWith(
                     color: Colors.white.withValues(alpha: 0.78), height: 1.5),
               ),
-              const SizedBox(height: 20),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  _HeroStatChip(
-                      label: '$totalOrders actions',
-                      icon: Icons.sync_alt_rounded),
-                  const _HeroStatChip(
-                      label: 'Offline ready', icon: Icons.wifi_off_rounded),
-                  _HeroStatChip(
-                    label: '${AppFormatters.currency(todaySales)} today',
-                    icon: Icons.payments_outlined,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 22),
+              const SizedBox(height: 16),
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final stacked = constraints.maxWidth < 560;
-                  if (stacked) {
+                  if (compact) {
                     return Column(
                       children: [
-                        _HeroActionButton(
-                          label: 'Record new sale',
-                          icon: Icons.add_shopping_cart_rounded,
-                          filled: true,
-                          onTap: onNewSale,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _HeroStatChip(
+                                label: '$totalOrders actions',
+                                icon: Icons.sync_alt_rounded,
+                                compact: true,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: _HeroStatChip(
+                                label: 'Offline ready',
+                                icon: Icons.wifi_off_rounded,
+                                compact: true,
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 12),
-                        _HeroActionButton(
-                          label: 'Record collection',
-                          icon: Icons.request_quote_outlined,
-                          onTap: onNewCollection,
+                        _HeroStatChip(
+                          label: '${AppFormatters.currency(todaySales)} today',
+                          icon: Icons.payments_outlined,
+                          compact: true,
+                          fullWidth: true,
                         ),
                       ],
                     );
                   }
 
-                  return Row(
+                  return Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
                     children: [
-                      Expanded(
-                        child: _HeroActionButton(
-                          label: 'Record new sale',
-                          icon: Icons.add_shopping_cart_rounded,
-                          filled: true,
-                          onTap: onNewSale,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _HeroActionButton(
-                          label: 'Record collection',
-                          icon: Icons.request_quote_outlined,
-                          onTap: onNewCollection,
-                        ),
+                      _HeroStatChip(
+                          label: '$totalOrders actions',
+                          icon: Icons.sync_alt_rounded),
+                      const _HeroStatChip(
+                          label: 'Offline ready', icon: Icons.wifi_off_rounded),
+                      _HeroStatChip(
+                        label: '${AppFormatters.currency(todaySales)} today',
+                        icon: Icons.payments_outlined,
                       ),
                     ],
                   );
@@ -685,16 +680,24 @@ class _HeroPanel extends StatelessWidget {
       ),
     );
   }
+
+  String _greetingForHour(int hour) {
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  }
 }
 
 class _HeroDateChip extends StatelessWidget {
   const _HeroDateChip({
     required this.label,
     required this.onTap,
+    this.compact = false,
   });
 
   final String label;
   final VoidCallback onTap;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -703,17 +706,21 @@ class _HeroDateChip extends StatelessWidget {
       borderRadius: BorderRadius.circular(999),
       child: _HeroGlassBadge(
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: EdgeInsets.symmetric(
+              horizontal: compact ? 12 : 14, vertical: compact ? 10 : 12),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.calendar_today_outlined,
-                  size: 18, color: Colors.white),
-              const SizedBox(width: 8),
+              Icon(Icons.calendar_today_outlined,
+                  size: compact ? 16 : 18, color: Colors.white),
+              SizedBox(width: compact ? 6 : 8),
               Text(
                 label,
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: compact ? 14 : 16,
+                ),
               ),
             ],
           ),
@@ -727,27 +734,43 @@ class _HeroStatChip extends StatelessWidget {
   const _HeroStatChip({
     required this.label,
     required this.icon,
+    this.compact = false,
+    this.fullWidth = false,
   });
 
   final String label;
   final IconData icon;
+  final bool compact;
+  final bool fullWidth;
 
   @override
   Widget build(BuildContext context) {
-    return _HeroGlassBadge(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 18, color: Colors.white),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.w700),
-            ),
-          ],
+    return SizedBox(
+      width: fullWidth ? double.infinity : null,
+      child: _HeroGlassBadge(
+        child: Padding(
+          padding:
+              EdgeInsets.symmetric(horizontal: compact ? 12 : 14, vertical: 10),
+          child: Row(
+            mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisAlignment:
+                fullWidth ? MainAxisAlignment.center : MainAxisAlignment.start,
+            children: [
+              Icon(icon, size: compact ? 16 : 18, color: Colors.white),
+              SizedBox(width: compact ? 6 : 8),
+              Flexible(
+                child: Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: compact ? 14 : 15,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -41,24 +41,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
           'Generate daily PDF summaries and CSV/JSON export bundles for desktop system entry.',
       headerImageAsset: AppAssets.reportsHero,
       pageBackgroundAsset: AppAssets.pageTexture,
-      header: Wrap(
-        spacing: 12,
-        runSpacing: 12,
-        children: [
-          _HeaderChip(
-            icon: Icons.calendar_today_outlined,
-            label: AppFormatters.date(_selectedDate),
-          ),
-          _HeaderChip(
-            icon: Icons.badge_outlined,
-            label: controller.currentSalesperson,
-          ),
-          const _HeaderChip(
-            icon: Icons.cloud_off_outlined,
-            label: 'Generated locally',
-          ),
-        ],
-      ),
       child: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         children: [

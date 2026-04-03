@@ -116,7 +116,7 @@ class _ShellHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasImage = headerImageAsset != null;
-    final imageMinHeight = compact ? 176.0 : 224.0;
+    final imageMinHeight = compact ? 156.0 : 196.0;
     final panelRadius = BorderRadius.circular(24);
 
     return Container(
@@ -172,8 +172,8 @@ class _ShellHeaderCard extends StatelessWidget {
               right: compact ? -30 : -12,
               top: compact ? -20 : -12,
               child: Container(
-                width: compact ? 120 : 160,
-                height: compact ? 120 : 160,
+                width: compact ? 108 : 140,
+                height: compact ? 108 : 140,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white.withValues(alpha: 0.14),
@@ -184,8 +184,8 @@ class _ShellHeaderCard extends StatelessWidget {
               left: compact ? -22 : -10,
               bottom: compact ? -42 : -54,
               child: Container(
-                width: compact ? 100 : 136,
-                height: compact ? 100 : 136,
+                width: compact ? 88 : 120,
+                height: compact ? 88 : 120,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: const Color(0xFF9FD9A9).withValues(alpha: 0.14),
@@ -193,7 +193,7 @@ class _ShellHeaderCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(compact ? 18 : 22),
+              padding: EdgeInsets.all(compact ? 14 : 18),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: ClipRRect(
@@ -203,9 +203,9 @@ class _ShellHeaderCard extends StatelessWidget {
                     child: Container(
                       constraints: BoxConstraints(
                         maxWidth:
-                            hasImage ? (compact ? 238 : 430) : double.infinity,
+                            hasImage ? (compact ? 226 : 392) : double.infinity,
                       ),
-                      padding: EdgeInsets.all(compact ? 18 : 24),
+                      padding: EdgeInsets.all(compact ? 16 : 20),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(22),
                         color: Colors.white
@@ -238,7 +238,7 @@ class _ShellHeaderCard extends StatelessWidget {
                                 ),
                           ),
                           if (subtitle != null) ...[
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 8),
                             Text(
                               subtitle!,
                               maxLines: compact ? 4 : 3,
@@ -248,12 +248,12 @@ class _ShellHeaderCard extends StatelessWidget {
                                   .bodyMedium
                                   ?.copyWith(
                                     color: Colors.white.withValues(alpha: 0.84),
-                                    height: 1.45,
+                                    height: 1.35,
                                   ),
                             ),
                           ],
                           if (header != null) ...[
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 16),
                             header!,
                           ],
                         ],
