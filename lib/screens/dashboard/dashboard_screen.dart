@@ -305,40 +305,53 @@ class _SmartSuggestionBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF8E1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFFFD54F)),
+        color: const Color(0xFFF1F8E9),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFC8E6C9)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A2E7D32),
+            blurRadius: 16,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.amber.shade200,
-              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x0A000000),
+                  blurRadius: 8,
+                )
+              ],
             ),
-            child: const Icon(Icons.lightbulb_outline_rounded, color: Colors.amber, size: 24),
+            child: const Icon(Icons.auto_awesome_rounded, color: Color(0xFF2E7D32), size: 24),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Smart Suggestion',
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.brown),
+                  'Route Strategy Tip',
+                  style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF1B5E20), fontSize: 13, letterSpacing: 0.2),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '3 shops on your route haven\'t made a payment this week. Consider following up today.',
-                  style: TextStyle(fontSize: 13, color: Colors.brown.shade700),
+                  'Your area "Colombo 07" has 3 shops with overdue balances. Prioritize collections today to maintain account limits.',
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade800, height: 1.4),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.chevron_right_rounded, color: Colors.brown),
+          const Icon(Icons.chevron_right_rounded, color: Color(0xFF2E7D32)),
         ],
       ),
     );
