@@ -55,86 +55,87 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
             backgroundColor: const Color(0xFF2E7D32),
             foregroundColor: Colors.white,
           ),
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.all(compact ? 16 : 18),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.78),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: const Color(0xFFDDE6DF)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Filters',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w800)),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Choose a day or shop to focus on the right collection records.',
-                      style: Theme.of(context).textTheme.bodySmall,
+          child: FutureBuilder<List<CollectionRecord>>(
+            future: controller.fetchCollections(
+                start: start, end: end, shopId: _shopId),
+            builder: (context, snapshot) {
+              final collections = snapshot.data;
+
+              return ListView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: const EdgeInsets.only(bottom: 96),
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(compact ? 16 : 18),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.78),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: const Color(0xFFDDE6DF)),
                     ),
-                    const SizedBox(height: 16),
-                    InkWell(
-                      borderRadius: BorderRadius.circular(18),
-                      onTap: _pickDate,
-                      child: InputDecorator(
-                        decoration: const InputDecoration(
-                          prefixIcon: Icon(Icons.calendar_month_outlined),
-                          labelText: 'Date',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Filters',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Choose a day or shop to focus on the right collection records.',
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
-                        child: Text(AppFormatters.date(_selectedDate)),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<int?>(
-                      initialValue: _shopId,
-                      isExpanded: true,
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.storefront_outlined),
-                        labelText: 'Shop filter',
-                      ),
-                      items: [
-                        const DropdownMenuItem<int?>(
-                            value: null, child: Text('All shops')),
-                        ...shops.map((shop) => DropdownMenuItem<int?>(
-                            value: shop.id, child: Text(shop.name))),
+                        const SizedBox(height: 16),
+                        InkWell(
+                          borderRadius: BorderRadius.circular(18),
+                          onTap: _pickDate,
+                          child: InputDecorator(
+                            decoration: const InputDecoration(
+                              prefixIcon: Icon(Icons.calendar_month_outlined),
+                              labelText: 'Date',
+                            ),
+                            child: Text(AppFormatters.date(_selectedDate)),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        DropdownButtonFormField<int?>(
+                          initialValue: _shopId,
+                          isExpanded: true,
+                          decoration: const InputDecoration(
+                            prefixIcon: Icon(Icons.storefront_outlined),
+                            labelText: 'Shop filter',
+                          ),
+                          items: [
+                            const DropdownMenuItem<int?>(
+                                value: null, child: Text('All shops')),
+                            ...shops.map((shop) => DropdownMenuItem<int?>(
+                                value: shop.id, child: Text(shop.name))),
+                          ],
+                          onChanged: (value) => setState(() => _shopId = value),
+                        ),
                       ],
-                      onChanged: (value) => setState(() => _shopId = value),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: FutureBuilder<List<CollectionRecord>>(
-                  future: controller.fetchCollections(
-                      start: start, end: end, shopId: _shopId),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    final collections = snapshot.data!;
-                    if (collections.isEmpty) {
-                      return const EmptyState(
-                        icon: Icons.receipt_long_outlined,
-                        title: 'No collections recorded',
-                        message:
-                            'Collections for the selected date will appear here.',
-                        imageAsset: AppAssets.emptyStateHero,
-                      );
-                    }
-
-                    return ListView.separated(
-                      itemCount: collections.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final entry = collections[index];
-                        return Container(
+                  ),
+                  const SizedBox(height: 16),
+                  if (!snapshot.hasData)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 32),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (collections!.isEmpty)
+                    const EmptyState(
+                      icon: Icons.receipt_long_outlined,
+                      title: 'No collections recorded',
+                      message:
+                          'Collections for the selected date will appear here.',
+                      imageAsset: AppAssets.emptyStateHero,
+                    )
+                  else
+                    ...collections.map((entry) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.82),
@@ -235,13 +236,12 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                               ],
                             ],
                           ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
+                        ),
+                      );
+                    }),
+                ],
+              );
+            },
           ),
         );
       },

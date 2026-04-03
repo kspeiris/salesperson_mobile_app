@@ -53,92 +53,94 @@ class _ShopsScreenState extends State<ShopsScreen> {
           tooltip: 'Add Shop',
         ),
       ],
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(compact ? 16 : 18),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE8F5E9)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Search customer records quickly, then import shops or add a new account from the same workspace.',
-                  style: Theme.of(context).textTheme.bodySmall,
+      child: FutureBuilder<List<Shop>>(
+        future: controller.fetchShops(query: _query),
+        builder: (context, snapshot) {
+          final shops = snapshot.data;
+
+          return ListView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: const EdgeInsets.only(bottom: 24),
+            children: [
+              Container(
+                padding: EdgeInsets.all(compact ? 16 : 18),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE8F5E9)),
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search by shop name, area, or owner',
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    suffixIcon: _query.isEmpty
-                        ? null
-                        : IconButton(
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _query = '');
-                            },
-                            icon: const Icon(Icons.close_rounded),
-                          ),
-                  ),
-                  onChanged: (value) => setState(() => _query = value),
-                ),
-                const SizedBox(height: 14),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    OutlinedButton.icon(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const ShopImportScreen()),
-                      ),
-                      icon: const Icon(Icons.download_for_offline_outlined),
-                      label: const Text('Import'),
+                    Text(
+                      'Search customer records quickly, then import shops or add a new account from the same workspace.',
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
-                    FilledButton.icon(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const ShopFormScreen()),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search by shop name, area, or owner',
+                        prefixIcon: const Icon(Icons.search_rounded),
+                        suffixIcon: _query.isEmpty
+                            ? null
+                            : IconButton(
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() => _query = '');
+                                },
+                                icon: const Icon(Icons.close_rounded),
+                              ),
                       ),
-                      icon: const Icon(Icons.add_business_outlined),
-                      label: const Text('Add Shop'),
+                      onChanged: (value) => setState(() => _query = value),
+                    ),
+                    const SizedBox(height: 14),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const ShopImportScreen()),
+                          ),
+                          icon: const Icon(Icons.download_for_offline_outlined),
+                          label: const Text('Import'),
+                        ),
+                        FilledButton.icon(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const ShopFormScreen()),
+                          ),
+                          icon: const Icon(Icons.add_business_outlined),
+                          label: const Text('Add Shop'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: FutureBuilder<List<Shop>>(
-              future: controller.fetchShops(query: _query),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final shops = snapshot.data!;
-                if (shops.isEmpty) {
-                  return const EmptyState(
-                    icon: Icons.storefront_outlined,
-                    title: 'No shops found',
-                    message:
-                        'Add your first shop or import a CSV file to start recording sales and collections.',
-                    imageAsset: AppAssets.emptyStateHero,
-                  );
-                }
-                return ListView.separated(
-                  itemCount: shops.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final shop = shops[index];
-                    return Container(
+              ),
+              const SizedBox(height: 20),
+              if (!snapshot.hasData)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (shops!.isEmpty)
+                const EmptyState(
+                  icon: Icons.storefront_outlined,
+                  title: 'No shops found',
+                  message:
+                      'Add your first shop or import a CSV file to start recording sales and collections.',
+                  imageAsset: AppAssets.emptyStateHero,
+                )
+              else
+                ...shops.map((shop) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
@@ -250,13 +252,12 @@ class _ShopsScreenState extends State<ShopsScreen> {
                           ),
                         ],
                       ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+                    ),
+                  );
+                }),
+            ],
+          );
+        },
       ),
     );
   }

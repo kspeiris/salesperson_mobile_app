@@ -81,95 +81,97 @@ class _ProductsScreenState extends State<ProductsScreen> {
           tooltip: 'Add Product',
         ),
       ],
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(compact ? 16 : 18),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE8F5E9)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Search the catalog quickly, then import or add products without leaving this screen.',
-                  style: Theme.of(context).textTheme.bodySmall,
+      child: FutureBuilder<List<Product>>(
+        future: controller.fetchProducts(query: _query),
+        builder: (context, snapshot) {
+          final products = snapshot.data;
+
+          return ListView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: const EdgeInsets.only(bottom: 24),
+            children: [
+              Container(
+                padding: EdgeInsets.all(compact ? 16 : 18),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE8F5E9)),
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search by product name, SKU, or barcode',
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    suffixIcon: _query.isEmpty
-                        ? null
-                        : IconButton(
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _query = '');
-                            },
-                            icon: const Icon(Icons.close_rounded),
-                          ),
-                  ),
-                  onChanged: (value) => setState(() => _query = value),
-                ),
-                const SizedBox(height: 14),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    OutlinedButton.icon(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const ProductImportScreen()),
-                      ),
-                      icon: const Icon(Icons.download_for_offline_outlined),
-                      label: const Text('Import'),
+                    Text(
+                      'Search the catalog quickly, then import or add products without leaving this screen.',
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
-                    FilledButton.icon(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const ProductFormScreen()),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search by product name, SKU, or barcode',
+                        prefixIcon: const Icon(Icons.search_rounded),
+                        suffixIcon: _query.isEmpty
+                            ? null
+                            : IconButton(
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() => _query = '');
+                                },
+                                icon: const Icon(Icons.close_rounded),
+                              ),
                       ),
-                      icon: const Icon(Icons.add_box_outlined),
-                      label: const Text('Add Product'),
+                      onChanged: (value) => setState(() => _query = value),
+                    ),
+                    const SizedBox(height: 14),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const ProductImportScreen()),
+                          ),
+                          icon: const Icon(Icons.download_for_offline_outlined),
+                          label: const Text('Import'),
+                        ),
+                        FilledButton.icon(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const ProductFormScreen()),
+                          ),
+                          icon: const Icon(Icons.add_box_outlined),
+                          label: const Text('Add Product'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: FutureBuilder<List<Product>>(
-              future: controller.fetchProducts(query: _query),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final products = snapshot.data!;
-                if (products.isEmpty) {
-                  return const EmptyState(
-                    icon: Icons.inventory_2_outlined,
-                    title: 'No products found',
-                    message:
-                        'Add Bio Care products locally or import a CSV file.',
-                    imageAsset: AppAssets.emptyStateHero,
-                  );
-                }
-                return ListView.separated(
-                  itemCount: products.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final product = products[index];
-                    final productIcon = _getProductIcon(product.name);
-                    final iconColor = _getProductColor(product.name);
+              ),
+              const SizedBox(height: 20),
+              if (!snapshot.hasData)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (products!.isEmpty)
+                const EmptyState(
+                  icon: Icons.inventory_2_outlined,
+                  title: 'No products found',
+                  message:
+                      'Add Bio Care products locally or import a CSV file.',
+                  imageAsset: AppAssets.emptyStateHero,
+                )
+              else
+                ...products.map((product) {
+                  final productIcon = _getProductIcon(product.name);
+                  final iconColor = _getProductColor(product.name);
 
-                    return Container(
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Container(
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -251,13 +253,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           ),
                         ],
                       ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+                    ),
+                  );
+                }),
+            ],
+          );
+        },
       ),
     );
   }

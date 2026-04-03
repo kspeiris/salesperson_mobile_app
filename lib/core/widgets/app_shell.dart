@@ -34,6 +34,7 @@ class AppShell extends StatelessWidget {
     final compact = width < 560;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         automaticallyImplyLeading: showBack,
         title: Text(title),
@@ -41,41 +42,52 @@ class AppShell extends StatelessWidget {
         bottom: bottom,
       ),
       floatingActionButton: floatingActionButton,
-      body: SafeArea(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            image: pageBackgroundAsset == null
-                ? null
-                : DecorationImage(
-                    image: AssetImage(pageBackgroundAsset!),
-                    fit: BoxFit.cover,
-                    alignment: Alignment.topCenter,
-                    opacity: 0.06,
+      body: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: SafeArea(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              image: pageBackgroundAsset == null
+                  ? null
+                  : DecorationImage(
+                      image: AssetImage(pageBackgroundAsset!),
+                      fit: BoxFit.cover,
+                      alignment: Alignment.topCenter,
+                      opacity: 0.06,
+                    ),
+            ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1040),
+                child: AnimatedPadding(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeOut,
+                  padding: EdgeInsets.fromLTRB(
+                    compact ? 16 : 24,
+                    8,
+                    compact ? 16 : 24,
+                    (compact ? 16 : 24) +
+                        MediaQuery.of(context).viewInsets.bottom,
                   ),
-          ),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1040),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                    compact ? 16 : 24, 8, compact ? 16 : 24, compact ? 16 : 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (subtitle != null || header != null)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 24),
-                        child: _ShellHeaderCard(
-                          title: title,
-                          subtitle: subtitle,
-                          header: header,
-                          compact: compact,
-                          headerImageAsset: headerImageAsset,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (subtitle != null || header != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 24),
+                          child: _ShellHeaderCard(
+                            title: title,
+                            subtitle: subtitle,
+                            header: header,
+                            compact: compact,
+                            headerImageAsset: headerImageAsset,
+                          ),
                         ),
-                      ),
-                    Expanded(child: child),
-                  ],
+                      Expanded(child: child),
+                    ],
+                  ),
                 ),
               ),
             ),

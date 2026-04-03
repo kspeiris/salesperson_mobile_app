@@ -50,139 +50,142 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const SaleEntryScreen())),
           ),
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.all(compact ? 18 : 22),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FCF8).withValues(alpha: 0.92),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: const Color(0xFFD8E9DA)),
-                  boxShadow: const [
-                    BoxShadow(
-                      blurRadius: 24,
-                      offset: Offset(0, 14),
-                      color: Color(0x102E7D32),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFEEF8EF), Color(0xFFDCEFD9)],
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.tune_rounded,
-                            color: Color(0xFF2E7D32),
-                          ),
+          child: FutureBuilder<List<SaleRecord>>(
+            future:
+                controller.fetchSales(start: start, end: end, shopId: _shopId),
+            builder: (context, snapshot) {
+              final sales = snapshot.data;
+
+              return ListView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: const EdgeInsets.only(bottom: 96),
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(compact ? 18 : 22),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8FCF8).withValues(alpha: 0.92),
+                      borderRadius: BorderRadius.circular(28),
+                      border: Border.all(color: const Color(0xFFD8E9DA)),
+                      boxShadow: const [
+                        BoxShadow(
+                          blurRadius: 24,
+                          offset: Offset(0, 14),
+                          color: Color(0x102E7D32),
                         ),
-                        const SizedBox(width: 12),
-                        Text('Filters',
-                            style: theme.textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w800)),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Narrow the list by date or shop to review the correct sales quickly.',
-                      style: theme.textTheme.bodySmall
-                          ?.copyWith(color: const Color(0xFF6E8472)),
-                    ),
-                    const SizedBox(height: 18),
-                    _FilterField(
-                      label: 'Date',
-                      icon: Icons.calendar_month_rounded,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(20),
-                        onTap: _pickDate,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 3),
-                          child: Text(
-                            AppFormatters.date(_selectedDate),
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF35533B),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFEEF8EF),
+                                    Color(0xFFDCEFD9)
+                                  ],
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.tune_rounded,
+                                color: Color(0xFF2E7D32),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text('Filters',
+                                style: theme.textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.w800)),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Narrow the list by date or shop to review the correct sales quickly.',
+                          style: theme.textTheme.bodySmall
+                              ?.copyWith(color: const Color(0xFF6E8472)),
+                        ),
+                        const SizedBox(height: 18),
+                        _FilterField(
+                          label: 'Date',
+                          icon: Icons.calendar_month_rounded,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: _pickDate,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 3),
+                              child: Text(
+                                AppFormatters.date(_selectedDate),
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF35533B),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    _FilterField(
-                      label: 'Shop filter',
-                      icon: Icons.store_rounded,
-                      trailing: const Icon(Icons.keyboard_arrow_down_rounded,
-                          color: Color(0xFF4E6B53)),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<int?>(
-                          value: _shopId,
-                          isExpanded: true,
-                          dropdownColor: Colors.white,
-                          borderRadius: BorderRadius.circular(18),
-                          icon: const SizedBox.shrink(),
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF223327),
+                        const SizedBox(height: 14),
+                        _FilterField(
+                          label: 'Shop filter',
+                          icon: Icons.store_rounded,
+                          trailing: const Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: Color(0xFF4E6B53)),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<int?>(
+                              value: _shopId,
+                              isExpanded: true,
+                              dropdownColor: Colors.white,
+                              borderRadius: BorderRadius.circular(18),
+                              icon: const SizedBox.shrink(),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF223327),
+                              ),
+                              items: [
+                                const DropdownMenuItem<int?>(
+                                    value: null, child: Text('All shops')),
+                                ...shops.map((shop) => DropdownMenuItem<int?>(
+                                    value: shop.id, child: Text(shop.name))),
+                              ],
+                              onChanged: (value) =>
+                                  setState(() => _shopId = value),
+                            ),
                           ),
-                          items: [
-                            const DropdownMenuItem<int?>(
-                                value: null, child: Text('All shops')),
-                            ...shops.map((shop) => DropdownMenuItem<int?>(
-                                value: shop.id, child: Text(shop.name))),
-                          ],
-                          onChanged: (value) => setState(() => _shopId = value),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  if (!snapshot.hasData)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 32),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (sales!.isEmpty)
+                    const EmptyState(
+                      icon: Icons.receipt_long_outlined,
+                      title: 'No sales recorded',
+                      message: 'Sales for the selected date will appear here.',
+                      imageAsset: AppAssets.emptyStateHero,
+                    )
+                  else
+                    ...sales.map(
+                      (sale) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: _SaleHistoryCard(
+                          sale: sale,
+                          onVoid: sale.isVoided ? null : () => _voidSale(sale),
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: FutureBuilder<List<SaleRecord>>(
-                  future: controller.fetchSales(
-                      start: start, end: end, shopId: _shopId),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    final sales = snapshot.data!;
-                    if (sales.isEmpty) {
-                      return const EmptyState(
-                        icon: Icons.receipt_long_outlined,
-                        title: 'No sales recorded',
-                        message:
-                            'Sales for the selected date will appear here.',
-                        imageAsset: AppAssets.emptyStateHero,
-                      );
-                    }
-
-                    return ListView.separated(
-                      padding: const EdgeInsets.only(bottom: 96),
-                      itemCount: sales.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 16),
-                      itemBuilder: (context, index) {
-                        final sale = sales[index];
-                        return _SaleHistoryCard(
-                          sale: sale,
-                          onVoid: sale.isVoided ? null : () => _voidSale(sale),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
+                ],
+              );
+            },
           ),
         );
       },
