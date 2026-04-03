@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/widgets/brand_logo.dart';
 import '../../core/widgets/metric_card.dart';
 import '../../core/widgets/section_card.dart';
 import '../collections/collection_entry_screen.dart';
@@ -381,48 +382,35 @@ class _HeroPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  width: compact ? 52 : 58,
-                  height: compact ? 52 : 58,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    _initialsFor(salesperson),
-                    style: textTheme.titleLarge?.copyWith(color: Colors.white),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Hello, $salesperson',
-                        style: textTheme.headlineSmall?.copyWith(color: Colors.white),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        companyName,
-                        style: textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.86)),
-                      ),
-                    ],
-                  ),
+                BrandLogo(
+                  height: compact ? 40 : 48,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  alignment: Alignment.centerLeft,
                 ),
                 _HeroDateChip(label: AppFormatters.date(selectedDate), onTap: onDateTap),
               ],
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 20),
+            Text(
+              'Hello, $salesperson',
+              style: (compact ? textTheme.headlineSmall : textTheme.headlineMedium)?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              companyName,
+              style: textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.86)),
+            ),
+            const SizedBox(height: 22),
             Text(
               'Stay on top of the route with clean daily totals, fast entry points, and a layout designed for quick mobile use in the field.',
               style: textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.82)),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 22),
             Wrap(
               spacing: 10,
               runSpacing: 10,
@@ -432,7 +420,7 @@ class _HeroPanel extends StatelessWidget {
                 const _HeroStatChip(label: 'Share reports later', icon: Icons.share_outlined),
               ],
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 28),
             LayoutBuilder(
               builder: (context, constraints) {
                 final stacked = constraints.maxWidth < 560;
@@ -445,7 +433,7 @@ class _HeroPanel extends StatelessWidget {
                         filled: true,
                         onTap: onNewSale,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       _HeroActionButton(
                         label: 'Record collection',
                         icon: Icons.request_quote_outlined,
@@ -465,7 +453,7 @@ class _HeroPanel extends StatelessWidget {
                         onTap: onNewSale,
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: _HeroActionButton(
                         label: 'Record collection',
@@ -481,13 +469,6 @@ class _HeroPanel extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  static String _initialsFor(String name) {
-    final parts = name.trim().split(RegExp(r'\s+')).where((part) => part.isNotEmpty).toList();
-    if (parts.isEmpty) return 'SR';
-    if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
-    return '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}'.toUpperCase();
   }
 }
 
@@ -576,27 +557,27 @@ class _HeroActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final background = filled ? Colors.white : Colors.white.withValues(alpha: 0.10);
+    final background = filled ? Colors.white : Colors.white.withValues(alpha: 0.08);
     final foreground = filled ? const Color(0xFF155C4A) : Colors.white;
 
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(22),
       child: Ink(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         decoration: BoxDecoration(
           color: background,
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: Colors.white.withValues(alpha: filled ? 0.0 : 0.16)),
+          border: Border.all(color: Colors.white.withValues(alpha: filled ? 0.0 : 0.18)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: foreground),
-            const SizedBox(width: 10),
+            Icon(icon, color: foreground, size: 22),
+            const SizedBox(width: 12),
             Text(
               label,
-              style: TextStyle(color: foreground, fontWeight: FontWeight.w700),
+              style: TextStyle(color: foreground, fontWeight: FontWeight.w800, fontSize: 16),
             ),
           ],
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/widgets/brand_logo.dart';
 import '../../screens/dashboard/dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -160,27 +161,22 @@ class _IntroPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: compact ? 58 : 68,
-              height: compact ? 58 : 68,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
-              ),
-              child: const Icon(Icons.waves_rounded, size: 32, color: Colors.white),
+            BrandLogo(
+              height: compact ? 44 : 54,
+              padding: EdgeInsets.all(compact ? 12 : 14),
+              alignment: Alignment.centerLeft,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Text(
-              'Bio Care Field Hub',
-              style: textTheme.headlineMedium?.copyWith(color: Colors.white),
+              'Active Aloe Field Hub',
+              style: textTheme.headlineMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Text(
-              '$companyName helps route teams capture orders, collections, and shop activity with a clean offline workflow built for daily field execution.',
+              '$companyName helps route teams capture orders, collections, and shop activity with a clean branded workflow built for daily field execution.',
               style: textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.88)),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 24),
             const Wrap(
               spacing: 10,
               runSpacing: 10,
@@ -190,19 +186,19 @@ class _IntroPanel extends StatelessWidget {
                 _TopBadge(icon: Icons.bar_chart_rounded, label: 'Reports ready'),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
             const _FeatureRow(
               icon: Icons.shopping_bag_outlined,
               title: 'Faster field capture',
               description: 'Move from shop visit to saved order in a few taps with a layout tuned for mobile use.',
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             const _FeatureRow(
               icon: Icons.payments_outlined,
               title: 'Collections stay visible',
               description: 'Keep balances, receipts, and follow-up activity easier to track during a busy route day.',
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             const _FeatureRow(
               icon: Icons.insert_chart_outlined_rounded,
               title: 'A better daily overview',
@@ -257,10 +253,14 @@ class _LoginCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Sign in to your route', style: Theme.of(context).textTheme.headlineSmall),
-              const SizedBox(height: 8),
-              const Text(
+              Text(
+                'Sign in to your route',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Text(
                 'Start with your salesperson name, unlock the workspace, and continue logging field activity even without internet access.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.4),
               ),
               const SizedBox(height: 24),
               TextFormField(
@@ -296,13 +296,16 @@ class _LoginCard extends StatelessWidget {
                   },
                 ),
               ],
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: onSubmit,
-                icon: const Icon(Icons.arrow_forward_rounded, size: 20),
-                label: const Text('Open workspace'),
+              const SizedBox(height: 28),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: onSubmit,
+                  icon: const Icon(Icons.arrow_forward_rounded, size: 20),
+                  label: const Text('Open workspace'),
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -325,6 +328,7 @@ class _LoginCard extends StatelessWidget {
                     const Expanded(
                       child: Text(
                         'Offline-first mode is active. Records stay safely on the device until you generate or share reports.',
+                        style: TextStyle(fontSize: 13, height: 1.4),
                       ),
                     ),
                   ],
@@ -406,12 +410,12 @@ class _FeatureRow extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: textTheme.titleMedium?.copyWith(color: Colors.white),
+                style: textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 description,
-                style: textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.80)),
+                style: textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.80), height: 1.4),
               ),
             ],
           ),
