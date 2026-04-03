@@ -130,35 +130,37 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                 SectionCard(
                   title: 'Payment Details',
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: RadioListTile<String>(
-                              title: const Text('Cash'),
-                              value: 'Cash',
-                              // ignore: deprecated_member_use
-                              groupValue: _paymentType,
-                              // ignore: deprecated_member_use
-                              onChanged: (value) => setState(() => _paymentType = value!),
-                              contentPadding: EdgeInsets.zero,
-                              activeColor: scheme.primary,
-                            ),
+                      const Text('Choose payment method:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF64748B))),
+                      const SizedBox(height: 12),
+                      SegmentedButton<String>(
+                        segments: const [
+                          ButtonSegment(
+                            value: 'Cash',
+                            label: Text('Cash'),
+                            icon: Icon(Icons.payments_rounded),
                           ),
-                          Expanded(
-                            child: RadioListTile<String>(
-                              title: const Text('Credit'),
-                              value: 'Credit',
-                              // ignore: deprecated_member_use
-                              groupValue: _paymentType,
-                              // ignore: deprecated_member_use
-                              onChanged: (value) => setState(() => _paymentType = value!),
-                              contentPadding: EdgeInsets.zero,
-                              activeColor: scheme.primary,
-                            ),
+                          ButtonSegment(
+                            value: 'Credit',
+                            label: Text('Credit'),
+                            icon: Icon(Icons.timer_rounded),
                           ),
                         ],
+                        selected: {_paymentType},
+                        onSelectionChanged: (Set<String> newSelection) {
+                          setState(() => _paymentType = newSelection.first);
+                        },
+                        showSelectedIcon: false,
+                        style: SegmentedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          selectedBackgroundColor: scheme.primary.withValues(alpha: 0.1),
+                          selectedForegroundColor: scheme.primary,
+                          side: BorderSide(color: scheme.primary.withValues(alpha: 0.2)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
                       ),
+                      const SizedBox(height: 24),
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _discountController,

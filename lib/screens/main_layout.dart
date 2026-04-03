@@ -37,11 +37,6 @@ class _MainLayoutState extends State<MainLayout> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: controller.currentTab,
         onDestinationSelected: (index) => controller.currentTab = index,
-        backgroundColor: Colors.white,
-        elevation: 8,
-        shadowColor: Colors.black.withValues(alpha: 0.2),
-        indicatorColor: scheme.primary.withValues(alpha: 0.1),
-        surfaceTintColor: Colors.transparent,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),

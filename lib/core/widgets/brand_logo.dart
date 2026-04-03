@@ -34,20 +34,45 @@ class BrandLogo extends StatelessWidget {
 
     if (showPlate) {
       content = Container(
-        padding: padding,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFE8F5E9)),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x0A000000),
-              blurRadius: 12,
+              color: Color(0x052E7D32),
+              blurRadius: 16,
               offset: Offset(0, 4),
             ),
           ],
         ),
-        child: image,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            image,
+            const SizedBox(width: 8),
+            Flexible(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2E7D32).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+                child: const Text(
+                  'PREMIUM',
+                  style: TextStyle(
+                    color: Color(0xFF2E7D32),
+                    fontSize: 8,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ],
+        ),
       );
     }
 

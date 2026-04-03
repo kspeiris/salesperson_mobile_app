@@ -17,14 +17,14 @@ class SectionCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: Theme.of(context).cardTheme.color,
+        borderRadius: BorderRadius.circular(24),
+        color: Colors.white,
         border: Border.all(color: const Color(0xFFE8F5E9)),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0A2E7D32),
-            blurRadius: 16,
-            offset: Offset(0, 4),
+            color: Color(0x052E7D32),
+            blurRadius: 24,
+            offset: Offset(0, 12),
           ),
         ],
       ),
@@ -34,23 +34,24 @@ class SectionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.2),
-                      ),
-                    ],
+                  child: Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF1E293B),
+                          letterSpacing: -0.2,
+                        ),
                   ),
                 ),
-                if (trailing != null) trailing!,
+                if (trailing != null) ...[
+                  const SizedBox(width: 12),
+                  trailing!,
+                ],
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
             child,
           ],
         ),

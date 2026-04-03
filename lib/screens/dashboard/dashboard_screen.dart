@@ -32,10 +32,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final width = MediaQuery.of(context).size.width;
     final metricCrossAxisCount = width >= 980 ? 4 : width >= 640 ? 2 : 1;
     final metricAspectRatio = width >= 980
-        ? 1.16
+        ? 1.36
         : width >= 640
-            ? 1.14
-            : 1.34;
+            ? 1.32
+            : 1.54;
 
     return Scaffold(
       appBar: AppBar(
@@ -416,11 +416,14 @@ class _HeroPanel extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                BrandLogo(
-                  height: compact ? 40 : 48,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  alignment: Alignment.centerLeft,
+                Flexible(
+                  child: BrandLogo(
+                    height: compact ? 40 : 48,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    alignment: Alignment.centerLeft,
+                  ),
                 ),
+                const SizedBox(width: 12),
                 _HeroDateChip(label: AppFormatters.date(selectedDate), onTap: onDateTap),
               ],
             ),
