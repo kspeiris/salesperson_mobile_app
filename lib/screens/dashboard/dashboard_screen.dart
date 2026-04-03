@@ -526,7 +526,7 @@ class _HeroPanel extends StatelessWidget {
     final compact = width < 620;
 
     return Container(
-      constraints: BoxConstraints(minHeight: compact ? 410 : 438),
+      constraints: BoxConstraints(minHeight: compact ? 394 : 424),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(26),
         image: const DecorationImage(
@@ -562,16 +562,28 @@ class _HeroPanel extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Flexible(
-                    child: _HeroGlassBadge(
-                      child: BrandLogo(
-                        height: compact ? 34 : 40,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 6),
-                        showPlate: false,
-                        alignment: Alignment.centerLeft,
+                    child: BrandLogo(
+                      height: compact ? 30 : 34,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 10),
+                      showPlate: true,
+                      alignment: Alignment.centerLeft,
+                      plateDecoration: BoxDecoration(
+                        color: const Color(0xFFF7FBF4),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.75),
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            blurRadius: 16,
+                            offset: Offset(0, 6),
+                            color: Color(0x16000000),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -581,7 +593,7 @@ class _HeroPanel extends StatelessWidget {
                       onTap: onDateTap),
                 ],
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 24),
               Text(
                 'Good morning, $salesperson',
                 style: (compact
@@ -600,13 +612,13 @@ class _HeroPanel extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.86),
                     fontWeight: FontWeight.w500),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Text(
                 'Your daily route summary and next best actions.',
                 style: textTheme.bodyMedium?.copyWith(
                     color: Colors.white.withValues(alpha: 0.78), height: 1.5),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Wrap(
                 spacing: 12,
                 runSpacing: 12,
@@ -622,7 +634,7 @@ class _HeroPanel extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 22),
               LayoutBuilder(
                 builder: (context, constraints) {
                   final stacked = constraints.maxWidth < 560;
