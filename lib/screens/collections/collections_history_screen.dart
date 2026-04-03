@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/theme/app_assets.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/empty_state.dart';
@@ -38,6 +39,8 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
         return AppShell(
           title: 'Collections History',
           subtitle: 'Track every payment received from shops, review the payment method used, and void incorrect entries when needed.',
+          headerImageAsset: AppAssets.collectionsHero,
+          pageBackgroundAsset: AppAssets.pageTexture,
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CollectionEntryScreen())),
             icon: const Icon(Icons.request_quote_rounded),
@@ -99,6 +102,7 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                         icon: Icons.receipt_long_outlined,
                         title: 'No collections recorded',
                         message: 'Collections for the selected date will appear here.',
+                        imageAsset: AppAssets.emptyStateHero,
                       );
                     }
 

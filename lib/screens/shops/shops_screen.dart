@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/theme/app_assets.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/empty_state.dart';
@@ -34,6 +35,8 @@ class _ShopsScreenState extends State<ShopsScreen> {
     return AppShell(
       title: 'Customer Management',
       subtitle: 'Manage Bio Care customer shops and outstanding credit balances.',
+      headerImageAsset: AppAssets.shopsHero,
+      pageBackgroundAsset: AppAssets.pageTexture,
       actions: [
         IconButton(
           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ShopImportScreen())),
@@ -117,6 +120,7 @@ class _ShopsScreenState extends State<ShopsScreen> {
                     icon: Icons.storefront_outlined,
                     title: 'No shops found',
                     message: 'Add your first shop or import a CSV file to start recording sales and collections.',
+                    imageAsset: AppAssets.emptyStateHero,
                   );
                 }
                 return ListView.separated(

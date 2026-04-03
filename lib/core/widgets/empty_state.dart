@@ -6,11 +6,13 @@ class EmptyState extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.message,
+    this.imageAsset,
   });
 
   final IconData icon;
   final String title;
   final String message;
+  final String? imageAsset;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +45,19 @@ class EmptyState extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (imageAsset != null) ...[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: AspectRatio(
+                    aspectRatio: 1.4,
+                    child: Image.asset(
+                      imageAsset!,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+              ],
               Container(
                 width: 76,
                 height: 76,

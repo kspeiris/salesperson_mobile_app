@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/theme/app_assets.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/section_card.dart';
 import '../products/product_import_screen.dart';
@@ -25,6 +26,8 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
     return AppShell(
       title: 'Data Management',
       subtitle: 'Handle exports, backups, restore flows, and master data imports from one place.',
+      headerImageAsset: AppAssets.settingsHero,
+      pageBackgroundAsset: AppAssets.pageTexture,
       child: ListView(
         children: [
           SectionCard(

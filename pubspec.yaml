@@ -31,3 +31,13 @@ flutter:
   uses-material-design: true
   assets:
     - biocare logo1.png
+    - Login hero.png
+    - Dashboard background.png
+    - Sales module image.png
+    - Collections module image.png
+    - Reports screen image.png
+    - Shops_customer management.png
+    - Products_catalog.png
+    - Settings_security.png
+    - Empty state for sales or collections.png
+    - Subtle reusable background texture.png

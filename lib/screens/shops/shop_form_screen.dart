@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/theme/app_assets.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/section_card.dart';
 import '../../models/entities.dart';
@@ -71,6 +72,8 @@ class _ShopFormScreenState extends State<ShopFormScreen> {
     return AppShell(
       title: widget.shop == null ? 'Add Shop' : 'Edit Shop',
       subtitle: 'Keep shop records complete so sales, collections, and balance tracking stay accurate in the field.',
+      headerImageAsset: AppAssets.shopsHero,
+      pageBackgroundAsset: AppAssets.pageTexture,
       child: Form(
         key: _formKey,
         child: ListView(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/theme/app_assets.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/section_card.dart';
 import '../../models/entities.dart';
@@ -24,6 +25,8 @@ class _ProductImportScreenState extends State<ProductImportScreen> {
     return AppShell(
       title: 'Import Products',
       subtitle: 'Bring product records into the device and review import issues before sales teams start using them.',
+      headerImageAsset: AppAssets.productsHero,
+      pageBackgroundAsset: AppAssets.pageTexture,
       child: ListView(
         children: [
           const SectionCard(

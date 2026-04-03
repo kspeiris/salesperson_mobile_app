@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/theme/app_assets.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/empty_state.dart';
@@ -52,6 +53,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return AppShell(
       title: 'Products',
       subtitle: 'Manage the Bio Care product catalog, pricing, and barcode items.',
+      headerImageAsset: AppAssets.productsHero,
+      pageBackgroundAsset: AppAssets.pageTexture,
       actions: [
         IconButton(
           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductImportScreen())),
@@ -135,6 +138,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     icon: Icons.inventory_2_outlined,
                     title: 'No products found',
                     message: 'Add Bio Care products locally or import a CSV file.',
+                    imageAsset: AppAssets.emptyStateHero,
                   );
                 }
                 return ListView.separated(

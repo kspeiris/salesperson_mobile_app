@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/theme/app_assets.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/brand_logo.dart';
 import '../../core/widgets/metric_card.dart';
@@ -387,18 +388,18 @@ class _HeroPanel extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: const SweepGradient(
-          center: Alignment.bottomRight,
-          startAngle: 0.0,
-          endAngle: 3.14 * 2,
+        image: const DecorationImage(
+          image: AssetImage(AppAssets.dashboardHero),
+          fit: BoxFit.cover,
+          alignment: Alignment.centerRight,
+        ),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: [
             Color(0xFF2E7D32),
-            Color(0xFF66BB6A),
             Color(0xFF1B5E20),
-            Color(0xFF2E7D32),
-            Color(0xFF2E7D32),
           ],
-          stops: [0.0, 0.25, 0.5, 0.75, 1.0],
         ),
         boxShadow: const [
           BoxShadow(
@@ -408,11 +409,24 @@ class _HeroPanel extends StatelessWidget {
           ),
         ],
       ),
-      child: Padding(
-        padding: EdgeInsets.all(compact ? 24 : 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              const Color(0xFF16311A).withValues(alpha: 0.86),
+              const Color(0xFF2E7D32).withValues(alpha: 0.70),
+              const Color(0xFF2E7D32).withValues(alpha: 0.40),
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(compact ? 24 : 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -501,7 +515,8 @@ class _HeroPanel extends StatelessWidget {
                 );
               },
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );

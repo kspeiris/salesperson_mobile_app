@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/theme/app_assets.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/section_card.dart';
@@ -62,6 +63,8 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
           body: AppShell(
             title: 'New Collection',
             subtitle: 'Capture payments received from shops and preserve a clean collection trail for reporting.',
+            headerImageAsset: AppAssets.collectionsHero,
+            pageBackgroundAsset: AppAssets.pageTexture,
             header: Wrap(
               spacing: 10,
               runSpacing: 10,

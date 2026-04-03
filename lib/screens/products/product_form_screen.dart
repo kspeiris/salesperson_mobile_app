@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/theme/app_assets.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/section_card.dart';
 import '../../models/entities.dart';
@@ -84,6 +85,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return AppShell(
       title: widget.product == null ? 'Add Product' : 'Edit Product',
       subtitle: 'Keep SKU, pricing, description, and barcode details clean so sales entry stays fast and accurate.',
+      headerImageAsset: AppAssets.productsHero,
+      pageBackgroundAsset: AppAssets.pageTexture,
       child: Form(
         key: _formKey,
         child: ListView(

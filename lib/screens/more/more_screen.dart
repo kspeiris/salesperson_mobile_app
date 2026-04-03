@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/theme/app_assets.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/section_card.dart';
 import '../data/data_management_screen.dart';
@@ -22,6 +23,8 @@ class MoreScreen extends StatelessWidget {
       title: 'Management',
       showBack: false,
       subtitle: 'Configure your company profile, manage master data, and perform system backups from one central hub.',
+      headerImageAsset: AppAssets.settingsHero,
+      pageBackgroundAsset: AppAssets.pageTexture,
       child: ListView(
         padding: const EdgeInsets.only(bottom: 32),
         children: [

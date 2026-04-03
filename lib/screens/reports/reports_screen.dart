@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/theme/app_assets.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/section_card.dart';
@@ -36,6 +37,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
     return AppShell(
       title: 'Daily Reports',
       subtitle: 'Generate daily PDF summaries and CSV/JSON export bundles for desktop system entry.',
+      headerImageAsset: AppAssets.reportsHero,
+      pageBackgroundAsset: AppAssets.pageTexture,
       header: Wrap(
         spacing: 10,
         runSpacing: 10,

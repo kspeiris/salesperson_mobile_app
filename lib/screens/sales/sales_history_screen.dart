@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/theme/app_assets.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/empty_state.dart';
@@ -39,6 +40,8 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
         return AppShell(
           title: 'Sales History',
           subtitle: 'Review recorded sales by day, filter by shop, and void incorrect entries with an audit reason.',
+          headerImageAsset: AppAssets.salesHero,
+          pageBackgroundAsset: AppAssets.pageTexture,
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SaleEntryScreen())),
             icon: const Icon(Icons.add_shopping_cart_rounded),
@@ -100,6 +103,7 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                         icon: Icons.receipt_long_outlined,
                         title: 'No sales recorded',
                         message: 'Sales for the selected date will appear here.',
+                        imageAsset: AppAssets.emptyStateHero,
                       );
                     }
 

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'dart:ui';
 
 import '../../app/app_controller.dart';
-import '../../screens/dashboard/dashboard_screen.dart';
+import '../../core/theme/app_assets.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -71,6 +71,11 @@ class _LoginScreenState extends State<LoginScreen> {
               const Color(0xFFEFF6FF), // extremely light blue
               Theme.of(context).scaffoldBackgroundColor,
             ],
+          ),
+          image: const DecorationImage(
+            image: AssetImage(AppAssets.pageTexture),
+            fit: BoxFit.cover,
+            opacity: 0.05,
           ),
         ),
         child: SafeArea(
@@ -140,18 +145,17 @@ class _IntroPanel extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
-        gradient: const SweepGradient(
-          center: Alignment.bottomRight,
-          startAngle: 0.0,
-          endAngle: 3.14 * 2,
+        image: const DecorationImage(
+          image: AssetImage(AppAssets.loginHero),
+          fit: BoxFit.cover,
+        ),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: [
             Color(0xFF2E7D32),
-            Color(0xFF66BB6A),
             Color(0xFF1B5E20),
-            Color(0xFF2E7D32),
-            Color(0xFF2E7D32),
           ],
-          stops: [0.0, 0.25, 0.5, 0.75, 1.0],
         ),
         boxShadow: const [
            BoxShadow(
@@ -166,7 +170,16 @@ class _IntroPanel extends StatelessWidget {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
           child: Container(
-            color: Colors.black.withValues(alpha: 0.25),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF16311A).withValues(alpha: 0.78),
+                  const Color(0xFF2E7D32).withValues(alpha: 0.52),
+                ],
+              ),
+            ),
             padding: EdgeInsets.all(compact ? 24 : 40),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
