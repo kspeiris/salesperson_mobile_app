@@ -128,8 +128,8 @@ class AppRepository {
       map[row['key'] as String] = row['value'] as String? ?? '';
     }
     return AppSettings(
-      companyName: map['company_name'] ?? 'Acme Distribution',
-      defaultSalesperson: map['default_salesperson'] ?? 'Kavindu Peiris',
+      companyName: map['company_name'] ?? 'Bio Care Consumers',
+      defaultSalesperson: map['default_salesperson'] ?? 'Bio Care Route Team',
       paymentMethods: (map['payment_methods'] ?? 'Cash,Bank,Cheque')
           .split(',')
           .map((entry) => entry.trim())

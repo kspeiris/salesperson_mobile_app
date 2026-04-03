@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   static ThemeData get lightTheme {
-    const primary = Color(0xFF0F5B52);
-    const secondary = Color(0xFFC67C2E);
-    const canvas = Color(0xFFF4F1EA);
-    const card = Color(0xFFFFFCF7);
-    const ink = Color(0xFF16302B);
+    const primary = Color(0xFF1E6B4A);
+    const secondary = Color(0xFFE29B2D);
+    const canvas = Color(0xFFF2F6EE);
+    const card = Color(0xFFFFFEF9);
+    const ink = Color(0xFF173327);
 
     final colorScheme = ColorScheme.fromSeed(
       seedColor: primary,
@@ -53,10 +53,10 @@ class AppTheme {
       cardTheme: CardThemeData(
         elevation: 0,
         color: card,
-        shadowColor: const Color(0x140C221E),
+        shadowColor: const Color(0x14122A20),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(28),
-          side: const BorderSide(color: Color(0xFFE4DDD2)),
+          side: const BorderSide(color: Color(0xFFDCE6D7)),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -68,16 +68,16 @@ class AppTheme {
         filled: true,
         fillColor: Colors.white.withValues(alpha: 0.96),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        labelStyle: const TextStyle(color: Color(0xFF5A736E)),
-        hintStyle: const TextStyle(color: Color(0xFF87A09B)),
-        prefixIconColor: const Color(0xFF5A736E),
+        labelStyle: const TextStyle(color: Color(0xFF567162)),
+        hintStyle: const TextStyle(color: Color(0xFF89A095)),
+        prefixIconColor: const Color(0xFF567162),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: Color(0xFFD8D0C4)),
+          borderSide: const BorderSide(color: Color(0xFFD7E3D4)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: Color(0xFFD8D0C4)),
+          borderSide: const BorderSide(color: Color(0xFFD7E3D4)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
@@ -130,13 +130,13 @@ class AppTheme {
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: const Color(0xFFF1ECE3),
-        selectedColor: const Color(0xFFDDEAE3),
+        backgroundColor: const Color(0xFFF0F5EA),
+        selectedColor: const Color(0xFFD8E8D7),
         labelStyle: const TextStyle(fontWeight: FontWeight.w600),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        side: const BorderSide(color: Color(0xFFD8D0C4)),
+        side: const BorderSide(color: Color(0xFFD7E3D4)),
       ),
-      dividerTheme: const DividerThemeData(space: 1, color: Color(0xFFE1D9CC)),
+      dividerTheme: const DividerThemeData(space: 1, color: Color(0xFFDDE7D8)),
       listTileTheme: const ListTileThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(22))),
         iconColor: ink,

@@ -43,7 +43,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Daily Operations'),
+        title: const Text('Bio Care Field Dashboard'),
         actions: [
           IconButton(
             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen())),
@@ -87,27 +87,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         childAspectRatio: metricAspectRatio,
                         children: [
                           MetricCard(
-                            title: 'Total sales',
+                            title: 'Beverage sales',
                             value: AppFormatters.currency(summary.totalSales),
-                            subtitle: '${summary.salesCount} sales recorded',
+                            subtitle: '${summary.salesCount} outlet invoices recorded',
                             icon: Icons.trending_up_rounded,
                           ),
                           MetricCard(
-                            title: 'Collections',
+                            title: 'Partner collections',
                             value: AppFormatters.currency(summary.totalCollections),
-                            subtitle: '${summary.collectionCount} receipts recorded',
+                            subtitle: '${summary.collectionCount} retailer receipts recorded',
                             icon: Icons.account_balance_wallet_outlined,
                           ),
                           MetricCard(
-                            title: 'Cash sales',
+                            title: 'Immediate cash',
                             value: AppFormatters.currency(summary.cashSales),
-                            subtitle: 'Closed immediately',
+                            subtitle: 'Settled during the visit',
                             icon: Icons.payments_rounded,
                           ),
                           MetricCard(
-                            title: 'Credit sales',
+                            title: 'Credit exposure',
                             value: AppFormatters.currency(summary.creditSales),
-                            subtitle: 'Outstanding balance tracked',
+                            subtitle: 'Outstanding balances in the route',
                             icon: Icons.receipt_long_outlined,
                           ),
                         ],
@@ -116,7 +116,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   const SizedBox(height: 16),
                   SectionCard(
-                    title: 'Create new record',
+                    title: 'Daily field actions',
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         final compact = constraints.maxWidth < 720;
@@ -124,8 +124,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           return Column(
                             children: [
                               _ActionPanel(
-                                title: 'Record a sale',
-                                description: 'Add a shop, build the cart, choose cash or credit, and save it offline instantly.',
+                                title: 'Record a beverage order',
+                                description: 'Add the outlet, build the order, choose cash or credit, and save the visit instantly.',
                                 icon: Icons.add_shopping_cart_rounded,
                                 onTap: () => Navigator.push(
                                   context,
@@ -135,8 +135,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ),
                               const SizedBox(height: 12),
                               _ActionPanel(
-                                title: 'Record a collection',
-                                description: 'Capture payments from shops and keep balances current for the next visit.',
+                                title: 'Record a partner payment',
+                                description: 'Capture retailer collections and keep route balances accurate for the next Bio Care visit.',
                                 icon: Icons.request_quote_outlined,
                                 onTap: () => Navigator.push(
                                   context,
@@ -151,8 +151,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           children: [
                             Expanded(
                               child: _ActionPanel(
-                                title: 'Record a sale',
-                                description: 'Add a shop, build the cart, choose cash or credit, and save it offline instantly.',
+                                title: 'Record a beverage order',
+                                description: 'Add the outlet, build the order, choose cash or credit, and save the visit instantly.',
                                 icon: Icons.add_shopping_cart_rounded,
                                 onTap: () => Navigator.push(
                                   context,
@@ -164,8 +164,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: _ActionPanel(
-                                title: 'Record a collection',
-                                description: 'Capture payments from shops and keep balances current for the next visit.',
+                                title: 'Record a partner payment',
+                                description: 'Capture retailer collections and keep route balances accurate for the next Bio Care visit.',
                                 icon: Icons.request_quote_outlined,
                                 onTap: () => Navigator.push(
                                   context,
@@ -180,7 +180,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   const SizedBox(height: 16),
                   SectionCard(
-                    title: 'Workspace',
+                    title: 'Bio Care workspace',
                     child: GridView.count(
                       crossAxisCount: width >= 900 ? 3 : width >= 600 ? 2 : 1,
                       shrinkWrap: true,
@@ -190,38 +190,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       childAspectRatio: width >= 600 ? 1.5 : 1.9,
                       children: [
                         _WorkspaceTile(
-                          title: 'Reports',
-                          subtitle: 'Generate PDF and export files for desktop entry.',
+                          title: 'Route reports',
+                          subtitle: 'Generate PDF and export files for daily Bio Care field reporting.',
                           icon: Icons.picture_as_pdf_outlined,
                           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportsScreen())),
                         ),
                         _WorkspaceTile(
-                          title: 'Sales history',
-                          subtitle: 'Review invoices by date and void when necessary.',
+                          title: 'Invoice history',
+                          subtitle: 'Review beverage orders by date and void when necessary.',
                           icon: Icons.history_rounded,
                           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SalesHistoryScreen())),
                         ),
                         _WorkspaceTile(
-                          title: 'Collections history',
-                          subtitle: 'Check daily receipts and adjust voided entries.',
+                          title: 'Collection history',
+                          subtitle: 'Check retailer receipts and adjust voided entries.',
                           icon: Icons.list_alt_rounded,
                           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CollectionsHistoryScreen())),
                         ),
                         _WorkspaceTile(
-                          title: 'Shops',
-                          subtitle: 'Maintain searchable customer records and balances.',
+                          title: 'Retail partners',
+                          subtitle: 'Maintain searchable outlet records, balances, and visit targets.',
                           icon: Icons.storefront_outlined,
                           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ShopsScreen())),
                         ),
                         _WorkspaceTile(
-                          title: 'Products',
-                          subtitle: 'Keep prices, SKUs, and barcode-ready items organized.',
+                          title: 'Beverage catalog',
+                          subtitle: 'Keep aloe, fruit, and herbal SKUs, prices, and barcodes organized.',
                           icon: Icons.inventory_2_outlined,
                           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductsScreen())),
                         ),
                         _WorkspaceTile(
-                          title: 'Settings',
-                          subtitle: 'Configure company profile, PIN, and data management tools.',
+                          title: 'Brand settings',
+                          subtitle: 'Configure company identity, PIN access, and data management tools.',
                           icon: Icons.settings_outlined,
                           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen())),
                         ),
@@ -290,8 +290,13 @@ class _HeroPanel extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '$companyName daily recorder',
+            '$companyName wellness route operations',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.86)),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Natural aloe vera, fruit, and herbal beverages with a field workflow that supports purity, consistency, and trusted retail supply.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.78)),
           ),
           const SizedBox(height: 20),
           Wrap(
@@ -303,11 +308,43 @@ class _HeroPanel extends StatelessWidget {
                 label: AppFormatters.date(selectedDate),
                 onTap: onDateTap,
               ),
-              const _StaticPill(icon: Icons.offline_bolt_rounded, label: 'Offline mode'),
-              const _StaticPill(icon: Icons.picture_as_pdf_outlined, label: 'PDF ready'),
+              const _StaticPill(icon: Icons.eco_outlined, label: 'Pure ingredients'),
+              const _StaticPill(icon: Icons.verified_outlined, label: 'Quality assured'),
+            ],
+          ),
+          const SizedBox(height: 20),
+          const Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              _HighlightChip(label: 'Since 2009'),
+              _HighlightChip(label: '100,000+ bottles/month'),
+              _HighlightChip(label: 'No artificial additives'),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _HighlightChip extends StatelessWidget {
+  const _HighlightChip({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
       ),
     );
   }
@@ -426,7 +463,7 @@ class _ActionPanel extends StatelessWidget {
             const SizedBox(height: 8),
             Text(description),
             const SizedBox(height: 16),
-            Text(primary ? 'Start sale' : 'Start collection', style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w700)),
+            Text(primary ? 'Start order' : 'Start payment log', style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w700)),
           ],
         ),
       ),

@@ -147,32 +147,32 @@ class _IntroPanel extends StatelessWidget {
                 color: scheme.primary.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(22),
               ),
-              child: Icon(Icons.point_of_sale_rounded, size: 32, color: scheme.primary),
+              child: Icon(Icons.spa_outlined, size: 32, color: scheme.primary),
             ),
             const SizedBox(height: 20),
-            Text('Salesperson Daily Recorder', style: Theme.of(context).textTheme.headlineMedium),
+            Text('Bio Care Field Hub', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 10),
             Text(
-              '$companyName field teams can capture sales, collections, and PDF-ready summaries with a workflow built for speed.',
+              '$companyName supports Sri Lankan wellness retail with aloe vera, fruit, and herbal beverages built around purity, quality control, and dependable field execution.',
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 24),
             const _FeatureRow(
-              icon: Icons.inventory_2_outlined,
-              title: 'Fast local entry',
-              description: 'Record item-level sales and payment collections even with no signal.',
+              icon: Icons.eco_outlined,
+              title: 'Natural product focus',
+              description: 'Keep daily orders moving for premium beverages made without artificial additives or preservatives.',
             ),
             const SizedBox(height: 16),
             const _FeatureRow(
-              icon: Icons.picture_as_pdf_outlined,
-              title: 'Report-ready output',
-              description: 'Generate daily PDFs and desktop-friendly exports from the same screen.',
+              icon: Icons.factory_outlined,
+              title: 'Built for scale',
+              description: 'Track field activity for a brand with dedicated manufacturing and capacity above 100,000 bottles each month.',
             ),
             const SizedBox(height: 16),
             const _FeatureRow(
-              icon: Icons.verified_user_outlined,
-              title: 'Controlled access',
-              description: 'Support salesperson identity and an optional local PIN for device protection.',
+              icon: Icons.verified_outlined,
+              title: 'Trust and compliance',
+              description: 'Support a brand story centered on food safety, GMP discipline, halal compliance, and consistent product quality.',
             ),
           ],
         ),
@@ -207,19 +207,19 @@ class _LoginCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Sign in', style: Theme.of(context).textTheme.headlineSmall),
+              Text('Enter field workspace', style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: 8),
               const Text(
-                'Open your daily workspace, record transactions quickly, and create report-ready files without internet.',
+                'Open the Bio Care route dashboard, capture outlet activity quickly, and keep reporting ready even without internet access.',
               ),
               const SizedBox(height: 24),
               TextFormField(
                 controller: salespersonController,
                 decoration: const InputDecoration(
-                  labelText: 'Salesperson',
+                  labelText: 'Route executive',
                   prefixIcon: Icon(Icons.person_outline_rounded),
                 ),
-                validator: (value) => (value == null || value.trim().isEmpty) ? 'Enter the salesperson name.' : null,
+                validator: (value) => (value == null || value.trim().isEmpty) ? 'Enter the route executive name.' : null,
               ),
               if (pinEnabled) ...[
                 const SizedBox(height: 16),
@@ -244,7 +244,7 @@ class _LoginCard extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: onSubmit,
                 icon: const Icon(Icons.arrow_forward_rounded),
-                label: const Text('Continue to dashboard'),
+                label: const Text('Open Bio Care dashboard'),
               ),
               const SizedBox(height: 16),
               Container(
@@ -260,7 +260,7 @@ class _LoginCard extends StatelessWidget {
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Offline-first mode is active. Records stay on the device until you share reports or exports.',
+                        'Offline-first mode is active. Outlet records stay on the device until you share Bio Care reports or exports.',
                       ),
                     ),
                   ],

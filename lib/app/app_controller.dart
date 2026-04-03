@@ -31,8 +31,8 @@ class AppController extends ChangeNotifier {
   bool _authenticated = false;
   String _currentSalesperson = 'Salesperson';
   AppSettings _settings = const AppSettings(
-    companyName: 'Acme Distribution',
-    defaultSalesperson: 'Kavindu Peiris',
+    companyName: 'Bio Care Consumers',
+    defaultSalesperson: 'Bio Care Route Team',
     paymentMethods: ['Cash', 'Bank', 'Cheque'],
     pinEnabled: false,
   );
