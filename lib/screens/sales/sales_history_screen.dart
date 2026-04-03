@@ -6,6 +6,7 @@ import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../models/entities.dart';
+import 'sale_entry_screen.dart';
 
 class SalesHistoryScreen extends StatefulWidget {
   const SalesHistoryScreen({super.key});
@@ -38,6 +39,13 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
         return AppShell(
           title: 'Sales History',
           subtitle: 'Review recorded sales by day, filter by shop, and void incorrect entries with an audit reason.',
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SaleEntryScreen())),
+            icon: const Icon(Icons.add_shopping_cart_rounded),
+            label: const Text('Add Sale'),
+            backgroundColor: const Color(0xFF2E7D32),
+            foregroundColor: Colors.white,
+          ),
           child: Column(
             children: [
               Container(

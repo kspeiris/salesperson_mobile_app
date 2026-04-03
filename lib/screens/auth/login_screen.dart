@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:ui';
 
 import '../../app/app_controller.dart';
-import '../../core/widgets/brand_logo.dart';
 import '../../screens/dashboard/dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -51,15 +51,14 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const DashboardScreen()));
+    // Removed explicit push. app.dart handles switching based on controller.authenticated state.
   }
 
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
-    final scheme = Theme.of(context).colorScheme;
     final width = MediaQuery.of(context).size.width;
-    final stacked = width < 760;
+    final stacked = width < 860;
 
     return Scaffold(
       body: Container(
@@ -68,8 +67,8 @@ class _LoginScreenState extends State<LoginScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              scheme.primary.withValues(alpha: 0.18),
-              scheme.secondary.withValues(alpha: 0.16),
+              Theme.of(context).scaffoldBackgroundColor,
+              const Color(0xFFEFF6FF), // extremely light blue
               Theme.of(context).scaffoldBackgroundColor,
             ],
           ),
@@ -77,15 +76,15 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(stacked ? 16 : 20, 12, stacked ? 16 : 20, 20),
+              padding: EdgeInsets.fromLTRB(stacked ? 16 : 32, 16, stacked ? 16 : 32, 32),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 920),
+                constraints: const BoxConstraints(maxWidth: 1080),
                 child: stacked
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           _IntroPanel(companyName: controller.settings.companyName, compact: true),
-                          const SizedBox(height: 18),
+                          const SizedBox(height: 24),
                           _LoginCard(
                             formKey: _formKey,
                             salespersonController: _salespersonController,
@@ -99,9 +98,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     : Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Expanded(child: _IntroPanel(companyName: controller.settings.companyName)),
-                          const SizedBox(width: 20),
                           Expanded(
+                            flex: 5,
+                            child: _IntroPanel(companyName: controller.settings.companyName),
+                          ),
+                          const SizedBox(width: 32),
+                          Expanded(
+                            flex: 4,
                             child: _LoginCard(
                               formKey: _formKey,
                               salespersonController: _salespersonController,
@@ -133,79 +136,115 @@ class _IntroPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final scheme = Theme.of(context).colorScheme;
 
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        gradient: const SweepGradient(
+          center: Alignment.bottomRight,
+          startAngle: 0.0,
+          endAngle: 3.14 * 2,
           colors: [
-            scheme.primary,
-            scheme.tertiary,
-            const Color(0xFF0C3E38),
+            Color(0xFF2E7D32),
+            Color(0xFF66BB6A),
+            Color(0xFF1B5E20),
+            Color(0xFF2E7D32),
+            Color(0xFF2E7D32),
           ],
+          stops: [0.0, 0.25, 0.5, 0.75, 1.0],
         ),
         boxShadow: const [
-          BoxShadow(
-            blurRadius: 28,
-            offset: Offset(0, 14),
-            color: Color(0x1A10241D),
+           BoxShadow(
+            blurRadius: 32,
+            offset: Offset(0, 16),
+            color: Color(0x1F2E7D32),
           ),
         ],
       ),
-      child: Padding(
-        padding: EdgeInsets.all(compact ? 22 : 28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            BrandLogo(
-              height: compact ? 44 : 54,
-              padding: EdgeInsets.all(compact ? 12 : 14),
-              alignment: Alignment.centerLeft,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Active Aloe Field Hub',
-              style: textTheme.headlineMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              '$companyName helps route teams capture orders, collections, and shop activity with a clean branded workflow built for daily field execution.',
-              style: textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.88)),
-            ),
-            const SizedBox(height: 24),
-            const Wrap(
-              spacing: 10,
-              runSpacing: 10,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(32),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+          child: Container(
+            color: Colors.black.withValues(alpha: 0.25),
+            padding: EdgeInsets.all(compact ? 24 : 40),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _TopBadge(icon: Icons.offline_bolt_rounded, label: 'Works offline'),
-                _TopBadge(icon: Icons.route_outlined, label: 'Built for routes'),
-                _TopBadge(icon: Icons.bar_chart_rounded, label: 'Reports ready'),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.eco_rounded, color: Color(0xFFA5D6A7), size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        companyName,
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Text(
+                  'Bio Care Sales App',
+                  style: textTheme.displaySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w800, height: 1.1),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  '"Pure Health. Trusted Quality."\nCapture orders, manage collections, and execute route strategies seamlessly with a delightfully engineered workflow.',
+                  style: textTheme.titleMedium?.copyWith(color: Colors.white.withValues(alpha: 0.85), height: 1.5, fontWeight: FontWeight.w400),
+                ),
+                const SizedBox(height: 32),
+                const Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    _Badge(icon: Icons.wifi_off_rounded, label: 'Offline-First Storage'),
+                    _Badge(icon: Icons.insights_rounded, label: 'Smart Insights'),
+                    _Badge(icon: Icons.security_rounded, label: 'Enterprise Grade'),
+                  ],
+                ),
               ],
             ),
-            const SizedBox(height: 32),
-            const _FeatureRow(
-              icon: Icons.shopping_bag_outlined,
-              title: 'Faster field capture',
-              description: 'Move from shop visit to saved order in a few taps with a layout tuned for mobile use.',
-            ),
-            const SizedBox(height: 20),
-            const _FeatureRow(
-              icon: Icons.payments_outlined,
-              title: 'Collections stay visible',
-              description: 'Keep balances, receipts, and follow-up activity easier to track during a busy route day.',
-            ),
-            const SizedBox(height: 20),
-            const _FeatureRow(
-              icon: Icons.insert_chart_outlined_rounded,
-              title: 'A better daily overview',
-              description: 'See sales, credit, collections, and next actions quickly without digging through screens.',
-            ),
-          ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class _Badge extends StatelessWidget {
+  const _Badge({required this.icon, required this.label});
+  
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: Colors.white.withValues(alpha: 0.9)),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(color: Colors.white.withValues(alpha: 0.95), fontWeight: FontWeight.w600, fontSize: 13),
+          ),
+        ],
       ),
     );
   }
@@ -230,23 +269,21 @@ class _LoginCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.92),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: const Color(0xFFE1E8E1)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
-            blurRadius: 24,
-            offset: Offset(0, 12),
-            color: Color(0x1210241D),
+            blurRadius: 40,
+            offset: Offset(0, 20),
+            color: Color(0x0A0F172A),
           ),
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(compact ? 22 : 28),
+        padding: EdgeInsets.all(compact ? 24 : 40),
         child: Form(
           key: formKey,
           child: Column(
@@ -254,37 +291,38 @@ class _LoginCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Sign in to your route',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                'Welcome back',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Text(
-                'Start with your salesperson name, unlock the workspace, and continue logging field activity even without internet access.',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.4),
+                'Sign in to access your dashboard and today\'s routes.',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: const Color(0xFF64748B)),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
               TextFormField(
                 controller: salespersonController,
+                style: const TextStyle(fontWeight: FontWeight.w500),
                 decoration: const InputDecoration(
-                  labelText: 'Salesperson',
-                  prefixIcon: Icon(Icons.person_outline_rounded),
+                  labelText: 'Salesperson ID / Name',
+                  prefixIcon: Icon(Icons.badge_outlined),
                 ),
                 textInputAction: pinEnabled ? TextInputAction.next : TextInputAction.done,
-                validator: (value) => (value == null || value.trim().isEmpty) ? 'Enter the salesperson name.' : null,
+                validator: (value) => (value == null || value.trim().isEmpty) ? 'Please enter your ID.' : null,
                 onFieldSubmitted: (_) {
                   if (!pinEnabled) onSubmit();
                 },
               ),
               if (pinEnabled) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: pinController,
                   obscureText: true,
+                  style: const TextStyle(fontWeight: FontWeight.w500, letterSpacing: 4),
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
-                    labelText: 'PIN',
-                    hintText: 'Enter your access PIN',
-                    prefixIcon: Icon(Icons.lock_outline_rounded),
+                    labelText: 'Access PIN',
+                    prefixIcon: Icon(Icons.password_rounded),
                   ),
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => onSubmit(),
@@ -296,40 +334,28 @@ class _LoginCard extends StatelessWidget {
                   },
                 ),
               ],
-              const SizedBox(height: 28),
+              const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton.icon(
+                child: FilledButton(
                   onPressed: onSubmit,
-                  icon: const Icon(Icons.arrow_forward_rounded, size: 20),
-                  label: const Text('Open workspace'),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  child: const Text('Access Workspace', style: TextStyle(fontSize: 16)),
                 ),
               ),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF4F8F5),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFDDE8E0)),
-                ),
+              const SizedBox(height: 24),
+              const Center(
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: scheme.primary.withValues(alpha: 0.10),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Icon(Icons.cloud_done_outlined, color: scheme.primary),
-                    ),
-                    const SizedBox(width: 12),
-                    const Expanded(
-                      child: Text(
-                        'Offline-first mode is active. Records stay safely on the device until you generate or share reports.',
-                        style: TextStyle(fontSize: 13, height: 1.4),
-                      ),
+                    Icon(Icons.shield_outlined, size: 16, color: Color(0xFF94A3B8)),
+                    SizedBox(width: 8),
+                    Text(
+                      'End-to-end encrypted local storage',
+                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -342,85 +368,3 @@ class _LoginCard extends StatelessWidget {
   }
 }
 
-class _TopBadge extends StatelessWidget {
-  const _TopBadge({
-    required this.icon,
-    required this.label,
-  });
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 18, color: Colors.white),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FeatureRow extends StatelessWidget {
-  const _FeatureRow({
-    required this.icon,
-    required this.title,
-    required this.description,
-  });
-
-  final IconData icon;
-  final String title;
-  final String description;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.14),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-          ),
-          child: Icon(icon, color: Colors.white),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: textTheme.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                description,
-                style: textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.80), height: 1.4),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}

@@ -30,11 +30,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
+    final scheme = Theme.of(context).colorScheme;
     _lastFile = controller.lastGeneratedReport ?? _lastFile;
 
     return AppShell(
       title: 'Daily Reports',
-      subtitle: 'Generate the daily PDF summary and optional CSV or JSON export bundle used for manual desktop system entry.',
+      subtitle: 'Generate daily PDF summaries and CSV/JSON export bundles for desktop system entry.',
       header: Wrap(
         spacing: 10,
         runSpacing: 10,
@@ -45,98 +46,120 @@ class _ReportsScreenState extends State<ReportsScreen> {
         ],
       ),
       child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
+          const SizedBox(height: 16),
           SectionCard(
-            title: 'Generate files',
-            child: Column(
-              children: [
-                InkWell(
-                  borderRadius: BorderRadius.circular(18),
-                  onTap: _pickDate,
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'Report date',
-                      prefixIcon: Icon(Icons.calendar_today_outlined),
-                    ),
-                    child: Text(AppFormatters.date(_selectedDate)),
-                  ),
+            title: '📅 Select Report Date',
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: _pickDate,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FDF8),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE8F5E9)),
                 ),
-                const SizedBox(height: 16),
-                FutureBuilder(
-                  future: controller.reportPreview(_selectedDate),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 18),
-                        child: Center(child: CircularProgressIndicator()),
-                      );
-                    }
+                child: Row(
+                  children: [
+                    Icon(Icons.calendar_month_rounded, color: scheme.primary),
+                    const SizedBox(width: 12),
+                    Text(AppFormatters.date(_selectedDate), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    const Spacer(),
+                    const Icon(Icons.arrow_drop_down_rounded, color: Colors.grey),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          FutureBuilder(
+            future: controller.reportPreview(_selectedDate),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
 
-                    final preview = snapshot.data!;
-                    return Column(
+              final preview = snapshot.data!;
+              return SectionCard(
+                title: '📄 Daily Summary',
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFE8F5E9)),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Sales', style: TextStyle(fontSize: 16, color: Colors.grey.shade700)),
+                              Text(AppFormatters.currency(preview.dashboard.totalSales), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8),
+                            child: Divider(height: 1, color: Color(0xFFE8F5E9)),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Collections', style: TextStyle(fontSize: 16, color: Colors.grey.shade700)),
+                              Text(AppFormatters.currency(preview.dashboard.totalCollections), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _PreviewTile(
-                                label: 'Sales total',
-                                value: AppFormatters.currency(preview.dashboard.totalSales),
-                              ),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _PreviewTile(
-                                label: 'Collections',
-                                value: AppFormatters.currency(preview.dashboard.totalCollections),
-                              ),
-                            ),
-                          ],
+                            onPressed: _isGenerating ? null : _generateReport,
+                            icon: _isGenerating
+                                ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                                : const Icon(Icons.picture_as_pdf_outlined),
+                            label: const Text('Generate PDF'),
+                          ),
                         ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(child: _PreviewTile(label: 'Sales count', value: '${preview.sales.length}')),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _PreviewTile(label: 'Collections count', value: '${preview.collections.length}'),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
-                          ],
+                            onPressed: _isExporting ? null : _exportBundle,
+                            icon: _isExporting
+                                ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                                : const Icon(Icons.upload_file_outlined),
+                            label: const Text('Export CSV'),
+                          ),
                         ),
                       ],
-                    );
-                  },
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: _isGenerating ? null : _generateReport,
-                        icon: _isGenerating
-                            ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                            : const Icon(Icons.picture_as_pdf_outlined),
-                        label: const Text('Generate PDF'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _isExporting ? null : _exportBundle,
-                        icon: _isExporting
-                            ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                            : const Icon(Icons.upload_file_outlined),
-                        label: const Text('CSV / JSON'),
-                      ),
                     ),
                   ],
                 ),
-              ],
-            ),
+              );
+            },
           ),
           const SizedBox(height: 16),
           if (_lastFile != null)
             SectionCard(
-              title: 'Latest PDF',
+               title: 'Latest PDF',
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -262,36 +285,6 @@ class _HeaderChip extends StatelessWidget {
   }
 }
 
-class _PreviewTile extends StatelessWidget {
-  const _PreviewTile({
-    required this.label,
-    required this.value,
-  });
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.76),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFDDE6DF)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: Theme.of(context).textTheme.bodySmall),
-          const SizedBox(height: 6),
-          Text(value, style: Theme.of(context).textTheme.titleLarge),
-        ],
-      ),
-    );
-  }
-}
-
 class _PathCard extends StatelessWidget {
   const _PathCard({
     required this.path,
@@ -308,7 +301,7 @@ class _PathCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: const Color(0xFFF4F8F5),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFDDE8E0)),
       ),
       child: Column(

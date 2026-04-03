@@ -14,23 +14,22 @@ class SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(16),
         color: Theme.of(context).cardTheme.color,
-        border: Border.all(color: const Color(0xFFDCE5DE)),
+        border: Border.all(color: const Color(0xFFE8F5E9)),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0A10241D),
-            blurRadius: 22,
-            offset: Offset(0, 10),
+            color: Color(0x0A2E7D32),
+            blurRadius: 16,
+            offset: Offset(0, 4),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -41,18 +40,9 @@ class SectionCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 42,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: scheme.secondary.withValues(alpha: 0.8),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
                       Text(
                         title,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.2),
                       ),
                     ],
                   ),
@@ -60,7 +50,7 @@ class SectionCard extends StatelessWidget {
                 if (trailing != null) trailing!,
               ],
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 20),
             child,
           ],
         ),

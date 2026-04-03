@@ -6,6 +6,7 @@ import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../models/entities.dart';
+import 'collection_entry_screen.dart';
 
 class CollectionsHistoryScreen extends StatefulWidget {
   const CollectionsHistoryScreen({super.key});
@@ -37,6 +38,13 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
         return AppShell(
           title: 'Collections History',
           subtitle: 'Track every payment received from shops, review the payment method used, and void incorrect entries when needed.',
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CollectionEntryScreen())),
+            icon: const Icon(Icons.request_quote_rounded),
+            label: const Text('Add Collection'),
+            backgroundColor: const Color(0xFF2E7D32),
+            foregroundColor: Colors.white,
+          ),
           child: Column(
             children: [
               Container(

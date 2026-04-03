@@ -19,7 +19,7 @@ class PdfReportService {
     pdf.addPage(
       pw.MultiPage(
         pageTheme: pw.PageTheme(
-          margin: const pw.EdgeInsets.all(28),
+          margin: const pw.EdgeInsets.all(32),
           theme: pw.ThemeData.withFont(
             base: pw.Font.helvetica(),
             bold: pw.Font.helveticaBold(),
@@ -27,13 +27,13 @@ class PdfReportService {
         ),
         build: (context) => [
           _buildHeader(companyName, salespersonName, report.date),
-          pw.SizedBox(height: 18),
+          pw.SizedBox(height: 24),
           _buildSummary(report.dashboard),
-          pw.SizedBox(height: 18),
+          pw.SizedBox(height: 24),
           _buildSalesTable(report.sales),
-          pw.SizedBox(height: 18),
+          pw.SizedBox(height: 24),
           _buildCollectionsTable(report.collections),
-          pw.SizedBox(height: 32),
+          pw.SizedBox(height: 48),
           _buildSignatureArea(),
         ],
       ),
@@ -51,28 +51,24 @@ class PdfReportService {
   }
 
   pw.Widget _buildHeader(String companyName, String salespersonName, DateTime date) {
-    return pw.Container(
-      padding: const pw.EdgeInsets.all(18),
-      decoration: pw.BoxDecoration(
-        color: PdfColor.fromHex('#F1F5F9'),
-        borderRadius: pw.BorderRadius.circular(12),
-      ),
-      child: pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          pw.Text(companyName, style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold)),
-          pw.SizedBox(height: 6),
-          pw.Text('Daily Sales & Collections Report', style: const pw.TextStyle(fontSize: 13)),
-          pw.SizedBox(height: 12),
-          pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-            children: [
-              pw.Text('Salesperson: $salespersonName'),
-              pw.Text('Report Date: ${AppFormatters.date(date)}'),
-            ],
-          ),
-        ],
-      ),
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(companyName, style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32'))),
+        pw.SizedBox(height: 2),
+        pw.Text('Panadura, Sri Lanka', style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey700)),
+        pw.SizedBox(height: 12),
+        pw.Container(height: 2, color: PdfColor.fromHex('#2E7D32')),
+        pw.SizedBox(height: 16),
+        pw.Text('Daily Sales Report', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+        pw.SizedBox(height: 8),
+        pw.Row(
+          children: [
+            pw.Expanded(child: pw.Text('Date: ${AppFormatters.date(date)}')),
+            pw.Expanded(child: pw.Text('Salesperson: $salespersonName')),
+          ],
+        ),
+      ],
     );
   }
 
@@ -80,32 +76,38 @@ class PdfReportService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('Summary', style: pw.TextStyle(fontSize: 15, fontWeight: pw.FontWeight.bold)),
-        pw.SizedBox(height: 10),
-        pw.Table(
-          border: pw.TableBorder.all(color: PdfColors.grey300),
-          children: [
-            _summaryRow('Cash Sales', AppFormatters.currency(summary.cashSales)),
-            _summaryRow('Credit Sales', AppFormatters.currency(summary.creditSales)),
-            _summaryRow('Total Sales', AppFormatters.currency(summary.totalSales)),
-            _summaryRow('Collections', AppFormatters.currency(summary.totalCollections)),
-            _summaryRow('Sales Transactions', '${summary.salesCount}'),
-            _summaryRow('Collection Transactions', '${summary.collectionCount}'),
-          ],
+        pw.Text('Summary', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32'))),
+        pw.SizedBox(height: 8),
+        pw.Container(
+          padding: const pw.EdgeInsets.all(12),
+          decoration: pw.BoxDecoration(
+            border: pw.Border.all(color: PdfColor.fromHex('#E8F5E9')),
+          ),
+          child: pw.Column(
+            children: [
+              _summaryRow('Cash Sales', AppFormatters.currency(summary.cashSales)),
+              _summaryRow('Credit Sales', AppFormatters.currency(summary.creditSales)),
+              _summaryRow('Total Sales', AppFormatters.currency(summary.totalSales)),
+              _summaryRow('Collections', AppFormatters.currency(summary.totalCollections)),
+              _summaryRow('Sales Transactions', '${summary.salesCount}'),
+              _summaryRow('Collection Transactions', '${summary.collectionCount}'),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  pw.TableRow _summaryRow(String label, String value) {
-    return pw.TableRow(
-      children: [
-        pw.Padding(padding: const pw.EdgeInsets.all(8), child: pw.Text(label)),
-        pw.Padding(
-          padding: const pw.EdgeInsets.all(8),
-          child: pw.Align(alignment: pw.Alignment.centerRight, child: pw.Text(value)),
-        ),
-      ],
+  pw.Widget _summaryRow(String label, String value) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 4),
+      child: pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        children: [
+          pw.Text(label),
+          pw.Text(value, style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+        ],
+      ),
     );
   }
 
@@ -114,7 +116,7 @@ class PdfReportService {
       return pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text('Sales Transactions', style: pw.TextStyle(fontSize: 15, fontWeight: pw.FontWeight.bold)),
+          pw.Text('Sales Transactions', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32'))),
           pw.SizedBox(height: 8),
           pw.Text('No sales recorded for the selected date.'),
         ],
@@ -135,15 +137,16 @@ class PdfReportService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('Sales Transactions', style: pw.TextStyle(fontSize: 15, fontWeight: pw.FontWeight.bold)),
+        pw.Text('Sales Transactions', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32'))),
         pw.SizedBox(height: 8),
         pw.TableHelper.fromTextArray(
           headers: const ['Time', 'Shop', 'Payment', 'Total'],
           data: rows,
-          headerDecoration: const pw.BoxDecoration(color: PdfColors.blueGrey100),
+          headerDecoration: pw.BoxDecoration(color: PdfColor.fromHex('#F8FDF8')),
           cellAlignment: pw.Alignment.centerLeft,
-          headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+          headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32')),
           cellPadding: const pw.EdgeInsets.all(6),
+          border: pw.TableBorder.all(color: PdfColor.fromHex('#E8F5E9')),
         ),
       ],
     );
@@ -154,7 +157,7 @@ class PdfReportService {
       return pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text('Collections', style: pw.TextStyle(fontSize: 15, fontWeight: pw.FontWeight.bold)),
+          pw.Text('Collections', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32'))),
           pw.SizedBox(height: 8),
           pw.Text('No collections recorded for the selected date.'),
         ],
@@ -175,14 +178,16 @@ class PdfReportService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('Collections', style: pw.TextStyle(fontSize: 15, fontWeight: pw.FontWeight.bold)),
+        pw.Text('Collections', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32'))),
         pw.SizedBox(height: 8),
         pw.TableHelper.fromTextArray(
           headers: const ['Time', 'Shop', 'Method', 'Amount'],
           data: rows,
-          headerDecoration: const pw.BoxDecoration(color: PdfColors.blueGrey100),
-          headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+          headerDecoration: pw.BoxDecoration(color: PdfColor.fromHex('#F8FDF8')),
+          cellAlignment: pw.Alignment.centerLeft,
+          headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32')),
           cellPadding: const pw.EdgeInsets.all(6),
+          border: pw.TableBorder.all(color: PdfColor.fromHex('#E8F5E9')),
         ),
       ],
     );
@@ -200,12 +205,13 @@ class PdfReportService {
 
   pw.Widget _signature(String label) {
     return pw.SizedBox(
-      width: 220,
+      width: 200,
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Divider(color: PdfColors.grey500),
-          pw.Text(label),
+          pw.Divider(color: PdfColors.grey400),
+          pw.SizedBox(height: 4),
+          pw.Text(label, style: const pw.TextStyle(color: PdfColors.grey700)),
         ],
       ),
     );

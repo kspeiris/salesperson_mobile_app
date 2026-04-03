@@ -29,9 +29,11 @@ class _ShopsScreenState extends State<ShopsScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
+    final scheme = Theme.of(context).colorScheme;
+
     return AppShell(
-      title: 'Shops',
-      subtitle: 'Search, add, edit, and deactivate customer shops used for sales and collection entry.',
+      title: 'Customer Management',
+      subtitle: 'Manage Bio Care customer shops and outstanding credit balances.',
       actions: [
         IconButton(
           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ShopImportScreen())),
@@ -49,9 +51,9 @@ class _ShopsScreenState extends State<ShopsScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.78),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFFDDE6DF)),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE8F5E9)),
             ),
             child: Column(
               children: [
@@ -93,7 +95,7 @@ class _ShopsScreenState extends State<ShopsScreen> {
                           MaterialPageRoute(builder: (_) => const ShopFormScreen()),
                         ),
                         icon: const Icon(Icons.add_business_outlined),
-                        label: const Text('Add shop'),
+                        label: const Text('Add Shop'),
                       ),
                     ),
                   ],
@@ -123,55 +125,81 @@ class _ShopsScreenState extends State<ShopsScreen> {
                   itemBuilder: (context, index) {
                     final shop = shops[index];
                     return Container(
-                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.82),
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: const Color(0xFFDDE6DF)),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFE8F5E9)),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x052E7D32),
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          )
+                        ],
                       ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Column(
                         children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.10),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: const Icon(Icons.storefront_outlined),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(shop.name, style: Theme.of(context).textTheme.titleMedium),
-                                const SizedBox(height: 6),
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  children: [
-                                    _MiniBadge(icon: Icons.place_outlined, label: shop.area),
-                                    _MiniBadge(icon: Icons.person_outline_rounded, label: shop.ownerContact),
-                                  ],
+                                Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: scheme.primary.withValues(alpha: 0.10),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Icon(Icons.storefront_outlined, color: scheme.primary),
                                 ),
-                                const SizedBox(height: 12),
-                                Text('Outstanding balance', style: Theme.of(context).textTheme.bodySmall),
-                                const SizedBox(height: 4),
-                                Text(
-                                  AppFormatters.currency(shop.balance),
-                                  style: Theme.of(context).textTheme.titleLarge,
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(shop.name, style: Theme.of(context).textTheme.titleMedium),
+                                      const SizedBox(height: 6),
+                                      Wrap(
+                                        spacing: 8,
+                                        runSpacing: 8,
+                                        children: [
+                                          _MiniBadge(icon: Icons.place_outlined, label: shop.area),
+                                          _MiniBadge(icon: Icons.person_outline_rounded, label: shop.ownerContact),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuButton<String>(
+                                  onSelected: (value) => _handleAction(value, shop),
+                                  itemBuilder: (_) => const [
+                                    PopupMenuItem(value: 'edit', child: Text('Edit')),
+                                    PopupMenuItem(value: 'deactivate', child: Text('Deactivate')),
+                                  ],
                                 ),
                               ],
                             ),
                           ),
-                          PopupMenuButton<String>(
-                            onSelected: (value) => _handleAction(value, shop),
-                            itemBuilder: (_) => const [
-                              PopupMenuItem(value: 'edit', child: Text('Edit')),
-                              PopupMenuItem(value: 'deactivate', child: Text('Deactivate')),
-                            ],
+                          const Divider(height: 1, color: Color(0xFFE8F5E9)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.account_balance_wallet_outlined, size: 16, color: Colors.grey.shade600),
+                                    const SizedBox(width: 6),
+                                    Text('Outstanding Credit', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey.shade700)),
+                                  ],
+                                ),
+                                Text(
+                                  AppFormatters.currency(shop.balance),
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: shop.balance > 0 ? Colors.red.shade700 : scheme.primary),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -227,15 +255,16 @@ class _MiniBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3F7F4),
+        color: const Color(0xFFF8FDF8),
         borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: const Color(0xFFE8F5E9)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16),
+          Icon(icon, size: 16, color: const Color(0xFF263238)),
           const SizedBox(width: 6),
-          Text(label, style: Theme.of(context).textTheme.bodySmall),
+          Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: const Color(0xFF263238))),
         ],
       ),
     );

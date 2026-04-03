@@ -26,13 +26,32 @@ class _ProductsScreenState extends State<ProductsScreen> {
     super.dispose();
   }
 
+  String _getProductEmoji(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('aloe')) return '🌿';
+    if (lower.contains('orange') || lower.contains('fruit') || lower.contains('citrus')) return '🍊';
+    if (lower.contains('energy') || lower.contains('boost')) return '💪';
+    if (lower.contains('herbal')) return '🍃';
+    return '🧪';
+  }
+
+  Color _getProductColor(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('aloe')) return const Color(0xFF2E7D32);
+    if (lower.contains('orange') || lower.contains('fruit')) return Colors.orange.shade700;
+    if (lower.contains('energy')) return Colors.amber.shade800;
+    if (lower.contains('herbal')) return Colors.purple.shade600;
+    return const Color(0xFF263238);
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
+    final scheme = Theme.of(context).colorScheme;
 
     return AppShell(
       title: 'Products',
-      subtitle: 'Manage the offline product catalog, pricing, SKU details, and barcode-linked items.',
+      subtitle: 'Manage the Bio Care product catalog, pricing, and barcode items.',
       actions: [
         IconButton(
           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductImportScreen())),
@@ -50,16 +69,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.78),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFFDDE6DF)),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE8F5E9)),
             ),
             child: Column(
               children: [
                 TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    hintText: 'Search by product, SKU, or barcode',
+                    hintText: 'Search by product name, SKU, or barcode',
                     prefixIcon: const Icon(Icons.search_rounded),
                     suffixIcon: _query.isEmpty
                         ? null
@@ -94,7 +113,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           MaterialPageRoute(builder: (_) => const ProductFormScreen()),
                         ),
                         icon: const Icon(Icons.add_box_outlined),
-                        label: const Text('Add product'),
+                        label: const Text('Add Product'),
                       ),
                     ),
                   ],
@@ -115,7 +134,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   return const EmptyState(
                     icon: Icons.inventory_2_outlined,
                     title: 'No products found',
-                    message: 'Add products locally or import a CSV file so salespersons can build item-level sales offline.',
+                    message: 'Add Bio Care products locally or import a CSV file.',
                   );
                 }
                 return ListView.separated(
@@ -123,12 +142,22 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final product = products[index];
+                    final emoji = _getProductEmoji(product.name);
+                    final iconColor = _getProductColor(product.name);
+
                     return Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.82),
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: const Color(0xFFDDE6DF)),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFE8F5E9)),
+                        boxShadow: const [
+                           BoxShadow(
+                             color: Color(0x052E7D32),
+                             blurRadius: 8,
+                             offset: Offset(0, 2),
+                           )
+                        ],
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,10 +166,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.12),
+                              color: iconColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: Icon(Icons.inventory_2_outlined, color: Theme.of(context).colorScheme.secondary),
+                            alignment: Alignment.center,
+                            child: Text(emoji, style: const TextStyle(fontSize: 24)),
                           ),
                           const SizedBox(width: 14),
                           Expanded(
@@ -165,7 +195,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                 const SizedBox(height: 4),
                                 Text(
                                   AppFormatters.currency(product.unitPrice),
-                                  style: Theme.of(context).textTheme.titleLarge,
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: scheme.primary),
                                 ),
                               ],
                             ),
@@ -231,15 +261,16 @@ class _ProductBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F3EA),
+        color: const Color(0xFFF8FDF8),
         borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: const Color(0xFFE8F5E9)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16),
+          Icon(icon, size: 16, color: const Color(0xFF263238)),
           const SizedBox(width: 6),
-          Text(label, style: Theme.of(context).textTheme.bodySmall, overflow: TextOverflow.ellipsis),
+          Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: const Color(0xFF263238)), overflow: TextOverflow.ellipsis),
         ],
       ),
     );

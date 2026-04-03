@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../core/theme/app_theme.dart';
 import '../screens/auth/login_screen.dart';
-import '../screens/dashboard/dashboard_screen.dart';
+import '../screens/main_layout.dart';
 import 'app_controller.dart';
 
 class SalespersonApp extends StatelessWidget {
@@ -20,7 +20,7 @@ class SalespersonApp extends StatelessWidget {
           if (!controller.initialized) {
             return const Scaffold(body: Center(child: CircularProgressIndicator()));
           }
-          return controller.authenticated ? const DashboardScreen() : const LoginScreen();
+          return controller.authenticated ? const MainLayout() : const LoginScreen();
         },
       ),
     );

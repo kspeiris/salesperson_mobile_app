@@ -6,14 +6,9 @@ import '../../core/utils/formatters.dart';
 import '../../core/widgets/brand_logo.dart';
 import '../../core/widgets/metric_card.dart';
 import '../../core/widgets/section_card.dart';
+import '../../models/entities.dart';
 import '../collections/collection_entry_screen.dart';
-import '../collections/collections_history_screen.dart';
-import '../products/products_screen.dart';
-import '../reports/reports_screen.dart';
 import '../sales/sale_entry_screen.dart';
-import '../sales/sales_history_screen.dart';
-import '../settings/settings_screen.dart';
-import '../shops/shops_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -36,22 +31,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final controller = context.watch<AppController>();
     final width = MediaQuery.of(context).size.width;
     final metricCrossAxisCount = width >= 980 ? 4 : width >= 640 ? 2 : 1;
-    final workspaceCrossAxisCount = width >= 900 ? 3 : width >= 620 ? 2 : 1;
     final metricAspectRatio = width >= 980
         ? 1.16
         : width >= 640
             ? 1.14
             : 1.34;
-    final workspaceAspectRatio = width >= 620 ? 1.26 : 1.52;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Field Dashboard'),
+        title: const Text('Bio Care Hub'),
+        centerTitle: false,
         actions: [
           IconButton(
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen())),
-            icon: const Icon(Icons.tune_rounded),
-            tooltip: 'Settings',
+            onPressed: () => controller.logout(),
+            icon: const Icon(Icons.logout_rounded),
+            tooltip: 'Logout',
           ),
         ],
       ),
@@ -59,17 +53,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: RefreshIndicator(
           onRefresh: () async => setState(() {}),
           child: FutureBuilder(
-            future: controller.dashboardFor(_selectedDate),
+            future: Future.wait([
+              controller.dashboardFor(_selectedDate),
+              controller.fetchSales(),
+              controller.fetchCollections(),
+            ]),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              final summary = snapshot.data!;
+              final summary = snapshot.data![0] as DashboardSummary;
+              final sales = snapshot.data![1] as List<SaleRecord>;
+              final collections = snapshot.data![2] as List<CollectionRecord>;
+
               final totalOrders = summary.salesCount + summary.collectionCount;
               final cashShare = summary.totalSales == 0 ? 0 : (summary.cashSales / summary.totalSales) * 100;
               final collectionCoverage =
                   summary.totalSales == 0 ? 0 : (summary.totalCollections / summary.totalSales) * 100;
+
+              // Combined activity, limited to 5
+              final activities = _combineActivity(sales, collections);
 
               return Center(
                 child: ConstrainedBox(
@@ -92,6 +96,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           MaterialPageRoute(builder: (_) => const CollectionEntryScreen()),
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      _SmartSuggestionBanner(),
                       const SizedBox(height: 16),
                       SectionCard(
                         title: 'Today at a glance',
@@ -142,7 +148,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         title: 'Collection coverage',
                                         value: '${collectionCoverage.toStringAsFixed(0)}%',
                                         description:
-                                            'A quick comparison of collections against today\'s sales value for the selected date.',
+                                            'A quick comparison of collections against today\'s sales value.',
                                         icon: Icons.ssid_chart_rounded,
                                       ),
                                       const SizedBox(height: 12),
@@ -150,7 +156,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         title: 'Route activity',
                                         value: '$totalOrders actions',
                                         description:
-                                            'Combined orders and receipts captured so far, giving you a clean pulse on route momentum.',
+                                            'Combined orders and receipts captured for the selected date.',
                                         icon: Icons.route_rounded,
                                       ),
                                     ],
@@ -164,7 +170,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         title: 'Collection coverage',
                                         value: '${collectionCoverage.toStringAsFixed(0)}%',
                                         description:
-                                            'A quick comparison of collections against today\'s sales value for the selected date.',
+                                            'A quick comparison of collections against today\'s sales value.',
                                         icon: Icons.ssid_chart_rounded,
                                       ),
                                     ),
@@ -174,7 +180,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         title: 'Route activity',
                                         value: '$totalOrders actions',
                                         description:
-                                            'Combined orders and receipts captured so far, giving you a clean pulse on route momentum.',
+                                            'Combined orders and receipts captured for the selected date.',
                                         icon: Icons.route_rounded,
                                       ),
                                     ),
@@ -187,125 +193,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       const SizedBox(height: 16),
                       SectionCard(
-                        title: 'Quick actions',
-                        child: GridView.count(
-                          crossAxisCount: width >= 740 ? 4 : 2,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: width >= 740 ? 1.15 : 1.02,
-                          children: [
-                            _QuickActionTile(
-                              title: 'New sale',
-                              subtitle: 'Capture an order',
-                              icon: Icons.add_shopping_cart_rounded,
-                              accent: const Color(0xFF155C4A),
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const SaleEntryScreen()),
+                        title: 'Recent activity',
+                        child: activities.isEmpty
+                            ? const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 32),
+                                child: Center(child: Text('No recorded activity found.')),
+                              )
+                            : Column(
+                                children: [
+                                  for (var i = 0; i < activities.length; i++) ...[
+                                    _ActivityItem(activity: activities[i]),
+                                    if (i < activities.length - 1)
+                                      const Divider(height: 24, color: Color(0xFFF1F4F1)),
+                                  ],
+                                ],
                               ),
-                            ),
-                            _QuickActionTile(
-                              title: 'Collection',
-                              subtitle: 'Log a payment',
-                              icon: Icons.request_quote_outlined,
-                              accent: const Color(0xFFE28A2B),
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const CollectionEntryScreen()),
-                              ),
-                            ),
-                            _QuickActionTile(
-                              title: 'History',
-                              subtitle: 'Review orders',
-                              icon: Icons.history_rounded,
-                              accent: const Color(0xFF2F7A6B),
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const SalesHistoryScreen()),
-                              ),
-                            ),
-                            _QuickActionTile(
-                              title: 'Reports',
-                              subtitle: 'Export daily files',
-                              icon: Icons.picture_as_pdf_outlined,
-                              accent: const Color(0xFF336C88),
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const ReportsScreen()),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      SectionCard(
-                        title: 'Workspace',
-                        child: GridView.count(
-                          crossAxisCount: workspaceCrossAxisCount,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: workspaceAspectRatio,
-                          children: [
-                            _WorkspaceTile(
-                              title: 'Sales history',
-                              subtitle: 'Review saved orders and void entries when needed.',
-                              icon: Icons.receipt_long_rounded,
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const SalesHistoryScreen()),
-                              ),
-                            ),
-                            _WorkspaceTile(
-                              title: 'Collections history',
-                              subtitle: 'Track receipts, balances, and payment updates.',
-                              icon: Icons.account_balance_wallet_outlined,
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const CollectionsHistoryScreen()),
-                              ),
-                            ),
-                            _WorkspaceTile(
-                              title: 'Shops',
-                              subtitle: 'Manage retail partners, balances, and route targets.',
-                              icon: Icons.storefront_outlined,
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const ShopsScreen()),
-                              ),
-                            ),
-                            _WorkspaceTile(
-                              title: 'Products',
-                              subtitle: 'Keep item pricing, barcodes, and catalog details organized.',
-                              icon: Icons.inventory_2_outlined,
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const ProductsScreen()),
-                              ),
-                            ),
-                            _WorkspaceTile(
-                              title: 'Reports',
-                              subtitle: 'Generate PDFs and share export files from the device.',
-                              icon: Icons.insert_drive_file_outlined,
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const ReportsScreen()),
-                              ),
-                            ),
-                            _WorkspaceTile(
-                              title: 'Settings',
-                              subtitle: 'Update identity, security, and data tools.',
-                              icon: Icons.settings_outlined,
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                     ],
                   ),
@@ -316,6 +218,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     );
+  }
+
+  List<dynamic> _combineActivity(List<SaleRecord> sales, List<CollectionRecord> collections) {
+    final list = <dynamic>[...sales, ...collections];
+    list.sort((a, b) {
+      final DateTime da = (a is SaleRecord) ? a.createdAt : (a as CollectionRecord).createdAt;
+      final DateTime db = (b is SaleRecord) ? b.createdAt : (b as CollectionRecord).createdAt;
+      return db.compareTo(da);
+    });
+    return list.take(5).toList();
   }
 
   Future<void> _pickDate() async {
@@ -330,6 +242,109 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 }
+
+class _ActivityItem extends StatelessWidget {
+  const _ActivityItem({required this.activity});
+
+  final dynamic activity;
+
+  @override
+  Widget build(BuildContext context) {
+    final isSale = activity is SaleRecord;
+    final String shopName = isSale ? (activity as SaleRecord).shopName : (activity as CollectionRecord).shopName;
+    final double amount = isSale ? (activity as SaleRecord).total : (activity as CollectionRecord).amount;
+    final DateTime createdAt = isSale ? (activity as SaleRecord).createdAt : (activity as CollectionRecord).createdAt;
+    
+    final dateStr = AppFormatters.date(createdAt);
+    final timeStr = AppFormatters.time(createdAt);
+
+    return Row(
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: isSale ? const Color(0xFFE8F5E9) : const Color(0xFFFFF3E0),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            isSale ? Icons.receipt_long_rounded : Icons.request_quote_rounded,
+            color: isSale ? const Color(0xFF2E7D32) : const Color(0xFFE65100),
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                shopName,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '$dateStr • $timeStr',
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+        Text(
+          AppFormatters.currency(amount),
+          style: const TextStyle(fontWeight: FontWeight.w800),
+        ),
+      ],
+    );
+  }
+}
+
+class _SmartSuggestionBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF8E1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFFD54F)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.amber.shade200,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.lightbulb_outline_rounded, color: Colors.amber, size: 24),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Smart Suggestion',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.brown),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '3 shops on your route haven\'t made a payment this week. Consider following up today.',
+                  style: TextStyle(fontSize: 13, color: Colors.brown.shade700),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right_rounded, color: Colors.brown),
+        ],
+      ),
+    );
+  }
+}
+
 
 class _HeroPanel extends StatelessWidget {
   const _HeroPanel({
@@ -358,26 +373,30 @@ class _HeroPanel extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(34),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        borderRadius: BorderRadius.circular(16),
+        gradient: const SweepGradient(
+          center: Alignment.bottomRight,
+          startAngle: 0.0,
+          endAngle: 3.14 * 2,
           colors: [
-            Color(0xFF155C4A),
-            Color(0xFF2F7A6B),
-            Color(0xFF0D3B35),
+            Color(0xFF2E7D32),
+            Color(0xFF66BB6A),
+            Color(0xFF1B5E20),
+            Color(0xFF2E7D32),
+            Color(0xFF2E7D32),
           ],
+          stops: [0.0, 0.25, 0.5, 0.75, 1.0],
         ),
         boxShadow: const [
           BoxShadow(
-            blurRadius: 28,
-            offset: Offset(0, 14),
-            color: Color(0x1F0F231D),
+            blurRadius: 32,
+            offset: Offset(0, 16),
+            color: Color(0x1F2E7D32),
           ),
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(compact ? 20 : 24),
+        padding: EdgeInsets.all(compact ? 24 : 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -392,35 +411,36 @@ class _HeroPanel extends StatelessWidget {
                 _HeroDateChip(label: AppFormatters.date(selectedDate), onTap: onDateTap),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 28),
             Text(
-              'Hello, $salesperson',
+              'Good Morning, $salesperson 🌿',
               style: (compact ? textTheme.headlineSmall : textTheme.headlineMedium)?.copyWith(
                 color: Colors.white,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               companyName,
-              style: textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.86)),
+              style: textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.86), fontWeight: FontWeight.w500),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 24),
             Text(
-              'Stay on top of the route with clean daily totals, fast entry points, and a layout designed for quick mobile use in the field.',
-              style: textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.82)),
+              'Your daily route summary and quick actions. Keep delivering health and trusted quality to our customers.',
+              style: textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.8), height: 1.6),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 28),
             Wrap(
-              spacing: 10,
-              runSpacing: 10,
+              spacing: 12,
+              runSpacing: 12,
               children: [
                 _HeroStatChip(label: '$totalOrders actions', icon: Icons.route_rounded),
                 const _HeroStatChip(label: 'Offline ready', icon: Icons.offline_bolt_rounded),
                 const _HeroStatChip(label: 'Share reports later', icon: Icons.share_outlined),
               ],
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 36),
             LayoutBuilder(
               builder: (context, constraints) {
                 final stacked = constraints.maxWidth < 560;
@@ -453,7 +473,7 @@ class _HeroPanel extends StatelessWidget {
                         onTap: onNewSale,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: _HeroActionButton(
                         label: 'Record collection',
@@ -562,12 +582,12 @@ class _HeroActionButton extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(16),
       child: Ink(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         decoration: BoxDecoration(
           color: background,
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.white.withValues(alpha: filled ? 0.0 : 0.18)),
         ),
         child: Row(
@@ -606,7 +626,7 @@ class _InsightCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
         color: scheme.primary.withValues(alpha: 0.05),
         border: Border.all(color: scheme.primary.withValues(alpha: 0.10)),
       ),
@@ -639,124 +659,6 @@ class _InsightCard extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _QuickActionTile extends StatelessWidget {
-  const _QuickActionTile({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.accent,
-    required this.onTap,
-  });
-
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color accent;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
-      child: Ink(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.white,
-              accent.withValues(alpha: 0.08),
-            ],
-          ),
-          border: Border.all(color: accent.withValues(alpha: 0.14)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                color: accent,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(icon, color: Colors.white),
-            ),
-            const Spacer(),
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 6),
-            Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _WorkspaceTile extends StatelessWidget {
-  const _WorkspaceTile({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.onTap,
-  });
-
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
-      child: Ink(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.78),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: const Color(0xFFDDE6DF)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: scheme.primary.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Icon(icon, color: scheme.primary),
-                ),
-                const Spacer(),
-                const Icon(Icons.chevron_right_rounded),
-              ],
-            ),
-            const Spacer(),
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 6),
-            Text(
-              subtitle,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
-        ),
       ),
     );
   }

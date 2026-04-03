@@ -39,6 +39,7 @@ class AppController extends ChangeNotifier {
   File? _lastGeneratedReport;
   ExportBundle? _lastExportBundle;
   String? _lastBackupPath;
+  int _currentTab = 0;
 
   bool get initialized => _initialized;
   bool get authenticated => _authenticated;
@@ -47,6 +48,12 @@ class AppController extends ChangeNotifier {
   File? get lastGeneratedReport => _lastGeneratedReport;
   ExportBundle? get lastExportBundle => _lastExportBundle;
   String? get lastBackupPath => _lastBackupPath;
+  int get currentTab => _currentTab;
+
+  set currentTab(int index) {
+    _currentTab = index;
+    notifyListeners();
+  }
 
   Future<void> initialize() async {
     await _repository.initialize();

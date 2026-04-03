@@ -58,137 +58,166 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
         final currentBalance = selectedShop?.balance ?? 0;
         final balanceAfter = currentBalance - amount;
 
-        return AppShell(
-          title: 'New Collection',
-          subtitle: 'Capture payments received from shops and preserve a clean collection trail for reporting and desktop entry.',
-          header: Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              _CollectionChip(icon: Icons.schedule_outlined, label: AppFormatters.dateTime(DateTime.now())),
-              _CollectionChip(icon: Icons.account_balance_wallet_outlined, label: _paymentMethod ?? 'Cash'),
-            ],
-          ),
-          child: Form(
-            key: _formKey,
-            child: ListView(
+        return Scaffold(
+          body: AppShell(
+            title: 'New Collection',
+            subtitle: 'Capture payments received from shops and preserve a clean collection trail for reporting.',
+            header: Wrap(
+              spacing: 10,
+              runSpacing: 10,
               children: [
-                SectionCard(
-                  title: 'Receipt details',
-                  child: Column(
-                    children: [
-                      DropdownButtonFormField<Shop>(
-                        initialValue: selectedShop,
-                        isExpanded: true,
-                        items: shops
-                            .map(
-                              (shop) => DropdownMenuItem<Shop>(
-                                value: shop,
-                                child: Text('${shop.name} - ${shop.area}'),
-                              ),
-                            )
-                            .toList(),
-                        decoration: const InputDecoration(
-                          labelText: 'Shop',
-                          prefixIcon: Icon(Icons.storefront_outlined),
-                        ),
-                        onChanged: (value) => setState(() => _selectedShop = value),
-                        validator: (value) => value == null ? 'Select a shop.' : null,
+                _CollectionChip(icon: Icons.schedule_outlined, label: AppFormatters.dateTime(DateTime.now())),
+                _CollectionChip(icon: Icons.account_balance_wallet_outlined, label: _paymentMethod ?? 'Cash'),
+              ],
+            ),
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                padding: const EdgeInsets.only(bottom: 100),
+                children: [
+                  SectionCard(
+                    title: 'Receipt details',
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFE8F5E9)),
                       ),
-                      const SizedBox(height: 14),
-                      TextFormField(
-                        controller: _amountController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        decoration: const InputDecoration(
-                          labelText: 'Amount',
-                          prefixIcon: Icon(Icons.payments_outlined),
-                        ),
-                        onChanged: (_) => setState(() {}),
-                        validator: (value) {
-                          final amount = double.tryParse((value ?? '').trim());
-                          if (amount == null || amount <= 0) {
-                            return 'Enter a positive amount.';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 14),
-                      DropdownButtonFormField<String>(
-                        initialValue: _paymentMethod,
-                        decoration: const InputDecoration(
-                          labelText: 'Payment method',
-                          prefixIcon: Icon(Icons.credit_score_outlined),
-                        ),
-                        items: methods
-                            .map((method) => DropdownMenuItem(value: method, child: Text(method)))
-                            .toList(),
-                        onChanged: (value) => setState(() => _paymentMethod = value),
-                      ),
-                      const SizedBox(height: 14),
-                      TextFormField(
-                        controller: _referenceController,
-                        minLines: 2,
-                        maxLines: 3,
-                        decoration: const InputDecoration(
-                          labelText: 'Reference note',
-                          hintText: 'Cheque number, bank note, or internal remark',
-                          alignLabelWithHint: true,
-                          prefixIcon: Icon(Icons.notes_outlined),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                SectionCard(
-                  title: 'Balance impact',
-                  child: Column(
-                    children: [
-                      Row(
+                      child: Column(
                         children: [
-                          Expanded(
-                            child: _BalanceMetric(
-                              label: 'Outstanding now',
-                              value: AppFormatters.currency(currentBalance),
+                          DropdownButtonFormField<Shop>(
+                            initialValue: selectedShop,
+                            isExpanded: true,
+                            items: shops
+                                .map(
+                                  (shop) => DropdownMenuItem<Shop>(
+                                    value: shop,
+                                    child: Text('${shop.name} - ${shop.area}'),
+                                  ),
+                                )
+                                .toList(),
+                            decoration: const InputDecoration(
+                              labelText: 'Shop',
+                              prefixIcon: Icon(Icons.storefront_outlined),
                             ),
+                            onChanged: (value) => setState(() => _selectedShop = value),
+                            validator: (value) => value == null ? 'Select a shop.' : null,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _BalanceMetric(
-                              label: 'After payment',
-                              value: AppFormatters.currency(balanceAfter < 0 ? 0 : balanceAfter),
-                              emphasized: true,
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _amountController,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            decoration: const InputDecoration(
+                              labelText: 'Amount',
+                              prefixIcon: Icon(Icons.payments_outlined),
+                            ),
+                            onChanged: (_) => setState(() {}),
+                            validator: (value) {
+                              final amount = double.tryParse((value ?? '').trim());
+                              if (amount == null || amount <= 0) {
+                                return 'Enter a positive amount.';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          DropdownButtonFormField<String>(
+                            initialValue: _paymentMethod,
+                            decoration: const InputDecoration(
+                              labelText: 'Payment method',
+                              prefixIcon: Icon(Icons.credit_score_outlined),
+                            ),
+                            items: methods
+                                .map((method) => DropdownMenuItem(value: method, child: Text(method)))
+                                .toList(),
+                            onChanged: (value) => setState(() => _paymentMethod = value),
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _referenceController,
+                            minLines: 2,
+                            maxLines: 3,
+                            decoration: const InputDecoration(
+                              labelText: 'Reference note',
+                              hintText: 'Cheque number, bank note, or internal remark',
+                              alignLabelWithHint: true,
+                              prefixIcon: Icon(Icons.notes_outlined),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 14),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF4F8F5),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFDDE8E0)),
-                        ),
-                        child: Column(
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SectionCard(
+                    title: 'Balance impact',
+                    child: Column(
+                      children: [
+                        Row(
                           children: [
-                            _summary('Selected payment method', _paymentMethod ?? '-'),
-                            const SizedBox(height: 10),
-                            _summary('Entered amount', AppFormatters.currency(amount)),
+                            Expanded(
+                              child: _BalanceMetric(
+                                label: 'Outstanding now',
+                                value: AppFormatters.currency(currentBalance),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _BalanceMetric(
+                                label: 'After payment',
+                                value: AppFormatters.currency(balanceAfter < 0 ? 0 : balanceAfter),
+                                emphasized: true,
+                              ),
+                            ),
                           ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 14),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8FDF8),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFE8F5E9)),
+                          ),
+                          child: Column(
+                            children: [
+                              _summary('Selected payment method', _paymentMethod ?? '-'),
+                              const SizedBox(height: 10),
+                              _summary('Entered amount', AppFormatters.currency(amount)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                ],
+              ),
+            ),
+          ),
+          bottomNavigationBar: SafeArea(
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x0F000000),
+                    blurRadius: 10,
+                    offset: Offset(0, -4),
+                  ),
+                ],
+              ),
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: _saveCollection,
-                  icon: const Icon(Icons.save_outlined),
-                  label: const Text('Save collection offline'),
-                ),
-              ],
+                onPressed: _saveCollection,
+                icon: const Icon(Icons.check_circle_rounded),
+                label: const Text('CONFIRM PAYMENT', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ),
             ),
           ),
         );
@@ -219,7 +248,7 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
   Widget _summary(String label, String value) {
     return Row(
       children: [
-        Expanded(child: Text(label)),
+        Expanded(child: Text(label, style: const TextStyle(color: Colors.black54))),
         Text(value, style: const TextStyle(fontWeight: FontWeight.w700)),
       ],
     );
@@ -242,15 +271,16 @@ class _CollectionChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: scheme.secondary.withValues(alpha: 0.12),
+        color: scheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: scheme.primary.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 18, color: scheme.secondary),
+          Icon(icon, size: 18, color: scheme.primary),
           const SizedBox(width: 8),
-          Text(label, style: TextStyle(color: scheme.secondary, fontWeight: FontWeight.w700)),
+          Text(label, style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w700)),
         ],
       ),
     );
@@ -274,18 +304,25 @@ class _BalanceMetric extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: emphasized ? scheme.secondary.withValues(alpha: 0.10) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: emphasized ? scheme.secondary.withValues(alpha: 0.18) : const Color(0xFFDDE6DF)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: emphasized ? scheme.primary : const Color(0xFFE8F5E9)),
+        boxShadow: emphasized ? [
+          BoxShadow(
+            color: scheme.primary.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          )
+        ] : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: Theme.of(context).textTheme.bodySmall),
+          Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: emphasized ? scheme.primary : null)),
           const SizedBox(height: 6),
           Text(
             value,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800, color: emphasized ? scheme.primary : null),
           ),
         ],
       ),
