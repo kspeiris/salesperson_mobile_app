@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:ui';
-
 import '../../app/app_controller.dart';
 import '../../core/theme/app_assets.dart';
 
@@ -47,7 +45,8 @@ class _LoginScreenState extends State<LoginScreen> {
       pin: _pinController.text,
     );
     if (error != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error)));
       return;
     }
     if (!mounted) return;
@@ -75,20 +74,24 @@ class _LoginScreenState extends State<LoginScreen> {
           image: const DecorationImage(
             image: AssetImage(AppAssets.pageTexture),
             fit: BoxFit.cover,
-            opacity: 0.05,
+            alignment: Alignment.topCenter,
+            opacity: 0.09,
           ),
         ),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(stacked ? 16 : 32, 16, stacked ? 16 : 32, 32),
+              padding: EdgeInsets.fromLTRB(
+                  stacked ? 16 : 32, 16, stacked ? 16 : 32, 32),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1080),
                 child: stacked
                     ? Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          _IntroPanel(companyName: controller.settings.companyName, compact: true),
+                          _IntroPanel(
+                              companyName: controller.settings.companyName,
+                              compact: true),
                           const SizedBox(height: 24),
                           _LoginCard(
                             formKey: _formKey,
@@ -105,7 +108,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           Expanded(
                             flex: 5,
-                            child: _IntroPanel(companyName: controller.settings.companyName),
+                            child: _IntroPanel(
+                                companyName: controller.settings.companyName),
                           ),
                           const SizedBox(width: 32),
                           Expanded(
@@ -143,11 +147,13 @@ class _IntroPanel extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Container(
+      constraints: BoxConstraints(minHeight: compact ? 320 : 520),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
         image: const DecorationImage(
           image: AssetImage(AppAssets.loginHero),
           fit: BoxFit.cover,
+          alignment: Alignment.centerRight,
         ),
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
@@ -158,7 +164,7 @@ class _IntroPanel extends StatelessWidget {
           ],
         ),
         boxShadow: const [
-           BoxShadow(
+          BoxShadow(
             blurRadius: 32,
             offset: Offset(0, 16),
             color: Color(0x1F2E7D32),
@@ -167,39 +173,47 @@ class _IntroPanel extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(32),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  const Color(0xFF16311A).withValues(alpha: 0.78),
-                  const Color(0xFF2E7D32).withValues(alpha: 0.52),
-                ],
-              ),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              stops: const [0.0, 0.48, 1.0],
+              colors: [
+                const Color(0xFF16311A).withValues(alpha: 0.92),
+                const Color(0xFF2E7D32).withValues(alpha: 0.70),
+                const Color(0xFF2E7D32).withValues(alpha: 0.24),
+              ],
             ),
-            padding: EdgeInsets.all(compact ? 24 : 40),
+          ),
+          padding: EdgeInsets.all(compact ? 24 : 40),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: compact ? 260 : 560),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+                    border:
+                        Border.all(color: Colors.white.withValues(alpha: 0.25)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.eco_rounded, color: Color(0xFFA5D6A7), size: 20),
+                      const Icon(Icons.eco_rounded,
+                          color: Color(0xFFA5D6A7), size: 20),
                       const SizedBox(width: 8),
                       Text(
                         companyName,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5),
                       ),
                     ],
                   ),
@@ -207,21 +221,32 @@ class _IntroPanel extends StatelessWidget {
                 const SizedBox(height: 32),
                 Text(
                   'Bio Care Sales App',
-                  style: textTheme.displaySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w800, height: 1.1),
+                  style: textTheme.displaySmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      height: 1.1),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   '"Pure Health. Trusted Quality."\nCapture orders, manage collections, and execute route strategies seamlessly with a delightfully engineered workflow.',
-                  style: textTheme.titleMedium?.copyWith(color: Colors.white.withValues(alpha: 0.85), height: 1.5, fontWeight: FontWeight.w400),
+                  style: textTheme.titleMedium?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.85),
+                      height: 1.5,
+                      fontWeight: FontWeight.w400),
                 ),
                 const SizedBox(height: 32),
                 const Wrap(
                   spacing: 12,
                   runSpacing: 12,
                   children: [
-                    _Badge(icon: Icons.wifi_off_rounded, label: 'Offline-First Storage'),
-                    _Badge(icon: Icons.insights_rounded, label: 'Smart Insights'),
-                    _Badge(icon: Icons.security_rounded, label: 'Enterprise Grade'),
+                    _Badge(
+                        icon: Icons.wifi_off_rounded,
+                        label: 'Offline-First Storage'),
+                    _Badge(
+                        icon: Icons.insights_rounded, label: 'Smart Insights'),
+                    _Badge(
+                        icon: Icons.security_rounded,
+                        label: 'Enterprise Grade'),
                   ],
                 ),
               ],
@@ -235,7 +260,7 @@ class _IntroPanel extends StatelessWidget {
 
 class _Badge extends StatelessWidget {
   const _Badge({required this.icon, required this.label});
-  
+
   final IconData icon;
   final String label;
 
@@ -255,7 +280,10 @@ class _Badge extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             label,
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.95), fontWeight: FontWeight.w600, fontSize: 13),
+            style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.95),
+                fontWeight: FontWeight.w600,
+                fontSize: 13),
           ),
         ],
       ),
@@ -305,12 +333,18 @@ class _LoginCard extends StatelessWidget {
             children: [
               Text(
                 'Welcome back',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium
+                    ?.copyWith(fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 8),
               Text(
                 'Sign in to access your dashboard and today\'s routes.',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: const Color(0xFF64748B)),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge
+                    ?.copyWith(color: const Color(0xFF64748B)),
               ),
               const SizedBox(height: 32),
               TextFormField(
@@ -320,8 +354,11 @@ class _LoginCard extends StatelessWidget {
                   labelText: 'Salesperson ID / Name',
                   prefixIcon: Icon(Icons.badge_outlined),
                 ),
-                textInputAction: pinEnabled ? TextInputAction.next : TextInputAction.done,
-                validator: (value) => (value == null || value.trim().isEmpty) ? 'Please enter your ID.' : null,
+                textInputAction:
+                    pinEnabled ? TextInputAction.next : TextInputAction.done,
+                validator: (value) => (value == null || value.trim().isEmpty)
+                    ? 'Please enter your ID.'
+                    : null,
                 onFieldSubmitted: (_) {
                   if (!pinEnabled) onSubmit();
                 },
@@ -331,7 +368,8 @@ class _LoginCard extends StatelessWidget {
                 TextFormField(
                   controller: pinController,
                   obscureText: true,
-                  style: const TextStyle(fontWeight: FontWeight.w500, letterSpacing: 4),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w500, letterSpacing: 4),
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Access PIN',
@@ -341,8 +379,12 @@ class _LoginCard extends StatelessWidget {
                   onFieldSubmitted: (_) => onSubmit(),
                   validator: (value) {
                     if (!pinEnabled) return null;
-                    if (value == null || value.trim().isEmpty) return 'PIN is required.';
-                    if (value.trim().length < 4) return 'PIN must be at least 4 digits.';
+                    if (value == null || value.trim().isEmpty) {
+                      return 'PIN is required.';
+                    }
+                    if (value.trim().length < 4) {
+                      return 'PIN must be at least 4 digits.';
+                    }
                     return null;
                   },
                 ),
@@ -354,9 +396,11 @@ class _LoginCard extends StatelessWidget {
                   onPressed: onSubmit,
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 20),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: const Text('Access Workspace', style: TextStyle(fontSize: 16)),
+                  child: const Text('Access Workspace',
+                      style: TextStyle(fontSize: 16)),
                 ),
               ),
               const SizedBox(height: 24),
@@ -364,11 +408,15 @@ class _LoginCard extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.shield_outlined, size: 16, color: Color(0xFF94A3B8)),
+                    Icon(Icons.shield_outlined,
+                        size: 16, color: Color(0xFF94A3B8)),
                     SizedBox(width: 8),
                     Text(
                       'End-to-end encrypted local storage',
-                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -380,4 +428,3 @@ class _LoginCard extends StatelessWidget {
     );
   }
 }
-

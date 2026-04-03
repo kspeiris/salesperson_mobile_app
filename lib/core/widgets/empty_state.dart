@@ -46,13 +46,23 @@ class EmptyState extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (imageAsset != null) ...[
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: AspectRatio(
-                    aspectRatio: 1.4,
-                    child: Image.asset(
-                      imageAsset!,
-                      fit: BoxFit.cover,
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    color: scheme.primary.withValues(alpha: 0.04),
+                    border: Border.all(
+                        color: scheme.primary.withValues(alpha: 0.08)),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    child: AspectRatio(
+                      aspectRatio: 1.5,
+                      child: Image.asset(
+                        imageAsset!,
+                        fit: BoxFit.contain,
+                        alignment: Alignment.center,
+                      ),
                     ),
                   ),
                 ),

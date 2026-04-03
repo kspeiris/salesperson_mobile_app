@@ -27,42 +27,56 @@ class _ProductsScreenState extends State<ProductsScreen> {
     super.dispose();
   }
 
-  String _getProductEmoji(String name) {
-    final lower = name.toLowerCase();
-    if (lower.contains('aloe')) return '🌿';
-    if (lower.contains('orange') || lower.contains('fruit') || lower.contains('citrus')) return '🍊';
-    if (lower.contains('energy') || lower.contains('boost')) return '💪';
-    if (lower.contains('herbal')) return '🍃';
-    return '🧪';
-  }
-
   Color _getProductColor(String name) {
     final lower = name.toLowerCase();
     if (lower.contains('aloe')) return const Color(0xFF2E7D32);
-    if (lower.contains('orange') || lower.contains('fruit')) return Colors.orange.shade700;
+    if (lower.contains('orange') || lower.contains('fruit')) {
+      return Colors.orange.shade700;
+    }
     if (lower.contains('energy')) return Colors.amber.shade800;
-    if (lower.contains('herbal')) return Colors.purple.shade600;
+    if (lower.contains('herbal')) {
+      return Colors.purple.shade600;
+    }
     return const Color(0xFF263238);
+  }
+
+  IconData _getProductIcon(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('aloe')) return Icons.spa_outlined;
+    if (lower.contains('orange') ||
+        lower.contains('fruit') ||
+        lower.contains('citrus')) {
+      return Icons.local_drink_outlined;
+    }
+    if (lower.contains('energy') || lower.contains('boost')) {
+      return Icons.bolt_outlined;
+    }
+    if (lower.contains('herbal')) return Icons.eco_outlined;
+    return Icons.inventory_2_outlined;
   }
 
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
     final scheme = Theme.of(context).colorScheme;
+    final compact = MediaQuery.of(context).size.width < 640;
 
     return AppShell(
       title: 'Products',
-      subtitle: 'Manage the Bio Care product catalog, pricing, and barcode items.',
+      subtitle:
+          'Manage the Bio Care product catalog, pricing, and barcode items.',
       headerImageAsset: AppAssets.productsHero,
       pageBackgroundAsset: AppAssets.pageTexture,
       actions: [
         IconButton(
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductImportScreen())),
+          onPressed: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const ProductImportScreen())),
           icon: const Icon(Icons.download_for_offline_outlined),
           tooltip: 'Import Products',
         ),
         IconButton(
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductFormScreen())),
+          onPressed: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const ProductFormScreen())),
           icon: const Icon(Icons.add_box_outlined),
           tooltip: 'Add Product',
         ),
@@ -70,14 +84,20 @@ class _ProductsScreenState extends State<ProductsScreen> {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(compact ? 16 : 18),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: const Color(0xFFE8F5E9)),
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  'Search the catalog quickly, then import or add products without leaving this screen.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 16),
                 TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
@@ -95,36 +115,35 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   ),
                   onChanged: (value) => setState(() => _query = value),
                 ),
-                const SizedBox(height: 12),
-                Row(
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
                   children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const ProductImportScreen()),
-                        ),
-                        icon: const Icon(Icons.download_for_offline_outlined),
-                        label: const Text('Import'),
+                    OutlinedButton.icon(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const ProductImportScreen()),
                       ),
+                      icon: const Icon(Icons.download_for_offline_outlined),
+                      label: const Text('Import'),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: FilledButton.icon(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const ProductFormScreen()),
-                        ),
-                        icon: const Icon(Icons.add_box_outlined),
-                        label: const Text('Add Product'),
+                    FilledButton.icon(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const ProductFormScreen()),
                       ),
+                      icon: const Icon(Icons.add_box_outlined),
+                      label: const Text('Add Product'),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Expanded(
             child: FutureBuilder<List<Product>>(
               future: controller.fetchProducts(query: _query),
@@ -137,7 +156,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   return const EmptyState(
                     icon: Icons.inventory_2_outlined,
                     title: 'No products found',
-                    message: 'Add Bio Care products locally or import a CSV file.',
+                    message:
+                        'Add Bio Care products locally or import a CSV file.',
                     imageAsset: AppAssets.emptyStateHero,
                   );
                 }
@@ -146,21 +166,21 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final product = products[index];
-                    final emoji = _getProductEmoji(product.name);
+                    final productIcon = _getProductIcon(product.name);
                     final iconColor = _getProductColor(product.name);
 
                     return Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: const Color(0xFFE8F5E9)),
                         boxShadow: const [
-                           BoxShadow(
-                             color: Color(0x052E7D32),
-                             blurRadius: 8,
-                             offset: Offset(0, 2),
-                           )
+                          BoxShadow(
+                            color: Color(0x052E7D32),
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          )
                         ],
                       ),
                       child: Row(
@@ -174,41 +194,59 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             alignment: Alignment.center,
-                            child: Text(emoji, style: const TextStyle(fontSize: 24)),
+                            child:
+                                Icon(productIcon, color: iconColor, size: 24),
                           ),
                           const SizedBox(width: 14),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(product.name, style: Theme.of(context).textTheme.titleMedium),
+                                Text(product.name,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium),
                                 const SizedBox(height: 6),
                                 Wrap(
                                   spacing: 8,
                                   runSpacing: 8,
                                   children: [
-                                    _ProductBadge(icon: Icons.sell_outlined, label: product.sku),
+                                    _ProductBadge(
+                                        icon: Icons.sell_outlined,
+                                        label: product.sku),
                                     _ProductBadge(
                                       icon: Icons.qr_code_2_rounded,
-                                      label: product.barcode.isEmpty ? 'No barcode' : product.barcode,
+                                      label: product.barcode.isEmpty
+                                          ? 'No barcode'
+                                          : product.barcode,
                                     ),
                                   ],
                                 ),
                                 const SizedBox(height: 12),
-                                Text('Unit price', style: Theme.of(context).textTheme.bodySmall),
+                                Text('Unit price',
+                                    style:
+                                        Theme.of(context).textTheme.bodySmall),
                                 const SizedBox(height: 4),
                                 Text(
                                   AppFormatters.currency(product.unitPrice),
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: scheme.primary),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge
+                                      ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: scheme.primary),
                                 ),
                               ],
                             ),
                           ),
                           PopupMenuButton<String>(
-                            onSelected: (value) => _handleAction(value, product),
+                            onSelected: (value) =>
+                                _handleAction(value, product),
                             itemBuilder: (_) => const [
                               PopupMenuItem(value: 'edit', child: Text('Edit')),
-                              PopupMenuItem(value: 'deactivate', child: Text('Deactivate')),
+                              PopupMenuItem(
+                                  value: 'deactivate',
+                                  child: Text('Deactivate')),
                             ],
                           ),
                         ],
@@ -226,7 +264,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   Future<void> _handleAction(String value, Product product) async {
     if (value == 'edit') {
-      await Navigator.push(context, MaterialPageRoute(builder: (_) => ProductFormScreen(product: product)));
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => ProductFormScreen(product: product)));
       if (mounted) setState(() {});
       return;
     }
@@ -238,8 +279,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
           title: const Text('Deactivate product?'),
           content: Text('This will hide ${product.name} from sales entry.'),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-            FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Deactivate')),
+            TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel')),
+            FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Deactivate')),
           ],
         ),
       );
@@ -274,7 +319,12 @@ class _ProductBadge extends StatelessWidget {
         children: [
           Icon(icon, size: 16, color: const Color(0xFF263238)),
           const SizedBox(width: 6),
-          Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: const Color(0xFF263238)), overflow: TextOverflow.ellipsis),
+          Text(label,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: const Color(0xFF263238)),
+              overflow: TextOverflow.ellipsis),
         ],
       ),
     );

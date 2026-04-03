@@ -13,7 +13,8 @@ class CollectionsHistoryScreen extends StatefulWidget {
   const CollectionsHistoryScreen({super.key});
 
   @override
-  State<CollectionsHistoryScreen> createState() => _CollectionsHistoryScreenState();
+  State<CollectionsHistoryScreen> createState() =>
+      _CollectionsHistoryScreenState();
 }
 
 class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
@@ -29,7 +30,9 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
-    final start = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final compact = MediaQuery.of(context).size.width < 640;
+    final start =
+        DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
     final end = start.add(const Duration(days: 1));
 
     return FutureBuilder<List<Shop>>(
@@ -38,11 +41,15 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
         final shops = shopSnapshot.data ?? const <Shop>[];
         return AppShell(
           title: 'Collections History',
-          subtitle: 'Track every payment received from shops, review the payment method used, and void incorrect entries when needed.',
+          subtitle:
+              'Track every payment received from shops, review the payment method used, and void incorrect entries when needed.',
           headerImageAsset: AppAssets.collectionsHero,
           pageBackgroundAsset: AppAssets.pageTexture,
           floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CollectionEntryScreen())),
+            onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const CollectionEntryScreen())),
             icon: const Icon(Icons.request_quote_rounded),
             label: const Text('Add Collection'),
             backgroundColor: const Color(0xFF2E7D32),
@@ -51,14 +58,26 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
           child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(compact ? 16 : 18),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.78),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: const Color(0xFFDDE6DF)),
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text('Filters',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Choose a day or shop to focus on the right collection records.',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: 16),
                     InkWell(
                       borderRadius: BorderRadius.circular(18),
                       onTap: _pickDate,
@@ -79,8 +98,10 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                         labelText: 'Shop filter',
                       ),
                       items: [
-                        const DropdownMenuItem<int?>(value: null, child: Text('All shops')),
-                        ...shops.map((shop) => DropdownMenuItem<int?>(value: shop.id, child: Text(shop.name))),
+                        const DropdownMenuItem<int?>(
+                            value: null, child: Text('All shops')),
+                        ...shops.map((shop) => DropdownMenuItem<int?>(
+                            value: shop.id, child: Text(shop.name))),
                       ],
                       onChanged: (value) => setState(() => _shopId = value),
                     ),
@@ -90,7 +111,8 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
               const SizedBox(height: 16),
               Expanded(
                 child: FutureBuilder<List<CollectionRecord>>(
-                  future: controller.fetchCollections(start: start, end: end, shopId: _shopId),
+                  future: controller.fetchCollections(
+                      start: start, end: end, shopId: _shopId),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(child: CircularProgressIndicator());
@@ -101,7 +123,8 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                       return const EmptyState(
                         icon: Icons.receipt_long_outlined,
                         title: 'No collections recorded',
-                        message: 'Collections for the selected date will appear here.',
+                        message:
+                            'Collections for the selected date will appear here.',
                         imageAsset: AppAssets.emptyStateHero,
                       );
                     }
@@ -112,7 +135,7 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                       itemBuilder: (context, index) {
                         final entry = collections[index];
                         return Container(
-                          padding: const EdgeInsets.all(18),
+                          padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.82),
                             borderRadius: BorderRadius.circular(24),
@@ -128,24 +151,39 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                                     width: 48,
                                     height: 48,
                                     decoration: BoxDecoration(
-                                      color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.12),
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary
+                                          .withValues(alpha: 0.12),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
-                                    child: Icon(Icons.request_quote_outlined, color: Theme.of(context).colorScheme.secondary),
+                                    child: Icon(Icons.request_quote_outlined,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary),
                                   ),
                                   const SizedBox(width: 14),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text(entry.shopName, style: Theme.of(context).textTheme.titleMedium),
+                                        Text(entry.shopName,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium),
                                         const SizedBox(height: 6),
                                         Wrap(
                                           spacing: 8,
                                           runSpacing: 8,
                                           children: [
-                                            _HistoryChip(label: entry.isVoided ? 'Voided' : entry.paymentMethod),
-                                            _HistoryChip(label: AppFormatters.time(entry.createdAt)),
+                                            _HistoryChip(
+                                                label: entry.isVoided
+                                                    ? 'Voided'
+                                                    : entry.paymentMethod),
+                                            _HistoryChip(
+                                                label: AppFormatters.time(
+                                                    entry.createdAt)),
                                           ],
                                         ),
                                       ],
@@ -159,22 +197,41 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                                       }
                                     },
                                     itemBuilder: (_) => const [
-                                      PopupMenuItem(value: 'void', child: Text('Void collection')),
+                                      PopupMenuItem(
+                                          value: 'void',
+                                          child: Text('Void collection')),
                                     ],
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 14),
-                              Text('Collected amount', style: Theme.of(context).textTheme.bodySmall),
+                              Text('Collected amount',
+                                  style:
+                                      Theme.of(context).textTheme.labelMedium),
                               const SizedBox(height: 4),
-                              Text(AppFormatters.currency(entry.amount), style: Theme.of(context).textTheme.titleLarge),
+                              Text(
+                                AppFormatters.currency(entry.amount),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(fontWeight: FontWeight.w800),
+                              ),
                               if (entry.referenceNote.isNotEmpty) ...[
-                                const SizedBox(height: 10),
-                                Text(entry.referenceNote, style: Theme.of(context).textTheme.bodyMedium),
+                                const SizedBox(height: 12),
+                                Text(entry.referenceNote,
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium),
                               ],
-                              if (entry.voidReason != null && entry.voidReason!.isNotEmpty) ...[
-                                const SizedBox(height: 10),
-                                Text('Reason: ${entry.voidReason}', style: Theme.of(context).textTheme.bodySmall),
+                              if (entry.voidReason != null &&
+                                  entry.voidReason!.isNotEmpty) ...[
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Reason: ${entry.voidReason}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(fontWeight: FontWeight.w600),
+                                ),
                               ],
                             ],
                           ),
@@ -215,14 +272,20 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
           decoration: const InputDecoration(labelText: 'Reason'),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Void')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel')),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Void')),
         ],
       ),
     );
 
     if (confirmed == true && entry.id != null) {
-      final reason = reasonController.text.trim().isEmpty ? 'Manual void' : reasonController.text.trim();
+      final reason = reasonController.text.trim().isEmpty
+          ? 'Manual void'
+          : reasonController.text.trim();
       await controller.voidCollection(entry.id!, reason);
       if (mounted) setState(() {});
     }
@@ -245,7 +308,10 @@ class _HistoryChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700),
+        style: Theme.of(context)
+            .textTheme
+            .bodySmall
+            ?.copyWith(fontWeight: FontWeight.w700),
       ),
     );
   }

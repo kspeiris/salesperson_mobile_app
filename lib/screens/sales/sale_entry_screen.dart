@@ -40,12 +40,15 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
   Widget build(BuildContext context) {
     final controller = context.read<AppController>();
     final scheme = Theme.of(context).colorScheme;
+    final compact = MediaQuery.of(context).size.width < 640;
 
     return FutureBuilder<List<dynamic>>(
-      future: Future.wait<dynamic>([controller.fetchShops(), controller.fetchProducts()]),
+      future: Future.wait<dynamic>(
+          [controller.fetchShops(), controller.fetchProducts()]),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+              body: Center(child: CircularProgressIndicator()));
         }
 
         final shops = _distinctShops(snapshot.data![0] as List<Shop>);
@@ -69,28 +72,40 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
           body: Form(
             key: _formKey,
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
               children: [
                 SectionCard(
                   title: 'Select Shop',
-                  child: DropdownButtonFormField<Shop>(
-                    initialValue: selectedShop,
-                    isExpanded: true,
-                    items: shops
-                        .map((shop) => DropdownMenuItem<Shop>(
-                              value: shop,
-                              child: Text('${shop.name} - ${shop.area}'),
-                            ))
-                        .toList(),
-                    decoration: const InputDecoration(
-                      labelText: 'Customer Shop',
-                      prefixIcon: Icon(Icons.storefront_rounded),
-                    ),
-                    onChanged: (value) => setState(() => _selectedShop = value),
-                    validator: (value) => value == null ? 'Select a shop.' : null,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Choose the shop before adding line items so pricing and totals stay attached to the right customer.',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<Shop>(
+                        initialValue: selectedShop,
+                        isExpanded: true,
+                        items: shops
+                            .map((shop) => DropdownMenuItem<Shop>(
+                                  value: shop,
+                                  child: Text('${shop.name} - ${shop.area}'),
+                                ))
+                            .toList(),
+                        decoration: const InputDecoration(
+                          labelText: 'Customer shop',
+                          prefixIcon: Icon(Icons.storefront_rounded),
+                        ),
+                        onChanged: (value) =>
+                            setState(() => _selectedShop = value),
+                        validator: (value) =>
+                            value == null ? 'Select a shop.' : null,
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 SectionCard(
                   title: 'Add Products',
                   trailing: TextButton.icon(
@@ -99,7 +114,13 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                     label: const Text('Scan'),
                   ),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(
+                        'Build the sale with one or more products, then adjust quantity or unit price when needed.',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 16),
                       for (var index = 0; index < _lines.length; index++) ...[
                         _SaleLineCard(
                           index: index,
@@ -115,25 +136,33 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                                   });
                                 },
                         ),
-                        if (index < _lines.length - 1) const SizedBox(height: 12),
+                        if (index < _lines.length - 1)
+                          const SizedBox(height: 12),
                       ],
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 14),
                       OutlinedButton.icon(
-                        onPressed: () => setState(() => _lines.add(_LineDraft())),
+                        onPressed: () =>
+                            setState(() => _lines.add(_LineDraft())),
                         icon: const Icon(Icons.add_rounded),
                         label: const Text('Add Another Product'),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 SectionCard(
                   title: 'Payment Details',
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Choose payment method:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF64748B))),
-                      const SizedBox(height: 12),
+                      Text(
+                        'Confirm how the sale is being paid and record any discount or invoice note for later review.',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 16),
+                      Text('Payment method',
+                          style: Theme.of(context).textTheme.labelMedium),
+                      const SizedBox(height: 10),
                       SegmentedButton<String>(
                         segments: const [
                           ButtonSegment(
@@ -154,19 +183,22 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                         showSelectedIcon: false,
                         style: SegmentedButton.styleFrom(
                           backgroundColor: Colors.white,
-                          selectedBackgroundColor: scheme.primary.withValues(alpha: 0.1),
+                          selectedBackgroundColor:
+                              scheme.primary.withValues(alpha: 0.1),
                           selectedForegroundColor: scheme.primary,
-                          side: BorderSide(color: scheme.primary.withValues(alpha: 0.2)),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          side: BorderSide(
+                              color: scheme.primary.withValues(alpha: 0.2)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
-                      const SizedBox(height: 24),
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _discountController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         decoration: const InputDecoration(
-                          labelText: 'Discount (Rs)',
+                          labelText: 'Discount amount',
                           prefixIcon: Icon(Icons.money_off_rounded),
                         ),
                         onChanged: (_) => setState(() {}),
@@ -177,14 +209,16 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                         minLines: 2,
                         maxLines: 3,
                         decoration: const InputDecoration(
-                          labelText: 'Invoice Note (Optional)',
+                          labelText: 'Invoice note',
+                          hintText: 'Optional internal note for this sale',
                           prefixIcon: Icon(Icons.notes_rounded),
+                          alignLabelWithHint: true,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 80), // spacing for bottom bar
+                if (!compact) const SizedBox(height: 8),
               ],
             ),
           ),
@@ -194,7 +228,10 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
               decoration: const BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
-                  BoxShadow(color: Color(0x0A000000), offset: Offset(0, -4), blurRadius: 16),
+                  BoxShadow(
+                      color: Color(0x0A000000),
+                      offset: Offset(0, -4),
+                      blurRadius: 16),
                 ],
               ),
               child: Row(
@@ -203,10 +240,17 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Grand Total', style: Theme.of(context).textTheme.bodyMedium),
+                      Text('Grand total',
+                          style: Theme.of(context).textTheme.labelMedium),
+                      const SizedBox(height: 2),
                       Text(
                         AppFormatters.currency(_grandTotal),
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: scheme.primary, fontWeight: FontWeight.bold),
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(
+                                color: scheme.primary,
+                                fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -215,7 +259,7 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () => _saveSale(),
                       icon: const Icon(Icons.check_circle_rounded),
-                      label: const Text('SAVE RECORD'),
+                      label: const Text('Save Record'),
                     ),
                   ),
                 ],
@@ -240,7 +284,8 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
     final product = await controller.findProductByBarcode(scannedValue.trim());
     if (!mounted) return;
     if (product == null) {
-      messenger.showSnackBar(SnackBar(content: Text('No active product found for barcode $scannedValue')));
+      messenger.showSnackBar(SnackBar(
+          content: Text('No active product found for barcode $scannedValue')));
       return;
     }
 
@@ -258,7 +303,8 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
       target.priceController.text = product.unitPrice.toStringAsFixed(2);
     });
 
-    messenger.showSnackBar(SnackBar(content: Text('${product.name} added from barcode scan.')));
+    messenger.showSnackBar(
+        SnackBar(content: Text('${product.name} added from barcode scan.')));
   }
 
   _LineDraft _createAdditionalLine() {
@@ -273,10 +319,13 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedShop == null) return;
 
-    final validLines = _lines.where((line) => line.product != null && line.quantity > 0).toList();
+    final validLines = _lines
+        .where((line) => line.product != null && line.quantity > 0)
+        .toList();
     if (validLines.isEmpty) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Add at least one item with quantity above zero.')),
+        const SnackBar(
+            content: Text('Add at least one item with quantity above zero.')),
       );
       return;
     }
@@ -310,7 +359,8 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
 
     await controller.createSale(sale);
     if (!mounted) return;
-    messenger.showSnackBar(const SnackBar(content: Text('Sale saved offline.')));
+    messenger
+        .showSnackBar(const SnackBar(content: Text('Sale saved offline.')));
     Navigator.pop(context);
   }
 }
@@ -343,7 +393,7 @@ class _SaleLineCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -352,7 +402,13 @@ class _SaleLineCard extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE8F5E9)),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            'Line item ${index + 1}',
+            style: Theme.of(context).textTheme.labelMedium,
+          ),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
@@ -372,7 +428,8 @@ class _SaleLineCard extends StatelessWidget {
                   onChanged: (value) {
                     line.product = value;
                     if (value != null) {
-                      line.priceController.text = value.unitPrice.toStringAsFixed(2);
+                      line.priceController.text =
+                          value.unitPrice.toStringAsFixed(2);
                     }
                     onChanged();
                   },
@@ -389,7 +446,7 @@ class _SaleLineCard extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              Text('Qty:', style: Theme.of(context).textTheme.bodyMedium),
+              Text('Qty', style: Theme.of(context).textTheme.labelMedium),
               const SizedBox(width: 12),
               Container(
                 decoration: BoxDecoration(
@@ -409,7 +466,9 @@ class _SaleLineCard extends StatelessWidget {
                       },
                       color: scheme.primary,
                     ),
-                    Text('${line.quantity}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text('${line.quantity}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16)),
                     IconButton(
                       icon: const Icon(Icons.add_rounded),
                       onPressed: () {
@@ -425,7 +484,8 @@ class _SaleLineCard extends StatelessWidget {
               Expanded(
                 child: TextFormField(
                   controller: line.priceController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   decoration: const InputDecoration(
                     labelText: 'Unit Price',
                     prefixText: 'Rs ',
@@ -440,7 +500,8 @@ class _SaleLineCard extends StatelessWidget {
             alignment: Alignment.centerRight,
             child: Text(
               'Total: ${AppFormatters.currency(line.total)}',
-              style: TextStyle(fontWeight: FontWeight.bold, color: scheme.primary, fontSize: 16),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800, color: scheme.primary),
             ),
           ),
         ],
@@ -455,7 +516,7 @@ class _LineDraft {
   final priceController = TextEditingController();
 
   int get quantity => _qty;
-  
+
   set qty(int value) {
     _qty = value;
   }

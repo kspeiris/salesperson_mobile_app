@@ -24,39 +24,63 @@ class _ShopImportScreenState extends State<ShopImportScreen> {
   Widget build(BuildContext context) {
     return AppShell(
       title: 'Import Shops',
-      subtitle: 'Bring in shop master data from a flat file and review any row-level issues before continuing.',
+      subtitle:
+          'Bring in shop master data from a flat file and review any row-level issues before continuing.',
       headerImageAsset: AppAssets.shopsHero,
       pageBackgroundAsset: AppAssets.pageTexture,
       child: ListView(
         children: [
-          const SectionCard(
+          SectionCard(
             title: 'Expected columns',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('CSV header example:'),
-                SizedBox(height: 8),
-                SelectableText('name,owner_contact,area,phone,credit_limit,balance'),
+                Text(
+                  'Use a header row with these columns so shop records and balances map correctly.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FDF8),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFE8F5E9)),
+                  ),
+                  child: const SelectableText(
+                      'name,owner_contact,area,phone,credit_limit,balance'),
+                ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           SectionCard(
             title: 'Import options',
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  'Choose whether this file should replace the current shop list or merge into it.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 12),
                 SwitchListTile.adaptive(
                   value: _replaceExisting,
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Replace existing shop records'),
-                  subtitle: const Text('Deletes current shop master data before import.'),
-                  onChanged: (value) => setState(() => _replaceExisting = value),
+                  subtitle: const Text(
+                      'Deletes current shop master data before import.'),
+                  onChanged: (value) =>
+                      setState(() => _replaceExisting = value),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 FilledButton.icon(
                   onPressed: _working ? null : _pickAndImport,
                   icon: _working
-                      ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                      ? const SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2))
                       : const Icon(Icons.file_open_outlined),
                   label: Text(_working ? 'Importing...' : 'Pick CSV/TXT file'),
                 ),
@@ -82,7 +106,8 @@ class _ShopImportScreenState extends State<ShopImportScreen> {
     final path = result?.files.single.path;
     if (path == null) return;
     setState(() => _working = true);
-    final importResult = await controller.importShopsFromFile(path, replaceExisting: _replaceExisting);
+    final importResult = await controller.importShopsFromFile(path,
+        replaceExisting: _replaceExisting);
     if (!mounted) return;
     setState(() {
       _working = false;
@@ -103,15 +128,24 @@ class _ImportSummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(result.summary, style: const TextStyle(fontWeight: FontWeight.w800)),
+          Text(result.summary,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w800)),
           if (result.errors.isNotEmpty) ...[
             const SizedBox(height: 12),
-            const Text('Issues', style: TextStyle(fontWeight: FontWeight.w700)),
+            Text('Issues',
+                style: Theme.of(context)
+                    .textTheme
+                    .labelLarge
+                    ?.copyWith(fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
             ...result.errors.take(10).map(
                   (entry) => Padding(
                     padding: const EdgeInsets.only(bottom: 6),
-                    child: Text('- $entry'),
+                    child: Text('- $entry',
+                        style: Theme.of(context).textTheme.bodySmall),
                   ),
                 ),
           ],

@@ -48,14 +48,16 @@ class AppShell extends StatelessWidget {
                 : DecorationImage(
                     image: AssetImage(pageBackgroundAsset!),
                     fit: BoxFit.cover,
-                    opacity: 0.05,
+                    alignment: Alignment.topCenter,
+                    opacity: 0.09,
                   ),
           ),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1040),
               child: Padding(
-                padding: EdgeInsets.fromLTRB(compact ? 16 : 24, 8, compact ? 16 : 24, compact ? 16 : 24),
+                padding: EdgeInsets.fromLTRB(
+                    compact ? 16 : 24, 8, compact ? 16 : 24, compact ? 16 : 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -100,8 +102,10 @@ class _ShellHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasImage = headerImageAsset != null;
+    final imageMinHeight = compact ? 164.0 : 208.0;
 
     return Container(
+      constraints: hasImage ? BoxConstraints(minHeight: imageMinHeight) : null,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         color: Colors.white,
@@ -123,7 +127,7 @@ class _ShellHeaderCard extends StatelessWidget {
                 child: Image.asset(
                   headerImageAsset!,
                   fit: BoxFit.cover,
-                  alignment: Alignment.centerRight,
+                  alignment: compact ? Alignment.centerRight : Alignment.center,
                 ),
               ),
             Positioned.fill(
@@ -132,11 +136,12 @@ class _ShellHeaderCard extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
+                    stops: hasImage ? const [0.0, 0.5, 1.0] : null,
                     colors: hasImage
                         ? [
                             Colors.white,
-                            Colors.white.withValues(alpha: 0.95),
-                            Colors.white.withValues(alpha: 0.72),
+                            Colors.white.withValues(alpha: 0.86),
+                            Colors.white.withValues(alpha: 0.28),
                           ]
                         : [Colors.white, Colors.white],
                   ),
@@ -146,19 +151,28 @@ class _ShellHeaderCard extends StatelessWidget {
             Padding(
               padding: EdgeInsets.all(compact ? 24 : 32),
               child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: hasImage && !compact ? 560 : double.infinity),
+                constraints: BoxConstraints(
+                  maxWidth: hasImage ? (compact ? 230 : 560) : double.infinity,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       title,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(height: 1.1, fontWeight: FontWeight.w800),
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall
+                          ?.copyWith(height: 1.1, fontWeight: FontWeight.w800),
                     ),
                     if (subtitle != null) ...[
                       const SizedBox(height: 8),
                       Text(
                         subtitle!,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: const Color(0xFF64748B)),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyLarge
+                            ?.copyWith(color: const Color(0xFF64748B)),
                       ),
                     ],
                     if (header != null) ...[

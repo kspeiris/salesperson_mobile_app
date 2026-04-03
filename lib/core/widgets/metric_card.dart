@@ -17,9 +17,10 @@ class MetricCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final compact = MediaQuery.of(context).size.width < 640;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(compact ? 18 : 20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -47,7 +48,8 @@ class MetricCard extends StatelessWidget {
                 ),
                 child: Icon(icon, color: scheme.primary, size: 22),
               ),
-              const Icon(Icons.arrow_outward_rounded, color: Color(0xFFCFD8DC), size: 18),
+              const Icon(Icons.arrow_outward_rounded,
+                  color: Color(0xFFCFD8DC), size: 18),
             ],
           ),
           const Spacer(),
@@ -58,7 +60,7 @@ class MetricCard extends StatelessWidget {
                   color: const Color(0xFF64748B),
                   letterSpacing: 0.2,
                 ),
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
@@ -69,7 +71,7 @@ class MetricCard extends StatelessWidget {
                   fontSize: 22,
                   color: const Color(0xFF1E293B),
                 ),
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
           if (subtitle.isNotEmpty) ...[
@@ -80,7 +82,7 @@ class MetricCard extends StatelessWidget {
                     color: scheme.primary,
                     fontWeight: FontWeight.w600,
                   ),
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
           ],

@@ -31,8 +31,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     final product = widget.product;
     _nameController = TextEditingController(text: product?.name ?? '');
     _skuController = TextEditingController(text: product?.sku ?? '');
-    _priceController = TextEditingController(text: product != null ? product.unitPrice.toStringAsFixed(2) : '');
-    _descriptionController = TextEditingController(text: product?.description ?? '');
+    _priceController = TextEditingController(
+        text: product != null ? product.unitPrice.toStringAsFixed(2) : '');
+    _descriptionController =
+        TextEditingController(text: product?.description ?? '');
     _barcodeController = TextEditingController(text: product?.barcode ?? '');
   }
 
@@ -63,7 +65,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     );
     await context.read<AppController>().saveProduct(product);
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Product saved locally.')));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Product saved locally.')));
     Navigator.pop(context);
   }
 
@@ -75,7 +78,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     if (scannedValue != null && scannedValue.trim().isNotEmpty) {
       _barcodeController.text = scannedValue.trim();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Barcode captured: $scannedValue')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Barcode captured: $scannedValue')));
       }
     }
   }
@@ -84,7 +88,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   Widget build(BuildContext context) {
     return AppShell(
       title: widget.product == null ? 'Add Product' : 'Edit Product',
-      subtitle: 'Keep SKU, pricing, description, and barcode details clean so sales entry stays fast and accurate.',
+      subtitle:
+          'Keep SKU, pricing, description, and barcode details clean so sales entry stays fast and accurate.',
       headerImageAsset: AppAssets.productsHero,
       pageBackgroundAsset: AppAssets.pageTexture,
       child: Form(
@@ -94,7 +99,13 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             SectionCard(
               title: 'Catalog details',
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text(
+                    'Keep the core catalog fields accurate so product selection stays clean during sales entry.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _nameController,
                     decoration: const InputDecoration(
@@ -102,9 +113,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       prefixIcon: Icon(Icons.inventory_2_outlined),
                     ),
                     textInputAction: TextInputAction.next,
-                    validator: (value) => (value == null || value.trim().isEmpty) ? 'Product name is required.' : null,
+                    validator: (value) =>
+                        (value == null || value.trim().isEmpty)
+                            ? 'Product name is required.'
+                            : null,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _skuController,
                     decoration: const InputDecoration(
@@ -112,12 +126,16 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       prefixIcon: Icon(Icons.sell_outlined),
                     ),
                     textInputAction: TextInputAction.next,
-                    validator: (value) => (value == null || value.trim().isEmpty) ? 'SKU is required.' : null,
+                    validator: (value) =>
+                        (value == null || value.trim().isEmpty)
+                            ? 'SKU is required.'
+                            : null,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _priceController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     decoration: const InputDecoration(
                       labelText: 'Unit price',
                       prefixIcon: Icon(Icons.currency_exchange_outlined),
@@ -125,18 +143,26 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     textInputAction: TextInputAction.next,
                     validator: (value) {
                       final price = double.tryParse((value ?? '').trim());
-                      if (price == null || price <= 0) return 'Enter a valid unit price.';
+                      if (price == null || price <= 0) {
+                        return 'Enter a valid unit price.';
+                      }
                       return null;
                     },
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             SectionCard(
               title: 'Barcode and notes',
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text(
+                    'Attach a barcode and optional description to make scanning and product recognition faster.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _barcodeController,
                     decoration: InputDecoration(
@@ -149,7 +175,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _descriptionController,
                     maxLines: 3,
@@ -163,7 +189,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            ElevatedButton.icon(onPressed: _save, icon: const Icon(Icons.save_outlined), label: const Text('Save Product')),
+            ElevatedButton.icon(
+                onPressed: _save,
+                icon: const Icon(Icons.save_outlined),
+                label: const Text('Save Product')),
           ],
         ),
       ),

@@ -32,7 +32,8 @@ class _ShopFormScreenState extends State<ShopFormScreen> {
     _ownerController = TextEditingController(text: shop?.ownerContact ?? '');
     _areaController = TextEditingController(text: shop?.area ?? '');
     _phoneController = TextEditingController(text: shop?.phone ?? '');
-    _creditLimitController = TextEditingController(text: shop != null ? shop.creditLimit.toStringAsFixed(2) : '0');
+    _creditLimitController = TextEditingController(
+        text: shop != null ? shop.creditLimit.toStringAsFixed(2) : '0');
   }
 
   @override
@@ -63,7 +64,8 @@ class _ShopFormScreenState extends State<ShopFormScreen> {
     );
     await context.read<AppController>().saveShop(shop);
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Shop saved locally.')));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Shop saved locally.')));
     Navigator.pop(context);
   }
 
@@ -71,7 +73,8 @@ class _ShopFormScreenState extends State<ShopFormScreen> {
   Widget build(BuildContext context) {
     return AppShell(
       title: widget.shop == null ? 'Add Shop' : 'Edit Shop',
-      subtitle: 'Keep shop records complete so sales, collections, and balance tracking stay accurate in the field.',
+      subtitle:
+          'Keep shop records complete so sales, collections, and balance tracking stay accurate in the field.',
       headerImageAsset: AppAssets.shopsHero,
       pageBackgroundAsset: AppAssets.pageTexture,
       child: Form(
@@ -81,7 +84,13 @@ class _ShopFormScreenState extends State<ShopFormScreen> {
             SectionCard(
               title: 'Shop details',
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text(
+                    'Capture the key shop and contact details so route visits and collection follow-ups stay reliable.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _nameController,
                     decoration: const InputDecoration(
@@ -89,9 +98,12 @@ class _ShopFormScreenState extends State<ShopFormScreen> {
                       prefixIcon: Icon(Icons.storefront_outlined),
                     ),
                     textInputAction: TextInputAction.next,
-                    validator: (value) => (value == null || value.trim().isEmpty) ? 'Shop name is required.' : null,
+                    validator: (value) =>
+                        (value == null || value.trim().isEmpty)
+                            ? 'Shop name is required.'
+                            : null,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _ownerController,
                     decoration: const InputDecoration(
@@ -99,9 +111,12 @@ class _ShopFormScreenState extends State<ShopFormScreen> {
                       prefixIcon: Icon(Icons.person_outline_rounded),
                     ),
                     textInputAction: TextInputAction.next,
-                    validator: (value) => (value == null || value.trim().isEmpty) ? 'Owner/contact is required.' : null,
+                    validator: (value) =>
+                        (value == null || value.trim().isEmpty)
+                            ? 'Owner/contact is required.'
+                            : null,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _areaController,
                     decoration: const InputDecoration(
@@ -109,9 +124,12 @@ class _ShopFormScreenState extends State<ShopFormScreen> {
                       prefixIcon: Icon(Icons.place_outlined),
                     ),
                     textInputAction: TextInputAction.next,
-                    validator: (value) => (value == null || value.trim().isEmpty) ? 'Area is required.' : null,
+                    validator: (value) =>
+                        (value == null || value.trim().isEmpty)
+                            ? 'Area is required.'
+                            : null,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _phoneController,
                     keyboardType: TextInputType.phone,
@@ -120,12 +138,15 @@ class _ShopFormScreenState extends State<ShopFormScreen> {
                       prefixIcon: Icon(Icons.phone_outlined),
                     ),
                     textInputAction: TextInputAction.next,
-                    validator: (value) => (value == null || value.trim().isEmpty) ? 'Phone number is required.' : null,
+                    validator: (value) =>
+                        (value == null || value.trim().isEmpty)
+                            ? 'Phone number is required.'
+                            : null,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             SectionCard(
               title: 'Credit setup',
               child: Column(
@@ -135,17 +156,20 @@ class _ShopFormScreenState extends State<ShopFormScreen> {
                     'Set the shop credit limit used during sales and follow-up collections.',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _creditLimitController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     decoration: const InputDecoration(
                       labelText: 'Credit limit',
                       prefixIcon: Icon(Icons.account_balance_wallet_outlined),
                     ),
                     validator: (value) {
                       final amount = double.tryParse((value ?? '').trim());
-                      if (amount == null || amount < 0) return 'Enter a valid credit limit.';
+                      if (amount == null || amount < 0) {
+                        return 'Enter a valid credit limit.';
+                      }
                       return null;
                     },
                   ),
@@ -153,7 +177,10 @@ class _ShopFormScreenState extends State<ShopFormScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            ElevatedButton.icon(onPressed: _save, icon: const Icon(Icons.save_outlined), label: const Text('Save Shop')),
+            ElevatedButton.icon(
+                onPressed: _save,
+                icon: const Icon(Icons.save_outlined),
+                label: const Text('Save Shop')),
           ],
         ),
       ),

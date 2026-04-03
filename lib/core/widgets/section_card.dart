@@ -14,6 +14,7 @@ class SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = MediaQuery.of(context).size.width < 640;
 
     return Container(
       decoration: BoxDecoration(
@@ -29,7 +30,7 @@ class SectionCard extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(compact ? 20 : 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -51,7 +52,7 @@ class SectionCard extends StatelessWidget {
                 ],
               ],
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: compact ? 16 : 18),
             child,
           ],
         ),

@@ -31,7 +31,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
     final width = MediaQuery.of(context).size.width;
-    final metricCrossAxisCount = width >= 980 ? 4 : width >= 640 ? 2 : 1;
+    final metricCrossAxisCount = width >= 980
+        ? 4
+        : width >= 640
+            ? 2
+            : 1;
     final metricAspectRatio = width >= 980
         ? 1.36
         : width >= 640
@@ -69,9 +73,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               final collections = snapshot.data![2] as List<CollectionRecord>;
 
               final totalOrders = summary.salesCount + summary.collectionCount;
-              final cashShare = summary.totalSales == 0 ? 0 : (summary.cashSales / summary.totalSales) * 100;
-              final collectionCoverage =
-                  summary.totalSales == 0 ? 0 : (summary.totalCollections / summary.totalSales) * 100;
+              final cashShare = summary.totalSales == 0
+                  ? 0
+                  : (summary.cashSales / summary.totalSales) * 100;
+              final collectionCoverage = summary.totalSales == 0
+                  ? 0
+                  : (summary.totalCollections / summary.totalSales) * 100;
 
               // Combined activity, limited to 5
               final activities = _combineActivity(sales, collections);
@@ -80,7 +87,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1040),
                   child: ListView(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
                     children: [
                       _HeroPanel(
                         salesperson: controller.currentSalesperson,
@@ -90,16 +97,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         onDateTap: _pickDate,
                         onNewSale: () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const SaleEntryScreen()),
+                          MaterialPageRoute(
+                              builder: (_) => const SaleEntryScreen()),
                         ),
                         onNewCollection: () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const CollectionEntryScreen()),
+                          MaterialPageRoute(
+                              builder: (_) => const CollectionEntryScreen()),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
                       _SmartSuggestionBanner(),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
                       SectionCard(
                         title: 'Today at a glance',
                         child: Column(
@@ -114,31 +123,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               children: [
                                 MetricCard(
                                   title: 'Sales value',
-                                  value: AppFormatters.currency(summary.totalSales),
-                                  subtitle: '${summary.salesCount} orders captured',
+                                  value: AppFormatters.currency(
+                                      summary.totalSales),
+                                  subtitle:
+                                      '${summary.salesCount} orders captured',
                                   icon: Icons.trending_up_rounded,
                                 ),
                                 MetricCard(
                                   title: 'Collections',
-                                  value: AppFormatters.currency(summary.totalCollections),
-                                  subtitle: '${summary.collectionCount} receipts logged',
+                                  value: AppFormatters.currency(
+                                      summary.totalCollections),
+                                  subtitle:
+                                      '${summary.collectionCount} receipts logged',
                                   icon: Icons.account_balance_wallet_outlined,
                                 ),
                                 MetricCard(
                                   title: 'Cash sales',
-                                  value: AppFormatters.currency(summary.cashSales),
-                                  subtitle: '${cashShare.toStringAsFixed(0)}% of today\'s sales',
+                                  value:
+                                      AppFormatters.currency(summary.cashSales),
+                                  subtitle:
+                                      '${cashShare.toStringAsFixed(0)}% of today\'s sales',
                                   icon: Icons.payments_rounded,
                                 ),
                                 MetricCard(
                                   title: 'Credit balance',
-                                  value: AppFormatters.currency(summary.creditSales),
+                                  value: AppFormatters.currency(
+                                      summary.creditSales),
                                   subtitle: 'Pending from recorded orders',
                                   icon: Icons.receipt_long_outlined,
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 18),
                             LayoutBuilder(
                               builder: (context, constraints) {
                                 final stacked = constraints.maxWidth < 720;
@@ -147,7 +163,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     children: [
                                       _InsightCard(
                                         title: 'Collection coverage',
-                                        value: '${collectionCoverage.toStringAsFixed(0)}%',
+                                        value:
+                                            '${collectionCoverage.toStringAsFixed(0)}%',
                                         description:
                                             'A quick comparison of collections against today\'s sales value.',
                                         icon: Icons.ssid_chart_rounded,
@@ -169,7 +186,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     Expanded(
                                       child: _InsightCard(
                                         title: 'Collection coverage',
-                                        value: '${collectionCoverage.toStringAsFixed(0)}%',
+                                        value:
+                                            '${collectionCoverage.toStringAsFixed(0)}%',
                                         description:
                                             'A quick comparison of collections against today\'s sales value.',
                                         icon: Icons.ssid_chart_rounded,
@@ -192,20 +210,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
                       SectionCard(
                         title: 'Recent activity',
                         child: activities.isEmpty
                             ? const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 32),
-                                child: Center(child: Text('No recorded activity found.')),
+                                child: Center(
+                                    child: Text('No recorded activity found.')),
                               )
                             : Column(
                                 children: [
-                                  for (var i = 0; i < activities.length; i++) ...[
+                                  for (var i = 0;
+                                      i < activities.length;
+                                      i++) ...[
                                     _ActivityItem(activity: activities[i]),
                                     if (i < activities.length - 1)
-                                      const Divider(height: 24, color: Color(0xFFF1F4F1)),
+                                      const Divider(
+                                          height: 24, color: Color(0xFFF1F4F1)),
                                   ],
                                 ],
                               ),
@@ -221,11 +243,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  List<dynamic> _combineActivity(List<SaleRecord> sales, List<CollectionRecord> collections) {
+  List<dynamic> _combineActivity(
+      List<SaleRecord> sales, List<CollectionRecord> collections) {
     final list = <dynamic>[...sales, ...collections];
     list.sort((a, b) {
-      final DateTime da = (a is SaleRecord) ? a.createdAt : (a as CollectionRecord).createdAt;
-      final DateTime db = (b is SaleRecord) ? b.createdAt : (b as CollectionRecord).createdAt;
+      final DateTime da =
+          (a is SaleRecord) ? a.createdAt : (a as CollectionRecord).createdAt;
+      final DateTime db =
+          (b is SaleRecord) ? b.createdAt : (b as CollectionRecord).createdAt;
       return db.compareTo(da);
     });
     return list.take(5).toList();
@@ -252,10 +277,16 @@ class _ActivityItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSale = activity is SaleRecord;
-    final String shopName = isSale ? (activity as SaleRecord).shopName : (activity as CollectionRecord).shopName;
-    final double amount = isSale ? (activity as SaleRecord).total : (activity as CollectionRecord).amount;
-    final DateTime createdAt = isSale ? (activity as SaleRecord).createdAt : (activity as CollectionRecord).createdAt;
-    
+    final String shopName = isSale
+        ? (activity as SaleRecord).shopName
+        : (activity as CollectionRecord).shopName;
+    final double amount = isSale
+        ? (activity as SaleRecord).total
+        : (activity as CollectionRecord).amount;
+    final DateTime createdAt = isSale
+        ? (activity as SaleRecord).createdAt
+        : (activity as CollectionRecord).createdAt;
+
     final dateStr = AppFormatters.date(createdAt);
     final timeStr = AppFormatters.time(createdAt);
 
@@ -333,7 +364,8 @@ class _SmartSuggestionBanner extends StatelessWidget {
                 )
               ],
             ),
-            child: const Icon(Icons.auto_awesome_rounded, color: Color(0xFF2E7D32), size: 24),
+            child: const Icon(Icons.auto_awesome_rounded,
+                color: Color(0xFF2E7D32), size: 24),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -342,12 +374,17 @@ class _SmartSuggestionBanner extends StatelessWidget {
               children: [
                 const Text(
                   'Route Strategy Tip',
-                  style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF1B5E20), fontSize: 13, letterSpacing: 0.2),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1B5E20),
+                      fontSize: 13,
+                      letterSpacing: 0.2),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'Your area "Colombo 07" has 3 shops with overdue balances. Prioritize collections today to maintain account limits.',
-                  style: TextStyle(fontSize: 14, color: Colors.grey.shade800, height: 1.4),
+                  style: TextStyle(
+                      fontSize: 14, color: Colors.grey.shade800, height: 1.4),
                 ),
               ],
             ),
@@ -358,7 +395,6 @@ class _SmartSuggestionBanner extends StatelessWidget {
     );
   }
 }
-
 
 class _HeroPanel extends StatelessWidget {
   const _HeroPanel({
@@ -386,12 +422,13 @@ class _HeroPanel extends StatelessWidget {
     final compact = width < 620;
 
     return Container(
+      constraints: BoxConstraints(minHeight: compact ? 340 : 380),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         image: const DecorationImage(
           image: AssetImage(AppAssets.dashboardHero),
           fit: BoxFit.cover,
-          alignment: Alignment.centerRight,
+          alignment: Alignment.center,
         ),
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
@@ -415,10 +452,11 @@ class _HeroPanel extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
+            stops: const [0.0, 0.55, 1.0],
             colors: [
-              const Color(0xFF16311A).withValues(alpha: 0.86),
-              const Color(0xFF2E7D32).withValues(alpha: 0.70),
-              const Color(0xFF2E7D32).withValues(alpha: 0.40),
+              const Color(0xFF16311A).withValues(alpha: 0.84),
+              const Color(0xFF2E7D32).withValues(alpha: 0.58),
+              const Color(0xFF2E7D32).withValues(alpha: 0.18),
             ],
           ),
         ),
@@ -427,94 +465,106 @@ class _HeroPanel extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: BrandLogo(
-                    height: compact ? 40 : 48,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    alignment: Alignment.centerLeft,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: BrandLogo(
+                      height: compact ? 40 : 48,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 10),
+                      alignment: Alignment.centerLeft,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                _HeroDateChip(label: AppFormatters.date(selectedDate), onTap: onDateTap),
-              ],
-            ),
-            const SizedBox(height: 28),
-            Text(
-              'Good Morning, $salesperson 🌿',
-              style: (compact ? textTheme.headlineSmall : textTheme.headlineMedium)?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.5,
+                  const SizedBox(width: 12),
+                  _HeroDateChip(
+                      label: AppFormatters.date(selectedDate),
+                      onTap: onDateTap),
+                ],
               ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              companyName,
-              style: textTheme.bodyLarge?.copyWith(color: Colors.white.withValues(alpha: 0.86), fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Your daily route summary and quick actions. Keep delivering health and trusted quality to our customers.',
-              style: textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.8), height: 1.6),
-            ),
-            const SizedBox(height: 28),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                _HeroStatChip(label: '$totalOrders actions', icon: Icons.route_rounded),
-                const _HeroStatChip(label: 'Offline ready', icon: Icons.offline_bolt_rounded),
-                const _HeroStatChip(label: 'Share reports later', icon: Icons.share_outlined),
-              ],
-            ),
-            const SizedBox(height: 36),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final stacked = constraints.maxWidth < 560;
-                if (stacked) {
-                  return Column(
+              const SizedBox(height: 28),
+              Text(
+                'Good morning, $salesperson',
+                style: (compact
+                        ? textTheme.headlineSmall
+                        : textTheme.headlineMedium)
+                    ?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                companyName,
+                style: textTheme.bodyLarge?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.86),
+                    fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Your daily route summary and quick actions. Keep delivering health and trusted quality to our customers.',
+                style: textTheme.bodyMedium?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.8), height: 1.6),
+              ),
+              const SizedBox(height: 28),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  _HeroStatChip(
+                      label: '$totalOrders actions', icon: Icons.route_rounded),
+                  const _HeroStatChip(
+                      label: 'Offline ready', icon: Icons.offline_bolt_rounded),
+                  const _HeroStatChip(
+                      label: 'Share reports later', icon: Icons.share_outlined),
+                ],
+              ),
+              const SizedBox(height: 36),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final stacked = constraints.maxWidth < 560;
+                  if (stacked) {
+                    return Column(
+                      children: [
+                        _HeroActionButton(
+                          label: 'Record new sale',
+                          icon: Icons.add_shopping_cart_rounded,
+                          filled: true,
+                          onTap: onNewSale,
+                        ),
+                        const SizedBox(height: 12),
+                        _HeroActionButton(
+                          label: 'Record collection',
+                          icon: Icons.request_quote_outlined,
+                          onTap: onNewCollection,
+                        ),
+                      ],
+                    );
+                  }
+
+                  return Row(
                     children: [
-                      _HeroActionButton(
-                        label: 'Record new sale',
-                        icon: Icons.add_shopping_cart_rounded,
-                        filled: true,
-                        onTap: onNewSale,
+                      Expanded(
+                        child: _HeroActionButton(
+                          label: 'Record new sale',
+                          icon: Icons.add_shopping_cart_rounded,
+                          filled: true,
+                          onTap: onNewSale,
+                        ),
                       ),
-                      const SizedBox(height: 12),
-                      _HeroActionButton(
-                        label: 'Record collection',
-                        icon: Icons.request_quote_outlined,
-                        onTap: onNewCollection,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: _HeroActionButton(
+                          label: 'Record collection',
+                          icon: Icons.request_quote_outlined,
+                          onTap: onNewCollection,
+                        ),
                       ),
                     ],
                   );
-                }
-
-                return Row(
-                  children: [
-                    Expanded(
-                      child: _HeroActionButton(
-                        label: 'Record new sale',
-                        icon: Icons.add_shopping_cart_rounded,
-                        filled: true,
-                        onTap: onNewSale,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _HeroActionButton(
-                        label: 'Record collection',
-                        icon: Icons.request_quote_outlined,
-                        onTap: onNewCollection,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
+                },
+              ),
             ],
           ),
         ),
@@ -547,11 +597,13 @@ class _HeroDateChip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.calendar_today_outlined, size: 18, color: Colors.white),
+            const Icon(Icons.calendar_today_outlined,
+                size: 18, color: Colors.white),
             const SizedBox(width: 8),
             Text(
               label,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.w700),
             ),
           ],
         ),
@@ -585,7 +637,8 @@ class _HeroStatChip extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             label,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.w700),
           ),
         ],
       ),
@@ -608,7 +661,8 @@ class _HeroActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final background = filled ? Colors.white : Colors.white.withValues(alpha: 0.08);
+    final background =
+        filled ? Colors.white : Colors.white.withValues(alpha: 0.08);
     final foreground = filled ? const Color(0xFF155C4A) : Colors.white;
 
     return InkWell(
@@ -619,7 +673,8 @@ class _HeroActionButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: background,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: filled ? 0.0 : 0.18)),
+          border: Border.all(
+              color: Colors.white.withValues(alpha: filled ? 0.0 : 0.18)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -628,7 +683,8 @@ class _HeroActionButton extends StatelessWidget {
             const SizedBox(width: 12),
             Text(
               label,
-              style: TextStyle(color: foreground, fontWeight: FontWeight.w800, fontSize: 16),
+              style: TextStyle(
+                  color: foreground, fontWeight: FontWeight.w800, fontSize: 16),
             ),
           ],
         ),
@@ -682,7 +738,10 @@ class _InsightCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   value,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 6),
                 Text(description),
