@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -51,6 +53,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onPressed: () => controller.logout(),
             icon: const Icon(Icons.logout_rounded),
             tooltip: 'Logout',
+            color: const Color(0xFF5E7A67),
           ),
         ],
       ),
@@ -86,153 +89,177 @@ class _DashboardScreenState extends State<DashboardScreen> {
               return Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1040),
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-                    children: [
-                      _HeroPanel(
-                        salesperson: controller.currentSalesperson,
-                        companyName: controller.settings.companyName,
-                        selectedDate: _selectedDate,
-                        totalOrders: totalOrders,
-                        onDateTap: _pickDate,
-                        onNewSale: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const SaleEntryScreen()),
-                        ),
-                        onNewCollection: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const CollectionEntryScreen()),
-                        ),
+                  child: DecoratedBox(
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(AppAssets.pageTexture),
+                        fit: BoxFit.cover,
+                        alignment: Alignment.topCenter,
+                        opacity: 0.06,
                       ),
-                      const SizedBox(height: 20),
-                      _SmartSuggestionBanner(),
-                      const SizedBox(height: 20),
-                      SectionCard(
-                        title: 'Today at a glance',
-                        child: Column(
-                          children: [
-                            GridView.count(
-                              crossAxisCount: metricCrossAxisCount,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 12,
-                              childAspectRatio: metricAspectRatio,
-                              children: [
-                                MetricCard(
-                                  title: 'Sales value',
-                                  value: AppFormatters.currency(
-                                      summary.totalSales),
-                                  subtitle:
-                                      '${summary.salesCount} orders captured',
-                                  icon: Icons.trending_up_rounded,
-                                ),
-                                MetricCard(
-                                  title: 'Collections',
-                                  value: AppFormatters.currency(
-                                      summary.totalCollections),
-                                  subtitle:
-                                      '${summary.collectionCount} receipts logged',
-                                  icon: Icons.account_balance_wallet_outlined,
-                                ),
-                                MetricCard(
-                                  title: 'Cash sales',
-                                  value:
-                                      AppFormatters.currency(summary.cashSales),
-                                  subtitle:
-                                      '${cashShare.toStringAsFixed(0)}% of today\'s sales',
-                                  icon: Icons.payments_rounded,
-                                ),
-                                MetricCard(
-                                  title: 'Credit balance',
-                                  value: AppFormatters.currency(
-                                      summary.creditSales),
-                                  subtitle: 'Pending from recorded orders',
-                                  icon: Icons.receipt_long_outlined,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 18),
-                            LayoutBuilder(
-                              builder: (context, constraints) {
-                                final stacked = constraints.maxWidth < 720;
-                                if (stacked) {
-                                  return Column(
+                    ),
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+                      children: [
+                        _HeroPanel(
+                          salesperson: controller.currentSalesperson,
+                          companyName: controller.settings.companyName,
+                          selectedDate: _selectedDate,
+                          totalOrders: totalOrders,
+                          todaySales: summary.totalSales,
+                          onDateTap: _pickDate,
+                          onNewSale: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const SaleEntryScreen()),
+                          ),
+                          onNewCollection: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const CollectionEntryScreen()),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        _SmartSuggestionBanner(
+                          onNewSale: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const SaleEntryScreen()),
+                          ),
+                          onNewCollection: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const CollectionEntryScreen()),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        SectionCard(
+                          title: 'Today at a glance',
+                          child: Column(
+                            children: [
+                              GridView.count(
+                                crossAxisCount: metricCrossAxisCount,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: metricAspectRatio,
+                                children: [
+                                  MetricCard(
+                                    title: 'Sales value',
+                                    value: AppFormatters.currency(
+                                        summary.totalSales),
+                                    subtitle:
+                                        '${summary.salesCount} orders captured',
+                                    icon: Icons.trending_up_rounded,
+                                  ),
+                                  MetricCard(
+                                    title: 'Collections',
+                                    value: AppFormatters.currency(
+                                        summary.totalCollections),
+                                    subtitle:
+                                        '${summary.collectionCount} receipts logged',
+                                    icon: Icons.account_balance_wallet_outlined,
+                                  ),
+                                  MetricCard(
+                                    title: 'Cash sales',
+                                    value: AppFormatters.currency(
+                                        summary.cashSales),
+                                    subtitle:
+                                        '${cashShare.toStringAsFixed(0)}% of today\'s sales',
+                                    icon: Icons.payments_rounded,
+                                  ),
+                                  MetricCard(
+                                    title: 'Credit balance',
+                                    value: AppFormatters.currency(
+                                        summary.creditSales),
+                                    subtitle: 'Pending from recorded orders',
+                                    icon: Icons.receipt_long_outlined,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 18),
+                              LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final stacked = constraints.maxWidth < 720;
+                                  if (stacked) {
+                                    return Column(
+                                      children: [
+                                        _InsightCard(
+                                          title: 'Collection coverage',
+                                          value:
+                                              '${collectionCoverage.toStringAsFixed(0)}%',
+                                          description:
+                                              'A quick comparison of collections against today\'s sales value.',
+                                          icon: Icons.ssid_chart_rounded,
+                                        ),
+                                        const SizedBox(height: 12),
+                                        _InsightCard(
+                                          title: 'Route activity',
+                                          value: '$totalOrders actions',
+                                          description:
+                                              'Combined orders and receipts captured for the selected date.',
+                                          icon: Icons.route_rounded,
+                                        ),
+                                      ],
+                                    );
+                                  }
+
+                                  return Row(
                                     children: [
-                                      _InsightCard(
-                                        title: 'Collection coverage',
-                                        value:
-                                            '${collectionCoverage.toStringAsFixed(0)}%',
-                                        description:
-                                            'A quick comparison of collections against today\'s sales value.',
-                                        icon: Icons.ssid_chart_rounded,
+                                      Expanded(
+                                        child: _InsightCard(
+                                          title: 'Collection coverage',
+                                          value:
+                                              '${collectionCoverage.toStringAsFixed(0)}%',
+                                          description:
+                                              'A quick comparison of collections against today\'s sales value.',
+                                          icon: Icons.ssid_chart_rounded,
+                                        ),
                                       ),
-                                      const SizedBox(height: 12),
-                                      _InsightCard(
-                                        title: 'Route activity',
-                                        value: '$totalOrders actions',
-                                        description:
-                                            'Combined orders and receipts captured for the selected date.',
-                                        icon: Icons.route_rounded,
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: _InsightCard(
+                                          title: 'Route activity',
+                                          value: '$totalOrders actions',
+                                          description:
+                                              'Combined orders and receipts captured for the selected date.',
+                                          icon: Icons.route_rounded,
+                                        ),
                                       ),
                                     ],
                                   );
-                                }
-
-                                return Row(
-                                  children: [
-                                    Expanded(
-                                      child: _InsightCard(
-                                        title: 'Collection coverage',
-                                        value:
-                                            '${collectionCoverage.toStringAsFixed(0)}%',
-                                        description:
-                                            'A quick comparison of collections against today\'s sales value.',
-                                        icon: Icons.ssid_chart_rounded,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: _InsightCard(
-                                        title: 'Route activity',
-                                        value: '$totalOrders actions',
-                                        description:
-                                            'Combined orders and receipts captured for the selected date.',
-                                        icon: Icons.route_rounded,
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      SectionCard(
-                        title: 'Recent activity',
-                        child: activities.isEmpty
-                            ? const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 32),
-                                child: Center(
-                                    child: Text('No recorded activity found.')),
-                              )
-                            : Column(
-                                children: [
-                                  for (var i = 0;
-                                      i < activities.length;
-                                      i++) ...[
-                                    _ActivityItem(activity: activities[i]),
-                                    if (i < activities.length - 1)
-                                      const Divider(
-                                          height: 24, color: Color(0xFFF1F4F1)),
-                                  ],
-                                ],
+                                },
                               ),
-                      ),
-                    ],
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        SectionCard(
+                          title: 'Recent activity',
+                          child: activities.isEmpty
+                              ? const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 32),
+                                  child: Center(
+                                      child:
+                                          Text('No recorded activity found.')),
+                                )
+                              : Column(
+                                  children: [
+                                    for (var i = 0;
+                                        i < activities.length;
+                                        i++) ...[
+                                      _ActivityItem(activity: activities[i]),
+                                      if (i < activities.length - 1)
+                                        const Divider(
+                                            height: 24,
+                                            color: Color(0xFFF1F4F1)),
+                                    ],
+                                  ],
+                                ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -334,62 +361,137 @@ class _ActivityItem extends StatelessWidget {
 }
 
 class _SmartSuggestionBanner extends StatelessWidget {
+  const _SmartSuggestionBanner({
+    required this.onNewSale,
+    required this.onNewCollection,
+  });
+
+  final VoidCallback onNewSale;
+  final VoidCallback onNewCollection;
+
   @override
   Widget build(BuildContext context) {
+    final compact = MediaQuery.of(context).size.width < 560;
+    final theme = Theme.of(context);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F8E9),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFC8E6C9)),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFF7FBF3),
+            Color(0xFFE8F3E4),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0xFFD7E9D3)),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0A2E7D32),
-            blurRadius: 16,
-            offset: Offset(0, 4),
+            color: Color(0x102E7D32),
+            blurRadius: 24,
+            offset: Offset(0, 12),
           ),
         ],
       ),
-      child: Row(
+      child: Stack(
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x0A000000),
-                  blurRadius: 8,
-                )
-              ],
-            ),
-            child: const Icon(Icons.auto_awesome_rounded,
-                color: Color(0xFF2E7D32), size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Route Strategy Tip',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF1B5E20),
-                      fontSize: 13,
-                      letterSpacing: 0.2),
+          Positioned(
+            right: compact ? -24 : -8,
+            bottom: compact ? -18 : -8,
+            child: IgnorePointer(
+              child: Opacity(
+                opacity: 0.28,
+                child: Image.asset(
+                  AppAssets.reportsHero,
+                  width: compact ? 108 : 150,
+                  fit: BoxFit.contain,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Your area "Colombo 07" has 3 shops with overdue balances. Prioritize collections today to maintain account limits.',
-                  style: TextStyle(
-                      fontSize: 14, color: Colors.grey.shade800, height: 1.4),
-                ),
-              ],
+              ),
             ),
           ),
-          const Icon(Icons.chevron_right_rounded, color: Color(0xFF2E7D32)),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x0A000000),
+                      blurRadius: 10,
+                    )
+                  ],
+                ),
+                child: const Icon(Icons.auto_awesome_rounded,
+                    color: Color(0xFF2E7D32), size: 24),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(right: compact ? 56 : 96),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Route strategy tip',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF1B5E20),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Your area "Colombo 07" has 3 shops with overdue balances. Prioritize collections today to maintain account limits.',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.grey.shade800,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          FilledButton.icon(
+                            onPressed: onNewSale,
+                            icon: const Icon(Icons.add_shopping_cart_rounded,
+                                size: 18),
+                            label: const Text('New Sale'),
+                            style: FilledButton.styleFrom(
+                              minimumSize: Size.zero,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: onNewCollection,
+                            icon: const Icon(Icons.request_quote_outlined,
+                                size: 18),
+                            label: const Text('Record Collection'),
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: Size.zero,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -402,6 +504,7 @@ class _HeroPanel extends StatelessWidget {
     required this.companyName,
     required this.selectedDate,
     required this.totalOrders,
+    required this.todaySales,
     required this.onDateTap,
     required this.onNewSale,
     required this.onNewCollection,
@@ -411,6 +514,7 @@ class _HeroPanel extends StatelessWidget {
   final String companyName;
   final DateTime selectedDate;
   final int totalOrders;
+  final double todaySales;
   final VoidCallback onDateTap;
   final VoidCallback onNewSale;
   final VoidCallback onNewCollection;
@@ -422,46 +526,38 @@ class _HeroPanel extends StatelessWidget {
     final compact = width < 620;
 
     return Container(
-      constraints: BoxConstraints(minHeight: compact ? 340 : 380),
+      constraints: BoxConstraints(minHeight: compact ? 410 : 438),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(26),
         image: const DecorationImage(
           image: AssetImage(AppAssets.dashboardHero),
           fit: BoxFit.cover,
           alignment: Alignment.center,
         ),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF2E7D32),
-            Color(0xFF1B5E20),
-          ],
-        ),
         boxShadow: const [
           BoxShadow(
-            blurRadius: 32,
+            blurRadius: 30,
             offset: Offset(0, 16),
-            color: Color(0x1F2E7D32),
+            color: Color(0x1A1B5E20),
           ),
         ],
       ),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(26),
           gradient: LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomCenter,
             stops: const [0.0, 0.55, 1.0],
             colors: [
-              const Color(0xFF16311A).withValues(alpha: 0.84),
-              const Color(0xFF2E7D32).withValues(alpha: 0.58),
-              const Color(0xFF2E7D32).withValues(alpha: 0.18),
+              const Color(0xFF143C1E).withValues(alpha: 0.75),
+              const Color(0xFF1D5B2B).withValues(alpha: 0.56),
+              const Color(0xFF4CAF50).withValues(alpha: 0.35),
             ],
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.all(compact ? 24 : 32),
+          padding: EdgeInsets.all(compact ? 22 : 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -469,11 +565,14 @@ class _HeroPanel extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Flexible(
-                    child: BrandLogo(
-                      height: compact ? 40 : 48,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 10),
-                      alignment: Alignment.centerLeft,
+                    child: _HeroGlassBadge(
+                      child: BrandLogo(
+                        height: compact ? 34 : 40,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 6),
+                        showPlate: false,
+                        alignment: Alignment.centerLeft,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -482,7 +581,7 @@ class _HeroPanel extends StatelessWidget {
                       onTap: onDateTap),
                 ],
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 30),
               Text(
                 'Good morning, $salesperson',
                 style: (compact
@@ -501,26 +600,29 @@ class _HeroPanel extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.86),
                     fontWeight: FontWeight.w500),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               Text(
-                'Your daily route summary and quick actions. Keep delivering health and trusted quality to our customers.',
+                'Your daily route summary and next best actions.',
                 style: textTheme.bodyMedium?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.8), height: 1.6),
+                    color: Colors.white.withValues(alpha: 0.78), height: 1.5),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
               Wrap(
                 spacing: 12,
                 runSpacing: 12,
                 children: [
                   _HeroStatChip(
-                      label: '$totalOrders actions', icon: Icons.route_rounded),
+                      label: '$totalOrders actions',
+                      icon: Icons.sync_alt_rounded),
                   const _HeroStatChip(
-                      label: 'Offline ready', icon: Icons.offline_bolt_rounded),
-                  const _HeroStatChip(
-                      label: 'Share reports later', icon: Icons.share_outlined),
+                      label: 'Offline ready', icon: Icons.wifi_off_rounded),
+                  _HeroStatChip(
+                    label: '${AppFormatters.currency(todaySales)} today',
+                    icon: Icons.payments_outlined,
+                  ),
                 ],
               ),
-              const SizedBox(height: 36),
+              const SizedBox(height: 28),
               LayoutBuilder(
                 builder: (context, constraints) {
                   final stacked = constraints.maxWidth < 560;
@@ -587,25 +689,22 @@ class _HeroDateChip extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(999),
-      child: Ink(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.calendar_today_outlined,
-                size: 18, color: Colors.white),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.w700),
-            ),
-          ],
+      child: _HeroGlassBadge(
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.calendar_today_outlined,
+                  size: 18, color: Colors.white),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -623,24 +722,21 @@ class _HeroStatChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 18, color: Colors.white),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: const TextStyle(
-                color: Colors.white, fontWeight: FontWeight.w700),
-          ),
-        ],
+    return _HeroGlassBadge(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 18, color: Colors.white),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -661,20 +757,46 @@ class _HeroActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final background =
-        filled ? Colors.white : Colors.white.withValues(alpha: 0.08);
-    final foreground = filled ? const Color(0xFF155C4A) : Colors.white;
+    final foreground = filled ? const Color(0xFF103E2A) : Colors.white;
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(18),
       child: Ink(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         decoration: BoxDecoration(
-          color: background,
-          borderRadius: BorderRadius.circular(16),
+          gradient: filled
+              ? const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFFB9F0A5),
+                    Color(0xFF7ED957),
+                  ],
+                )
+              : null,
+          color: filled ? null : Colors.white.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(
-              color: Colors.white.withValues(alpha: filled ? 0.0 : 0.18)),
+            color: filled
+                ? Colors.white.withValues(alpha: 0.0)
+                : Colors.white.withValues(alpha: 0.24),
+          ),
+          boxShadow: filled
+              ? const [
+                  BoxShadow(
+                    blurRadius: 22,
+                    offset: Offset(0, 12),
+                    color: Color(0x33143B1E),
+                  ),
+                ]
+              : const [
+                  BoxShadow(
+                    blurRadius: 16,
+                    offset: Offset(0, 8),
+                    color: Color(0x0D102D18),
+                  ),
+                ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -687,6 +809,30 @@ class _HeroActionButton extends StatelessWidget {
                   color: foreground, fontWeight: FontWeight.w800, fontSize: 16),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroGlassBadge extends StatelessWidget {
+  const _HeroGlassBadge({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(999),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
+          ),
+          child: child,
         ),
       ),
     );

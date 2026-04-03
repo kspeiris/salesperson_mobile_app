@@ -30,6 +30,7 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
     final compact = MediaQuery.of(context).size.width < 640;
+    final theme = Theme.of(context);
     final start =
         DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
     final end = start.add(const Duration(days: 1));
@@ -45,68 +46,107 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
               'Review recorded sales by day, filter by shop, and void incorrect entries with an audit reason.',
           headerImageAsset: AppAssets.salesHero,
           pageBackgroundAsset: AppAssets.pageTexture,
-          floatingActionButton: FloatingActionButton.extended(
+          floatingActionButton: _PremiumSalesFab(
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const SaleEntryScreen())),
-            icon: const Icon(Icons.add_shopping_cart_rounded),
-            label: const Text('Add Sale'),
-            backgroundColor: const Color(0xFF2E7D32),
-            foregroundColor: Colors.white,
           ),
           child: Column(
             children: [
               Container(
-                padding: EdgeInsets.all(compact ? 16 : 18),
+                padding: EdgeInsets.all(compact ? 18 : 22),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.78),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: const Color(0xFFDDE6DF)),
+                  color: const Color(0xFFF8FCF8).withValues(alpha: 0.92),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: const Color(0xFFD8E9DA)),
+                  boxShadow: const [
+                    BoxShadow(
+                      blurRadius: 24,
+                      offset: Offset(0, 14),
+                      color: Color(0x102E7D32),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Filters',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w800)),
-                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFEEF8EF), Color(0xFFDCEFD9)],
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.tune_rounded,
+                            color: Color(0xFF2E7D32),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text('Filters',
+                            style: theme.textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w800)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
                     Text(
                       'Narrow the list by date or shop to review the correct sales quickly.',
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: const Color(0xFF6E8472)),
                     ),
-                    const SizedBox(height: 16),
-                    InkWell(
-                      borderRadius: BorderRadius.circular(18),
-                      onTap: _pickDate,
-                      child: InputDecorator(
-                        decoration: const InputDecoration(
-                          prefixIcon: Icon(Icons.calendar_month_outlined),
-                          labelText: 'Date',
+                    const SizedBox(height: 18),
+                    _FilterField(
+                      label: 'Date',
+                      icon: Icons.calendar_month_rounded,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: _pickDate,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 3),
+                          child: Text(
+                            AppFormatters.date(_selectedDate),
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF35533B),
+                            ),
+                          ),
                         ),
-                        child: Text(AppFormatters.date(_selectedDate)),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<int?>(
-                      initialValue: _shopId,
-                      isExpanded: true,
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.storefront_outlined),
-                        labelText: 'Shop filter',
+                    const SizedBox(height: 14),
+                    _FilterField(
+                      label: 'Shop filter',
+                      icon: Icons.store_rounded,
+                      trailing: const Icon(Icons.keyboard_arrow_down_rounded,
+                          color: Color(0xFF4E6B53)),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<int?>(
+                          value: _shopId,
+                          isExpanded: true,
+                          dropdownColor: Colors.white,
+                          borderRadius: BorderRadius.circular(18),
+                          icon: const SizedBox.shrink(),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF223327),
+                          ),
+                          items: [
+                            const DropdownMenuItem<int?>(
+                                value: null, child: Text('All shops')),
+                            ...shops.map((shop) => DropdownMenuItem<int?>(
+                                value: shop.id, child: Text(shop.name))),
+                          ],
+                          onChanged: (value) => setState(() => _shopId = value),
+                        ),
                       ),
-                      items: [
-                        const DropdownMenuItem<int?>(
-                            value: null, child: Text('All shops')),
-                        ...shops.map((shop) => DropdownMenuItem<int?>(
-                            value: shop.id, child: Text(shop.name))),
-                      ],
-                      onChanged: (value) => setState(() => _shopId = value),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               Expanded(
                 child: FutureBuilder<List<SaleRecord>>(
                   future: controller.fetchSales(
@@ -128,110 +168,14 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                     }
 
                     return ListView.separated(
+                      padding: const EdgeInsets.only(bottom: 96),
                       itemCount: sales.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      separatorBuilder: (_, __) => const SizedBox(height: 16),
                       itemBuilder: (context, index) {
                         final sale = sales[index];
-                        return Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.82),
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(color: const Color(0xFFDDE6DF)),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary
-                                          .withValues(alpha: 0.10),
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child:
-                                        const Icon(Icons.point_of_sale_rounded),
-                                  ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(sale.shopName,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium),
-                                        const SizedBox(height: 6),
-                                        Wrap(
-                                          spacing: 8,
-                                          runSpacing: 8,
-                                          children: [
-                                            _StatusChip(
-                                                label: sale.isVoided
-                                                    ? 'Voided'
-                                                    : sale.paymentType),
-                                            _StatusChip(
-                                                label:
-                                                    '${sale.items.length} items'),
-                                            _StatusChip(
-                                                label: AppFormatters.time(
-                                                    sale.createdAt)),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  PopupMenuButton<String>(
-                                    enabled: !sale.isVoided,
-                                    onSelected: (value) {
-                                      if (value == 'void') _voidSale(sale);
-                                    },
-                                    itemBuilder: (_) => const [
-                                      PopupMenuItem(
-                                          value: 'void',
-                                          child: Text('Void sale')),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 14),
-                              Text('Grand total',
-                                  style:
-                                      Theme.of(context).textTheme.labelMedium),
-                              const SizedBox(height: 4),
-                              Text(
-                                AppFormatters.currency(sale.total),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(fontWeight: FontWeight.w800),
-                              ),
-                              if (sale.note.isNotEmpty) ...[
-                                const SizedBox(height: 12),
-                                Text(sale.note,
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium),
-                              ],
-                              if (sale.voidReason != null &&
-                                  sale.voidReason!.isNotEmpty) ...[
-                                const SizedBox(height: 12),
-                                Text(
-                                  'Reason: ${sale.voidReason}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(fontWeight: FontWeight.w600),
-                                ),
-                              ],
-                            ],
-                          ),
+                        return _SaleHistoryCard(
+                          sale: sale,
+                          onVoid: sale.isVoided ? null : () => _voidSale(sale),
                         );
                       },
                     );
@@ -305,24 +249,371 @@ List<Shop> _distinctShops(List<Shop> shops) {
 }
 
 class _StatusChip extends StatelessWidget {
-  const _StatusChip({required this.label});
+  const _StatusChip({
+    required this.label,
+    this.icon,
+    this.accentColor = const Color(0xFFEDF5EE),
+    this.textColor = const Color(0xFF55705B),
+  });
 
   final String label;
+  final IconData? icon;
+  final Color accentColor;
+  final Color textColor;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3F7F4),
+        color: accentColor,
         borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
       ),
-      child: Text(
-        label,
-        style: Theme.of(context)
-            .textTheme
-            .bodySmall
-            ?.copyWith(fontWeight: FontWeight.w700),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 14, color: textColor),
+            const SizedBox(width: 6),
+          ],
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: textColor,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterField extends StatelessWidget {
+  const _FilterField({
+    required this.label,
+    required this.icon,
+    required this.child,
+    this.trailing,
+  });
+
+  final String label;
+  final IconData icon;
+  final Widget child;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3FAF4),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFDDEDDC)),
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 16,
+            offset: Offset(0, 8),
+            color: Color(0x082E7D32),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(icon, color: const Color(0xFF2E7D32)),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: const Color(0xFF6C8370),
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                const SizedBox(height: 6),
+                child,
+              ],
+            ),
+          ),
+          if (trailing != null) ...[
+            const SizedBox(width: 12),
+            trailing!,
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _SaleHistoryCard extends StatelessWidget {
+  const _SaleHistoryCard({
+    required this.sale,
+    required this.onVoid,
+  });
+
+  final SaleRecord sale;
+  final VoidCallback? onVoid;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isVoided = sale.isVoided;
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFFFFFFF), Color(0xFFF5FBF6)],
+        ),
+        border: Border.all(color: const Color(0xFFDCEADF)),
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 24,
+            offset: Offset(0, 14),
+            color: Color(0x0D214B2B),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: Stack(
+          children: [
+            Positioned(
+              right: -8,
+              top: -4,
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFFB7DDBA).withValues(alpha: 0.18),
+                ),
+              ),
+            ),
+            Positioned(
+              right: 18,
+              bottom: 14,
+              child: Icon(
+                Icons.receipt_long_rounded,
+                size: 44,
+                color: const Color(0xFF9CCAA3).withValues(alpha: 0.28),
+              ),
+            ),
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.white.withValues(alpha: 0.0),
+                      const Color(0xFFEAF5EC).withValues(alpha: 0.26),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFFF0F7F1), Color(0xFFDDEEDF)],
+                          ),
+                          border: Border.all(color: Colors.white),
+                        ),
+                        child: Icon(
+                          isVoided
+                              ? Icons.remove_shopping_cart_rounded
+                              : Icons.storefront_rounded,
+                          color: isVoided
+                              ? const Color(0xFF8C5A5A)
+                              : const Color(0xFF295D31),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              sale.shopName,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xFF223327),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                _StatusChip(
+                                  label: isVoided ? 'Voided' : sale.paymentType,
+                                  icon: isVoided
+                                      ? Icons.block_rounded
+                                      : Icons.payments_outlined,
+                                  accentColor: isVoided
+                                      ? const Color(0xFFF9ECEC)
+                                      : const Color(0xFFEDF6EF),
+                                  textColor: isVoided
+                                      ? const Color(0xFF9A4B4B)
+                                      : const Color(0xFF4F6D55),
+                                ),
+                                _StatusChip(
+                                  label: '${sale.items.length} items',
+                                  icon: Icons.inventory_2_outlined,
+                                ),
+                                _StatusChip(
+                                  label: AppFormatters.time(sale.createdAt),
+                                  icon: Icons.schedule_rounded,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      PopupMenuButton<String>(
+                        enabled: !isVoided,
+                        color: Colors.white,
+                        surfaceTintColor: Colors.transparent,
+                        onSelected: (value) {
+                          if (value == 'void' && onVoid != null) onVoid!();
+                        },
+                        itemBuilder: (_) => const [
+                          PopupMenuItem(
+                            value: 'void',
+                            child: Text('Void sale'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Divider(
+                      height: 1,
+                      color: const Color(0xFFDCE9DE).withValues(alpha: 0.9),
+                    ),
+                  ),
+                  Text(
+                    'Grand total',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: const Color(0xFF6C8370),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    AppFormatters.currency(sale.total),
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.6,
+                      color: const Color(0xFF1D2F22),
+                    ),
+                  ),
+                  if (sale.note.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    Text(
+                      sale.note,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: const Color(0xFF607565),
+                      ),
+                    ),
+                  ],
+                  if (sale.voidReason != null &&
+                      sale.voidReason!.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF9EEEE),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        'Audit reason: ${sale.voidReason}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF8A4A4A),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PremiumSalesFab extends StatelessWidget {
+  const _PremiumSalesFab({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 24,
+            offset: Offset(0, 12),
+            color: Color(0x22357F3A),
+          ),
+        ],
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF2E7D32), Color(0xFF43A047)],
+          ),
+        ),
+        child: FloatingActionButton.extended(
+          onPressed: onPressed,
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          extendedPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          icon: const Icon(Icons.add_shopping_cart_rounded),
+          label: const Text('Add Sale'),
+        ),
       ),
     );
   }

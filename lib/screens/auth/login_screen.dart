@@ -61,28 +61,28 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context).scaffoldBackgroundColor,
-              const Color(0xFFEFF6FF), // extremely light blue
-              Theme.of(context).scaffoldBackgroundColor,
+              Color(0xFFF8FDF8),
+              Color(0xFFF3FAF3),
+              Color(0xFFEFF7FF),
             ],
           ),
-          image: const DecorationImage(
+          image: DecorationImage(
             image: AssetImage(AppAssets.pageTexture),
             fit: BoxFit.cover,
             alignment: Alignment.topCenter,
-            opacity: 0.09,
+            opacity: 0.07,
           ),
         ),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(
-                  stacked ? 16 : 32, 16, stacked ? 16 : 32, 32),
+                  stacked ? 16 : 32, 20, stacked ? 16 : 32, 32),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1080),
                 child: stacked
@@ -147,48 +147,40 @@ class _IntroPanel extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Container(
-      constraints: BoxConstraints(minHeight: compact ? 320 : 520),
+      constraints: BoxConstraints(minHeight: compact ? 382 : 560),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(30),
         image: const DecorationImage(
           image: AssetImage(AppAssets.loginHero),
           fit: BoxFit.cover,
           alignment: Alignment.centerRight,
         ),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF2E7D32),
-            Color(0xFF1B5E20),
-          ],
-        ),
         boxShadow: const [
           BoxShadow(
-            blurRadius: 32,
-            offset: Offset(0, 16),
-            color: Color(0x1F2E7D32),
+            blurRadius: 36,
+            offset: Offset(0, 20),
+            color: Color(0x1C1B5E20),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(30),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              stops: const [0.0, 0.48, 1.0],
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight,
+              stops: const [0.0, 0.55, 1.0],
               colors: [
-                const Color(0xFF16311A).withValues(alpha: 0.92),
-                const Color(0xFF2E7D32).withValues(alpha: 0.70),
-                const Color(0xFF2E7D32).withValues(alpha: 0.24),
+                const Color(0xFF143B1E).withValues(alpha: 0.90),
+                const Color(0xFF2E7D32).withValues(alpha: 0.64),
+                const Color(0xFF9CCC65).withValues(alpha: 0.20),
               ],
             ),
           ),
-          padding: EdgeInsets.all(compact ? 24 : 40),
+          padding: EdgeInsets.all(compact ? 22 : 38),
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: compact ? 260 : 560),
+            constraints: BoxConstraints(maxWidth: compact ? 285 : 560),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -197,16 +189,23 @@ class _IntroPanel extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.white.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(18),
                     border:
-                        Border.all(color: Colors.white.withValues(alpha: 0.25)),
+                        Border.all(color: Colors.white.withValues(alpha: 0.22)),
+                    boxShadow: const [
+                      BoxShadow(
+                        blurRadius: 18,
+                        offset: Offset(0, 8),
+                        color: Color(0x14000000),
+                      ),
+                    ],
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.eco_rounded,
-                          color: Color(0xFFA5D6A7), size: 20),
+                      const Icon(Icons.spa_rounded,
+                          color: Color(0xFFD8F3DC), size: 18),
                       const SizedBox(width: 8),
                       Text(
                         companyName,
@@ -218,35 +217,36 @@ class _IntroPanel extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 30),
                 Text(
                   'Bio Care Sales App',
                   style: textTheme.displaySmall?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                      height: 1.1),
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    height: 1.05,
+                    letterSpacing: -0.9,
+                  ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 Text(
-                  '"Pure Health. Trusted Quality."\nCapture orders, manage collections, and execute route strategies seamlessly with a delightfully engineered workflow.',
+                  '"Pure Health. Trusted Quality."\nCapture orders, collections, and route actions in one beautifully focused workspace.',
                   style: textTheme.titleMedium?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.85),
-                      height: 1.5,
-                      fontWeight: FontWeight.w400),
+                    color: Colors.white.withValues(alpha: 0.84),
+                    height: 1.45,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 26),
                 const Wrap(
                   spacing: 12,
                   runSpacing: 12,
                   children: [
                     _Badge(
-                        icon: Icons.wifi_off_rounded,
-                        label: 'Offline-First Storage'),
+                        icon: Icons.wifi_off_rounded, label: 'Offline-First'),
+                    _Badge(icon: Icons.insights_rounded, label: 'Insights'),
                     _Badge(
-                        icon: Icons.insights_rounded, label: 'Smart Insights'),
-                    _Badge(
-                        icon: Icons.security_rounded,
-                        label: 'Enterprise Grade'),
+                        icon: Icons.verified_user_outlined,
+                        label: 'Enterprise'),
                   ],
                 ),
               ],
@@ -267,23 +267,31 @@ class _Badge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(100),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+        color: Colors.white.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 18,
+            offset: Offset(0, 6),
+            color: Color(0x12000000),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: Colors.white.withValues(alpha: 0.9)),
+          Icon(icon, size: 15, color: Colors.white.withValues(alpha: 0.92)),
           const SizedBox(width: 8),
           Text(
             label,
             style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.95),
-                fontWeight: FontWeight.w600,
-                fontSize: 13),
+              color: Colors.white.withValues(alpha: 0.96),
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+            ),
           ),
         ],
       ),
@@ -310,27 +318,66 @@ class _LoginCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final initials = salespersonController.text.trim().isEmpty
+        ? 'BC'
+        : salespersonController.text
+            .trim()
+            .split(RegExp(r'\s+'))
+            .where((part) => part.isNotEmpty)
+            .take(2)
+            .map((part) => part.characters.first.toUpperCase())
+            .join();
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: Colors.white.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.70)),
         boxShadow: const [
           BoxShadow(
-            blurRadius: 40,
-            offset: Offset(0, 20),
-            color: Color(0x0A0F172A),
+            blurRadius: 34,
+            offset: Offset(0, 18),
+            color: Color(0x120F172A),
           ),
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(compact ? 24 : 40),
+        padding: EdgeInsets.all(compact ? 22 : 34),
         child: Form(
           key: formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                children: [
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF43A047),
+                          Color(0xFF1B5E20),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      initials.isEmpty ? 'BC' : initials,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
               Text(
                 'Welcome back',
                 style: Theme.of(context)
@@ -341,18 +388,25 @@ class _LoginCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 'Sign in to access your dashboard and today\'s routes.',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge
-                    ?.copyWith(color: const Color(0xFF64748B)),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: const Color(0xFF64748B),
+                      height: 1.45,
+                    ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
               TextFormField(
                 controller: salespersonController,
                 style: const TextStyle(fontWeight: FontWeight.w500),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Salesperson ID / Name',
-                  prefixIcon: Icon(Icons.badge_outlined),
+                  prefixIcon: Container(
+                    margin: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEAF6EC),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.badge_outlined),
+                  ),
                 ),
                 textInputAction:
                     pinEnabled ? TextInputAction.next : TextInputAction.done,
@@ -371,9 +425,16 @@ class _LoginCard extends StatelessWidget {
                   style: const TextStyle(
                       fontWeight: FontWeight.w500, letterSpacing: 4),
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Access PIN',
-                    prefixIcon: Icon(Icons.password_rounded),
+                    prefixIcon: Container(
+                      margin: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEAF6EC),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.password_rounded),
+                    ),
                   ),
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => onSubmit(),
@@ -395,28 +456,67 @@ class _LoginCard extends StatelessWidget {
                 child: FilledButton(
                   onPressed: onSubmit,
                   style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    backgroundColor: const Color(0xFF2E7D32),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shadowColor: const Color(0x332E7D32),
+                    padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                   ),
-                  child: const Text('Access Workspace',
-                      style: TextStyle(fontSize: 16)),
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Color(0xFF2E7D32),
+                          Color(0xFF43A047),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: const [
+                        BoxShadow(
+                          blurRadius: 18,
+                          offset: Offset(0, 10),
+                          color: Color(0x2B2E7D32),
+                        ),
+                      ],
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      child: Center(
+                        child: Text(
+                          'Access Workspace',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
-              const Center(
+              Center(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.shield_outlined,
-                        size: 16, color: Color(0xFF94A3B8)),
-                    SizedBox(width: 8),
+                    Icon(
+                      Icons.shield_outlined,
+                      size: 16,
+                      color: const Color(0xFF94A3B8).withValues(alpha: 0.90),
+                    ),
+                    const SizedBox(width: 8),
                     Text(
                       'End-to-end encrypted local storage',
                       style: TextStyle(
-                          color: Color(0xFF94A3B8),
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500),
+                        color: const Color(0xFF94A3B8).withValues(alpha: 0.88),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),

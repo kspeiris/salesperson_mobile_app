@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class AppShell extends StatelessWidget {
@@ -49,7 +51,7 @@ class AppShell extends StatelessWidget {
                     image: AssetImage(pageBackgroundAsset!),
                     fit: BoxFit.cover,
                     alignment: Alignment.topCenter,
-                    opacity: 0.09,
+                    opacity: 0.06,
                   ),
           ),
           child: Center(
@@ -102,24 +104,29 @@ class _ShellHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasImage = headerImageAsset != null;
-    final imageMinHeight = compact ? 164.0 : 208.0;
+    final imageMinHeight = compact ? 176.0 : 224.0;
+    final panelRadius = BorderRadius.circular(24);
 
     return Container(
       constraints: hasImage ? BoxConstraints(minHeight: imageMinHeight) : null,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFE8F5E9)),
+        borderRadius: panelRadius,
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFF7FCF7), Color(0xFFEAF5EB)],
+        ),
+        border: Border.all(color: const Color(0xFFD6E7D8)),
         boxShadow: const [
           BoxShadow(
-            blurRadius: 18,
-            offset: Offset(0, 6),
-            color: Color(0x080F172A),
+            blurRadius: 28,
+            offset: Offset(0, 14),
+            color: Color(0x122E7D32),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: panelRadius,
         child: Stack(
           children: [
             if (hasImage)
@@ -127,7 +134,8 @@ class _ShellHeaderCard extends StatelessWidget {
                 child: Image.asset(
                   headerImageAsset!,
                   fit: BoxFit.cover,
-                  alignment: compact ? Alignment.centerRight : Alignment.center,
+                  alignment:
+                      compact ? Alignment.centerRight : Alignment.centerRight,
                 ),
               ),
             Positioned.fill(
@@ -136,50 +144,110 @@ class _ShellHeaderCard extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
-                    stops: hasImage ? const [0.0, 0.5, 1.0] : null,
+                    stops: hasImage ? const [0.0, 0.42, 1.0] : null,
                     colors: hasImage
                         ? [
-                            Colors.white,
-                            Colors.white.withValues(alpha: 0.86),
-                            Colors.white.withValues(alpha: 0.28),
+                            const Color(0xFF1F6A36).withValues(alpha: 0.92),
+                            const Color(0xFF3E9250).withValues(alpha: 0.58),
+                            Colors.white.withValues(alpha: 0.06),
                           ]
-                        : [Colors.white, Colors.white],
+                        : const [Color(0xFFF7FCF7), Color(0xFFEAF5EB)],
                   ),
                 ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(compact ? 24 : 32),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: hasImage ? (compact ? 230 : 560) : double.infinity,
+            Positioned(
+              right: compact ? -30 : -12,
+              top: compact ? -20 : -12,
+              child: Container(
+                width: compact ? 120 : 160,
+                height: compact ? 120 : 160,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.14),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      title,
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineSmall
-                          ?.copyWith(height: 1.1, fontWeight: FontWeight.w800),
-                    ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        subtitle!,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(color: const Color(0xFF64748B)),
+              ),
+            ),
+            Positioned(
+              left: compact ? -22 : -10,
+              bottom: compact ? -42 : -54,
+              child: Container(
+                width: compact ? 100 : 136,
+                height: compact ? 100 : 136,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF9FD9A9).withValues(alpha: 0.14),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(compact ? 18 : 22),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(22),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                    child: Container(
+                      constraints: BoxConstraints(
+                        maxWidth:
+                            hasImage ? (compact ? 238 : 430) : double.infinity,
                       ),
-                    ],
-                    if (header != null) ...[
-                      const SizedBox(height: 24),
-                      header!,
-                    ],
-                  ],
+                      padding: EdgeInsets.all(compact ? 18 : 24),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(22),
+                        color: Colors.white
+                            .withValues(alpha: hasImage ? 0.18 : 0.72),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.28),
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            blurRadius: 18,
+                            offset: Offset(0, 10),
+                            color: Color(0x120F172A),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            title,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
+                                  height: 1.05,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                ),
+                          ),
+                          if (subtitle != null) ...[
+                            const SizedBox(height: 10),
+                            Text(
+                              subtitle!,
+                              maxLines: compact ? 4 : 3,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.84),
+                                    height: 1.45,
+                                  ),
+                            ),
+                          ],
+                          if (header != null) ...[
+                            const SizedBox(height: 20),
+                            header!,
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
