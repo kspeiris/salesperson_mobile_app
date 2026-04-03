@@ -42,17 +42,65 @@ class _ProductsScreenState extends State<ProductsScreen> {
         IconButton(
           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductFormScreen())),
           icon: const Icon(Icons.add_box_outlined),
+          tooltip: 'Add Product',
         ),
       ],
       child: Column(
         children: [
-          TextField(
-            controller: _searchController,
-            decoration: const InputDecoration(
-              hintText: 'Search by product, SKU, or barcode',
-              prefixIcon: Icon(Icons.search_rounded),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.78),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: const Color(0xFFDDE6DF)),
             ),
-            onChanged: (value) => setState(() => _query = value),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search by product, SKU, or barcode',
+                    prefixIcon: const Icon(Icons.search_rounded),
+                    suffixIcon: _query.isEmpty
+                        ? null
+                        : IconButton(
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _query = '');
+                            },
+                            icon: const Icon(Icons.close_rounded),
+                          ),
+                  ),
+                  onChanged: (value) => setState(() => _query = value),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const ProductImportScreen()),
+                        ),
+                        icon: const Icon(Icons.download_for_offline_outlined),
+                        label: const Text('Import'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const ProductFormScreen()),
+                        ),
+                        icon: const Icon(Icons.add_box_outlined),
+                        label: const Text('Add product'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -75,30 +123,61 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final product = products[index];
-                    return Card(
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(16),
-                        leading: Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(16),
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.82),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: const Color(0xFFDDE6DF)),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Icon(Icons.inventory_2_outlined, color: Theme.of(context).colorScheme.secondary),
                           ),
-                          child: Icon(Icons.inventory_2_outlined, color: Theme.of(context).colorScheme.secondary),
-                        ),
-                        title: Text(product.name, style: const TextStyle(fontWeight: FontWeight.w700)),
-                        subtitle: Text(
-                          '${product.sku}\nUnit Price: ${AppFormatters.currency(product.unitPrice)}\nBarcode: ${product.barcode.isEmpty ? '-' : product.barcode}',
-                        ),
-                        isThreeLine: true,
-                        trailing: PopupMenuButton<String>(
-                          onSelected: (value) => _handleAction(value, product),
-                          itemBuilder: (_) => const [
-                            PopupMenuItem(value: 'edit', child: Text('Edit')),
-                            PopupMenuItem(value: 'deactivate', child: Text('Deactivate')),
-                          ],
-                        ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(product.name, style: Theme.of(context).textTheme.titleMedium),
+                                const SizedBox(height: 6),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: [
+                                    _ProductBadge(icon: Icons.sell_outlined, label: product.sku),
+                                    _ProductBadge(
+                                      icon: Icons.qr_code_2_rounded,
+                                      label: product.barcode.isEmpty ? 'No barcode' : product.barcode,
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Text('Unit price', style: Theme.of(context).textTheme.bodySmall),
+                                const SizedBox(height: 4),
+                                Text(
+                                  AppFormatters.currency(product.unitPrice),
+                                  style: Theme.of(context).textTheme.titleLarge,
+                                ),
+                              ],
+                            ),
+                          ),
+                          PopupMenuButton<String>(
+                            onSelected: (value) => _handleAction(value, product),
+                            itemBuilder: (_) => const [
+                              PopupMenuItem(value: 'edit', child: Text('Edit')),
+                              PopupMenuItem(value: 'deactivate', child: Text('Deactivate')),
+                            ],
+                          ),
+                        ],
                       ),
                     );
                   },
@@ -135,5 +214,34 @@ class _ProductsScreenState extends State<ProductsScreen> {
         setState(() {});
       }
     }
+  }
+}
+
+class _ProductBadge extends StatelessWidget {
+  const _ProductBadge({
+    required this.icon,
+    required this.label,
+  });
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F3EA),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16),
+          const SizedBox(width: 6),
+          Text(label, style: Theme.of(context).textTheme.bodySmall, overflow: TextOverflow.ellipsis),
+        ],
+      ),
+    );
   }
 }

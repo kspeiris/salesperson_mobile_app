@@ -23,6 +23,8 @@ class AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final width = MediaQuery.of(context).size.width;
+    final compact = width < 560;
 
     return Scaffold(
       appBar: AppBar(
@@ -35,10 +37,11 @@ class AppShell extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
               colors: [
-                scheme.primary.withValues(alpha: 0.06),
+                scheme.primary.withValues(alpha: 0.10),
+                scheme.tertiary.withValues(alpha: 0.04),
                 Theme.of(context).scaffoldBackgroundColor,
                 Theme.of(context).scaffoldBackgroundColor,
               ],
@@ -48,20 +51,42 @@ class AppShell extends StatelessWidget {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 920),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                padding: EdgeInsets.fromLTRB(compact ? 14 : 16, 8, compact ? 14 : 16, compact ? 14 : 18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (subtitle != null || header != null)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16),
-                        child: Card(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.white.withValues(alpha: 0.96),
+                                scheme.primary.withValues(alpha: 0.05),
+                              ],
+                            ),
+                            border: Border.all(color: scheme.primary.withValues(alpha: 0.10)),
+                            boxShadow: const [
+                              BoxShadow(
+                                blurRadius: 24,
+                                offset: Offset(0, 10),
+                                color: Color(0x0D10241D),
+                              ),
+                            ],
+                          ),
                           child: Padding(
-                            padding: const EdgeInsets.all(20),
+                            padding: EdgeInsets.all(compact ? 18 : 20),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(title, style: Theme.of(context).textTheme.headlineSmall),
+                                Text(
+                                  title,
+                                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(height: 1.05),
+                                ),
                                 if (subtitle != null) ...[
                                   const SizedBox(height: 8),
                                   Text(subtitle!),

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
 import '../../core/widgets/app_shell.dart';
+import '../../core/widgets/section_card.dart';
 import '../../models/entities.dart';
 import '../shared/barcode_scanner_screen.dart';
 
@@ -82,49 +83,81 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   Widget build(BuildContext context) {
     return AppShell(
       title: widget.product == null ? 'Add Product' : 'Edit Product',
+      subtitle: 'Keep SKU, pricing, description, and barcode details clean so sales entry stays fast and accurate.',
       child: Form(
         key: _formKey,
         child: ListView(
           children: [
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Product Name'),
-              validator: (value) => (value == null || value.trim().isEmpty) ? 'Product name is required.' : null,
-            ),
-            const SizedBox(height: 14),
-            TextFormField(
-              controller: _skuController,
-              decoration: const InputDecoration(labelText: 'SKU'),
-              validator: (value) => (value == null || value.trim().isEmpty) ? 'SKU is required.' : null,
-            ),
-            const SizedBox(height: 14),
-            TextFormField(
-              controller: _barcodeController,
-              decoration: InputDecoration(
-                labelText: 'Barcode',
-                suffixIcon: IconButton(
-                  onPressed: _scanBarcode,
-                  icon: const Icon(Icons.qr_code_scanner_rounded),
-                  tooltip: 'Scan Barcode',
-                ),
+            SectionCard(
+              title: 'Catalog details',
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Product name',
+                      prefixIcon: Icon(Icons.inventory_2_outlined),
+                    ),
+                    textInputAction: TextInputAction.next,
+                    validator: (value) => (value == null || value.trim().isEmpty) ? 'Product name is required.' : null,
+                  ),
+                  const SizedBox(height: 14),
+                  TextFormField(
+                    controller: _skuController,
+                    decoration: const InputDecoration(
+                      labelText: 'SKU',
+                      prefixIcon: Icon(Icons.sell_outlined),
+                    ),
+                    textInputAction: TextInputAction.next,
+                    validator: (value) => (value == null || value.trim().isEmpty) ? 'SKU is required.' : null,
+                  ),
+                  const SizedBox(height: 14),
+                  TextFormField(
+                    controller: _priceController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(
+                      labelText: 'Unit price',
+                      prefixIcon: Icon(Icons.currency_exchange_outlined),
+                    ),
+                    textInputAction: TextInputAction.next,
+                    validator: (value) {
+                      final price = double.tryParse((value ?? '').trim());
+                      if (price == null || price <= 0) return 'Enter a valid unit price.';
+                      return null;
+                    },
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 14),
-            TextFormField(
-              controller: _priceController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(labelText: 'Unit Price'),
-              validator: (value) {
-                final price = double.tryParse((value ?? '').trim());
-                if (price == null || price <= 0) return 'Enter a valid unit price.';
-                return null;
-              },
-            ),
-            const SizedBox(height: 14),
-            TextFormField(
-              controller: _descriptionController,
-              maxLines: 3,
-              decoration: const InputDecoration(labelText: 'Description'),
+            const SizedBox(height: 16),
+            SectionCard(
+              title: 'Barcode and notes',
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _barcodeController,
+                    decoration: InputDecoration(
+                      labelText: 'Barcode',
+                      prefixIcon: const Icon(Icons.qr_code_2_rounded),
+                      suffixIcon: IconButton(
+                        onPressed: _scanBarcode,
+                        icon: const Icon(Icons.qr_code_scanner_rounded),
+                        tooltip: 'Scan Barcode',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  TextFormField(
+                    controller: _descriptionController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Description',
+                      alignLabelWithHint: true,
+                      prefixIcon: Icon(Icons.notes_outlined),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(onPressed: _save, icon: const Icon(Icons.save_outlined), label: const Text('Save Product')),

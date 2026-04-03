@@ -73,14 +73,35 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     }
 
                     final preview = snapshot.data!;
-                    return Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
+                    return Column(
                       children: [
-                        _PreviewTile(label: 'Sales total', value: AppFormatters.currency(preview.dashboard.totalSales)),
-                        _PreviewTile(label: 'Collections', value: AppFormatters.currency(preview.dashboard.totalCollections)),
-                        _PreviewTile(label: 'Sales count', value: '${preview.sales.length}'),
-                        _PreviewTile(label: 'Collections count', value: '${preview.collections.length}'),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _PreviewTile(
+                                label: 'Sales total',
+                                value: AppFormatters.currency(preview.dashboard.totalSales),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _PreviewTile(
+                                label: 'Collections',
+                                value: AppFormatters.currency(preview.dashboard.totalCollections),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(child: _PreviewTile(label: 'Sales count', value: '${preview.sales.length}')),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _PreviewTile(label: 'Collections count', value: '${preview.collections.length}'),
+                            ),
+                          ],
+                        ),
                       ],
                     );
                   },
@@ -119,7 +140,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(_lastFile!.path, style: Theme.of(context).textTheme.bodySmall),
+                  _PathCard(path: _lastFile!.path, label: 'Saved file'),
                   const SizedBox(height: 12),
                   FilledButton.icon(
                     onPressed: () => context.read<AppController>().shareLastReport(),
@@ -136,9 +157,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('CSV: ${controller.lastExportBundle!.csvFile}', style: Theme.of(context).textTheme.bodySmall),
-                  const SizedBox(height: 6),
-                  Text('JSON: ${controller.lastExportBundle!.jsonFile}', style: Theme.of(context).textTheme.bodySmall),
+                  _PathCard(path: controller.lastExportBundle!.csvFile, label: 'CSV file'),
+                  const SizedBox(height: 10),
+                  _PathCard(path: controller.lastExportBundle!.jsonFile, label: 'JSON file'),
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
@@ -253,12 +274,11 @@ class _PreviewTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 180,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.72),
+        color: Colors.white.withValues(alpha: 0.76),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE4DDD2)),
+        border: Border.all(color: const Color(0xFFDDE6DF)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,6 +286,37 @@ class _PreviewTile extends StatelessWidget {
           Text(label, style: Theme.of(context).textTheme.bodySmall),
           const SizedBox(height: 6),
           Text(value, style: Theme.of(context).textTheme.titleLarge),
+        ],
+      ),
+    );
+  }
+}
+
+class _PathCard extends StatelessWidget {
+  const _PathCard({
+    required this.path,
+    required this.label,
+  });
+
+  final String path;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF4F8F5),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFDDE8E0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.bodySmall),
+          const SizedBox(height: 6),
+          Text(path, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
     );

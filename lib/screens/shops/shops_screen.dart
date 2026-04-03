@@ -41,17 +41,65 @@ class _ShopsScreenState extends State<ShopsScreen> {
         IconButton(
           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ShopFormScreen())),
           icon: const Icon(Icons.add_business_outlined),
+          tooltip: 'Add Shop',
         ),
       ],
       child: Column(
         children: [
-          TextField(
-            controller: _searchController,
-            decoration: const InputDecoration(
-              hintText: 'Search by shop name, area, or owner',
-              prefixIcon: Icon(Icons.search_rounded),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.78),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: const Color(0xFFDDE6DF)),
             ),
-            onChanged: (value) => setState(() => _query = value),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search by shop name, area, or owner',
+                    prefixIcon: const Icon(Icons.search_rounded),
+                    suffixIcon: _query.isEmpty
+                        ? null
+                        : IconButton(
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _query = '');
+                            },
+                            icon: const Icon(Icons.close_rounded),
+                          ),
+                  ),
+                  onChanged: (value) => setState(() => _query = value),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const ShopImportScreen()),
+                        ),
+                        icon: const Icon(Icons.download_for_offline_outlined),
+                        label: const Text('Import'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const ShopFormScreen()),
+                        ),
+                        icon: const Icon(Icons.add_business_outlined),
+                        label: const Text('Add shop'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -74,30 +122,58 @@ class _ShopsScreenState extends State<ShopsScreen> {
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final shop = shops[index];
-                    return Card(
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(16),
-                        leading: Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.10),
-                            borderRadius: BorderRadius.circular(16),
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.82),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: const Color(0xFFDDE6DF)),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.10),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: const Icon(Icons.storefront_outlined),
                           ),
-                          child: const Icon(Icons.storefront_outlined),
-                        ),
-                        title: Text(shop.name, style: const TextStyle(fontWeight: FontWeight.w700)),
-                        subtitle: Text(
-                          '${shop.area}\nOwner: ${shop.ownerContact}\nOutstanding: ${AppFormatters.currency(shop.balance)}',
-                        ),
-                        isThreeLine: true,
-                        trailing: PopupMenuButton<String>(
-                          onSelected: (value) => _handleAction(value, shop),
-                          itemBuilder: (_) => const [
-                            PopupMenuItem(value: 'edit', child: Text('Edit')),
-                            PopupMenuItem(value: 'deactivate', child: Text('Deactivate')),
-                          ],
-                        ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(shop.name, style: Theme.of(context).textTheme.titleMedium),
+                                const SizedBox(height: 6),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: [
+                                    _MiniBadge(icon: Icons.place_outlined, label: shop.area),
+                                    _MiniBadge(icon: Icons.person_outline_rounded, label: shop.ownerContact),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Text('Outstanding balance', style: Theme.of(context).textTheme.bodySmall),
+                                const SizedBox(height: 4),
+                                Text(
+                                  AppFormatters.currency(shop.balance),
+                                  style: Theme.of(context).textTheme.titleLarge,
+                                ),
+                              ],
+                            ),
+                          ),
+                          PopupMenuButton<String>(
+                            onSelected: (value) => _handleAction(value, shop),
+                            itemBuilder: (_) => const [
+                              PopupMenuItem(value: 'edit', child: Text('Edit')),
+                              PopupMenuItem(value: 'deactivate', child: Text('Deactivate')),
+                            ],
+                          ),
+                        ],
                       ),
                     );
                   },
@@ -134,5 +210,34 @@ class _ShopsScreenState extends State<ShopsScreen> {
         setState(() {});
       }
     }
+  }
+}
+
+class _MiniBadge extends StatelessWidget {
+  const _MiniBadge({
+    required this.icon,
+    required this.label,
+  });
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3F7F4),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16),
+          const SizedBox(width: 6),
+          Text(label, style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ),
+    );
   }
 }

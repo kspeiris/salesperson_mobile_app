@@ -42,12 +42,10 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
     final controller = context.read<AppController>();
 
     return FutureBuilder<List<dynamic>>(
-      future: Future.wait<dynamic>(
-          [controller.fetchShops(), controller.fetchProducts()]),
+      future: Future.wait<dynamic>([controller.fetchShops(), controller.fetchProducts()]),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Scaffold(
-              body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
 
         final shops = _distinctShops(snapshot.data![0] as List<Shop>);
@@ -65,18 +63,13 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
 
         return AppShell(
           title: 'New Sale',
-          subtitle:
-              'Create an item-based sale, keep it offline, and include all details needed for end-of-day reporting.',
+          subtitle: 'Create an item-based sale, keep it offline, and include all details needed for end-of-day reporting.',
           header: Wrap(
             spacing: 10,
             runSpacing: 10,
             children: [
-              _InfoChip(
-                  icon: Icons.schedule_outlined,
-                  label: AppFormatters.dateTime(DateTime.now())),
-              _InfoChip(
-                  icon: Icons.shopping_bag_outlined,
-                  label: '${_lines.length} line items'),
+              _InfoChip(icon: Icons.schedule_outlined, label: AppFormatters.dateTime(DateTime.now())),
+              _InfoChip(icon: Icons.shopping_bag_outlined, label: '${_lines.length} line items'),
               _InfoChip(icon: Icons.payments_outlined, label: _paymentType),
             ],
           ),
@@ -93,40 +86,39 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                         isExpanded: true,
                         items: shops
                             .map((shop) => DropdownMenuItem<Shop>(
-                                value: shop,
-                                child: Text('${shop.name} - ${shop.area}')))
+                                  value: shop,
+                                  child: Text('${shop.name} - ${shop.area}'),
+                                ))
                             .toList(),
                         decoration: const InputDecoration(
                           labelText: 'Shop',
                           prefixIcon: Icon(Icons.storefront_outlined),
                         ),
-                        onChanged: (value) =>
-                            setState(() => _selectedShop = value),
-                        validator: (value) =>
-                            value == null ? 'Select a shop.' : null,
+                        onChanged: (value) => setState(() => _selectedShop = value),
+                        validator: (value) => value == null ? 'Select a shop.' : null,
                       ),
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
                         initialValue: _paymentType,
                         items: const [
                           DropdownMenuItem(value: 'Cash', child: Text('Cash')),
-                          DropdownMenuItem(
-                              value: 'Credit', child: Text('Credit')),
+                          DropdownMenuItem(value: 'Credit', child: Text('Credit')),
                         ],
                         decoration: const InputDecoration(
                           labelText: 'Payment type',
-                          prefixIcon:
-                              Icon(Icons.account_balance_wallet_outlined),
+                          prefixIcon: Icon(Icons.account_balance_wallet_outlined),
                         ),
-                        onChanged: (value) =>
-                            setState(() => _paymentType = value ?? 'Cash'),
+                        onChanged: (value) => setState(() => _paymentType = value ?? 'Cash'),
                       ),
                       const SizedBox(height: 14),
                       TextFormField(
                         controller: _noteController,
+                        minLines: 2,
+                        maxLines: 3,
                         decoration: const InputDecoration(
                           labelText: 'Invoice note',
-                          hintText: 'Optional delivery or billing note',
+                          hintText: 'Optional delivery, billing, or route note',
+                          alignLabelWithHint: true,
                           prefixIcon: Icon(Icons.sticky_note_2_outlined),
                         ),
                       ),
@@ -146,8 +138,7 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                         label: const Text('Scan'),
                       ),
                       TextButton.icon(
-                        onPressed: () =>
-                            setState(() => _lines.add(_LineDraft())),
+                        onPressed: () => setState(() => _lines.add(_LineDraft())),
                         icon: const Icon(Icons.add_rounded),
                         label: const Text('Add item'),
                       ),
@@ -170,54 +161,78 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                                   });
                                 },
                         ),
-                        if (index < _lines.length - 1)
-                          const SizedBox(height: 12),
+                        if (index < _lines.length - 1) const SizedBox(height: 12),
                       ],
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        _summary('Subtotal', AppFormatters.currency(_subtotal)),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _discountController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true),
-                          decoration: const InputDecoration(
-                            labelText: 'Discount',
-                            prefixIcon: Icon(Icons.sell_outlined),
+                SectionCard(
+                  title: 'Order summary',
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _SummaryMetric(
+                              label: 'Subtotal',
+                              value: AppFormatters.currency(_subtotal),
+                            ),
                           ),
-                          onChanged: (_) => setState(() {}),
-                          validator: (value) {
-                            final discount =
-                                double.tryParse((value ?? '').trim());
-                            if (discount == null || discount < 0) {
-                              return 'Enter a valid discount.';
-                            }
-                            if (discount > _subtotal) {
-                              return 'Discount cannot exceed subtotal.';
-                            }
-                            return null;
-                          },
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _SummaryMetric(
+                              label: 'Grand total',
+                              value: AppFormatters.currency(_grandTotal),
+                              emphasized: true,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      TextFormField(
+                        controller: _discountController,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        decoration: const InputDecoration(
+                          labelText: 'Discount',
+                          prefixIcon: Icon(Icons.sell_outlined),
                         ),
-                        const SizedBox(height: 12),
-                        _summary('Payment type', _paymentType),
-                        const Divider(height: 28),
-                        _summary(
-                            'Grand total', AppFormatters.currency(_grandTotal),
-                            strong: true),
-                      ],
-                    ),
+                        onChanged: (_) => setState(() {}),
+                        validator: (value) {
+                          final discount = double.tryParse((value ?? '').trim());
+                          if (discount == null || discount < 0) {
+                            return 'Enter a valid discount.';
+                          }
+                          if (discount > _subtotal) {
+                            return 'Discount cannot exceed subtotal.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 14),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF4F8F5),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: const Color(0xFFDDE8E0)),
+                        ),
+                        child: Column(
+                          children: [
+                            _summary('Payment type', _paymentType),
+                            const SizedBox(height: 10),
+                            _summary('Active line items', '${_lines.where((line) => line.product != null).length}'),
+                            const Divider(height: 24),
+                            _summary('Total after discount', AppFormatters.currency(_grandTotal), strong: true),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
-                  onPressed: () => _saveSale(products),
+                  onPressed: () => _saveSale(),
                   icon: const Icon(Icons.save_rounded),
                   label: const Text('Save sale offline'),
                 ),
@@ -242,8 +257,7 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
     final product = await controller.findProductByBarcode(scannedValue.trim());
     if (!mounted) return;
     if (product == null) {
-      messenger.showSnackBar(SnackBar(
-          content: Text('No active product found for barcode $scannedValue')));
+      messenger.showSnackBar(SnackBar(content: Text('No active product found for barcode $scannedValue')));
       return;
     }
 
@@ -257,14 +271,11 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
       }
       target ??= _createAdditionalLine();
       target.product = product;
-      target.qtyController.text = target.qtyController.text.trim().isEmpty
-          ? '1'
-          : target.qtyController.text;
+      target.qtyController.text = target.qtyController.text.trim().isEmpty ? '1' : target.qtyController.text;
       target.priceController.text = product.unitPrice.toStringAsFixed(2);
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${product.name} added from barcode scan.')));
+    messenger.showSnackBar(SnackBar(content: Text('${product.name} added from barcode scan.')));
   }
 
   _LineDraft _createAdditionalLine() {
@@ -273,19 +284,16 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
     return line;
   }
 
-  Future<void> _saveSale(List<Product> products) async {
+  Future<void> _saveSale() async {
     final messenger = ScaffoldMessenger.of(context);
 
     if (!_formKey.currentState!.validate()) return;
     if (_selectedShop == null) return;
 
-    final validLines = _lines
-        .where((line) => line.product != null && line.quantity > 0)
-        .toList();
+    final validLines = _lines.where((line) => line.product != null && line.quantity > 0).toList();
     if (validLines.isEmpty) {
       messenger.showSnackBar(
-        const SnackBar(
-            content: Text('Add at least one item with quantity above zero.')),
+        const SnackBar(content: Text('Add at least one item with quantity above zero.')),
       );
       return;
     }
@@ -319,8 +327,7 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
 
     await controller.createSale(sale);
     if (!mounted) return;
-    messenger
-        .showSnackBar(const SnackBar(content: Text('Sale saved offline.')));
+    messenger.showSnackBar(const SnackBar(content: Text('Sale saved offline.')));
     Navigator.pop(context);
   }
 
@@ -331,8 +338,9 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
         Text(
           value,
           style: TextStyle(
-              fontWeight: strong ? FontWeight.w800 : FontWeight.w600,
-              fontSize: strong ? 18 : 14),
+            fontWeight: strong ? FontWeight.w800 : FontWeight.w600,
+            fontSize: strong ? 18 : 14,
+          ),
         ),
       ],
     );
@@ -373,30 +381,35 @@ class _SaleLineCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.72),
+        color: Colors.white.withValues(alpha: 0.80),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFE1D9CC)),
+        border: Border.all(color: const Color(0xFFDDE6DF)),
       ),
       child: Column(
         children: [
           Row(
             children: [
               Expanded(
-                  child: Text('Item ${index + 1}',
-                      style: const TextStyle(fontWeight: FontWeight.w700))),
+                child: Text('Item ${index + 1}', style: Theme.of(context).textTheme.titleMedium),
+              ),
               if (onRemove != null)
                 IconButton(
-                    onPressed: onRemove,
-                    icon: const Icon(Icons.delete_outline_rounded)),
+                  onPressed: onRemove,
+                  icon: const Icon(Icons.delete_outline_rounded),
+                  tooltip: 'Remove item',
+                ),
             ],
           ),
           DropdownButtonFormField<Product>(
             initialValue: line.product,
             isExpanded: true,
             items: products
-                .map((product) => DropdownMenuItem<Product>(
+                .map(
+                  (product) => DropdownMenuItem<Product>(
                     value: product,
-                    child: Text('${product.name} - ${product.sku}')))
+                    child: Text('${product.name} - ${product.sku}'),
+                  ),
+                )
                 .toList(),
             decoration: const InputDecoration(
               labelText: 'Product',
@@ -434,8 +447,7 @@ class _SaleLineCard extends StatelessWidget {
               Expanded(
                 child: TextFormField(
                   controller: line.priceController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   decoration: const InputDecoration(
                     labelText: 'Unit price',
                     prefixIcon: Icon(Icons.currency_exchange_outlined),
@@ -451,10 +463,23 @@ class _SaleLineCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text('Line total: ${AppFormatters.currency(line.total)}',
-                style: const TextStyle(fontWeight: FontWeight.w700)),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF4F8F5),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Row(
+              children: [
+                const Text('Line total'),
+                const Spacer(),
+                Text(
+                  AppFormatters.currency(line.total),
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -486,9 +511,43 @@ class _InfoChip extends StatelessWidget {
         children: [
           Icon(icon, size: 18, color: scheme.primary),
           const SizedBox(width: 8),
-          Text(label,
-              style: TextStyle(
-                  color: scheme.primary, fontWeight: FontWeight.w700)),
+          Text(label, style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w700)),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryMetric extends StatelessWidget {
+  const _SummaryMetric({
+    required this.label,
+    required this.value,
+    this.emphasized = false,
+  });
+
+  final String label;
+  final String value;
+  final bool emphasized;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: emphasized ? scheme.primary.withValues(alpha: 0.08) : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: emphasized ? scheme.primary.withValues(alpha: 0.16) : const Color(0xFFDDE6DF)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.bodySmall),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+          ),
         ],
       ),
     );

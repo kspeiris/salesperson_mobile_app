@@ -27,8 +27,7 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
-    final start =
-        DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final start = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
     final end = start.add(const Duration(days: 1));
 
     return FutureBuilder<List<Shop>>(
@@ -38,14 +37,19 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
 
         return AppShell(
           title: 'Sales History',
-          subtitle:
-              'Review recorded sales by day, filter by shop, and void incorrect entries with an audit reason.',
+          subtitle: 'Review recorded sales by day, filter by shop, and void incorrect entries with an audit reason.',
           child: Column(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.78),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: const Color(0xFFDDE6DF)),
+                ),
+                child: Column(
+                  children: [
+                    InkWell(
                       borderRadius: BorderRadius.circular(18),
                       onTap: _pickDate,
                       child: InputDecorator(
@@ -56,10 +60,8 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                         child: Text(AppFormatters.date(_selectedDate)),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: DropdownButtonFormField<int?>(
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<int?>(
                       initialValue: _shopId,
                       isExpanded: true,
                       decoration: const InputDecoration(
@@ -67,21 +69,18 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                         labelText: 'Shop filter',
                       ),
                       items: [
-                        const DropdownMenuItem<int?>(
-                            value: null, child: Text('All shops')),
-                        ...shops.map((shop) => DropdownMenuItem<int?>(
-                            value: shop.id, child: Text(shop.name))),
+                        const DropdownMenuItem<int?>(value: null, child: Text('All shops')),
+                        ...shops.map((shop) => DropdownMenuItem<int?>(value: shop.id, child: Text(shop.name))),
                       ],
                       onChanged: (value) => setState(() => _shopId = value),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
               Expanded(
                 child: FutureBuilder<List<SaleRecord>>(
-                  future: controller.fetchSales(
-                      start: start, end: end, shopId: _shopId),
+                  future: controller.fetchSales(start: start, end: end, shopId: _shopId),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(child: CircularProgressIndicator());
@@ -92,8 +91,7 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                       return const EmptyState(
                         icon: Icons.receipt_long_outlined,
                         title: 'No sales recorded',
-                        message:
-                            'Sales for the selected date will appear here.',
+                        message: 'Sales for the selected date will appear here.',
                       );
                     }
 
@@ -102,89 +100,71 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final sale = sales[index];
-                        return Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(18),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 48,
-                                  height: 48,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .primary
-                                        .withValues(alpha: 0.10),
-                                    borderRadius: BorderRadius.circular(16),
+                        return Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.82),
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(color: const Color(0xFFDDE6DF)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.10),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: const Icon(Icons.point_of_sale_rounded),
                                   ),
-                                  child:
-                                      const Icon(Icons.point_of_sale_rounded),
-                                ),
-                                const SizedBox(width: 14),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(sale.shopName,
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.w700)),
-                                          ),
-                                          _StatusChip(
-                                              label: sale.isVoided
-                                                  ? 'Voided'
-                                                  : sale.paymentType),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                          '${AppFormatters.time(sale.createdAt)} - ${sale.items.length} items'),
-                                      if (sale.note.isNotEmpty) ...[
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(sale.shopName, style: Theme.of(context).textTheme.titleMedium),
                                         const SizedBox(height: 6),
-                                        Text(sale.note,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall),
-                                      ],
-                                      if (sale.voidReason != null &&
-                                          sale.voidReason!.isNotEmpty) ...[
-                                        const SizedBox(height: 6),
-                                        Text('Reason: ${sale.voidReason}',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall),
-                                      ],
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(AppFormatters.currency(sale.total),
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w800)),
-                                    const SizedBox(height: 8),
-                                    PopupMenuButton<String>(
-                                      enabled: !sale.isVoided,
-                                      onSelected: (value) {
-                                        if (value == 'void') _voidSale(sale);
-                                      },
-                                      itemBuilder: (_) => const [
-                                        PopupMenuItem(
-                                            value: 'void',
-                                            child: Text('Void sale')),
+                                        Wrap(
+                                          spacing: 8,
+                                          runSpacing: 8,
+                                          children: [
+                                            _StatusChip(label: sale.isVoided ? 'Voided' : sale.paymentType),
+                                            _StatusChip(label: '${sale.items.length} items'),
+                                            _StatusChip(label: AppFormatters.time(sale.createdAt)),
+                                          ],
+                                        ),
                                       ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  PopupMenuButton<String>(
+                                    enabled: !sale.isVoided,
+                                    onSelected: (value) {
+                                      if (value == 'void') _voidSale(sale);
+                                    },
+                                    itemBuilder: (_) => const [
+                                      PopupMenuItem(value: 'void', child: Text('Void sale')),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+                              Text('Grand total', style: Theme.of(context).textTheme.bodySmall),
+                              const SizedBox(height: 4),
+                              Text(AppFormatters.currency(sale.total), style: Theme.of(context).textTheme.titleLarge),
+                              if (sale.note.isNotEmpty) ...[
+                                const SizedBox(height: 10),
+                                Text(sale.note, style: Theme.of(context).textTheme.bodyMedium),
                               ],
-                            ),
+                              if (sale.voidReason != null && sale.voidReason!.isNotEmpty) ...[
+                                const SizedBox(height: 10),
+                                Text('Reason: ${sale.voidReason}', style: Theme.of(context).textTheme.bodySmall),
+                              ],
+                            ],
                           ),
                         );
                       },
@@ -224,19 +204,13 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
           decoration: const InputDecoration(labelText: 'Reason'),
         ),
         actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
-          FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Void')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Void')),
         ],
       ),
     );
     if (confirmed == true && sale.id != null) {
-      final reason = reasonController.text.trim().isEmpty
-          ? 'Manual void'
-          : reasonController.text.trim();
+      final reason = reasonController.text.trim().isEmpty ? 'Manual void' : reasonController.text.trim();
       await controller.voidSale(sale.id!, reason);
       if (mounted) setState(() {});
     }
@@ -266,16 +240,15 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1ECE3),
+        color: const Color(0xFFF3F7F4),
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(label,
-          style: Theme.of(context)
-              .textTheme
-              .bodySmall
-              ?.copyWith(fontWeight: FontWeight.w700)),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700),
+      ),
     );
   }
 }

@@ -23,34 +23,42 @@ class _ShopImportScreenState extends State<ShopImportScreen> {
   Widget build(BuildContext context) {
     return AppShell(
       title: 'Import Shops',
+      subtitle: 'Bring in shop master data from a flat file and review any row-level issues before continuing.',
       child: ListView(
         children: [
           const SectionCard(
-            title: 'Expected Columns',
+            title: 'Expected columns',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('CSV header example:'),
                 SizedBox(height: 8),
-                SelectableText(
-                    'name,owner_contact,area,phone,credit_limit,balance'),
+                SelectableText('name,owner_contact,area,phone,credit_limit,balance'),
               ],
             ),
           ),
           const SizedBox(height: 16),
-          SwitchListTile.adaptive(
-            value: _replaceExisting,
-            contentPadding: EdgeInsets.zero,
-            title: const Text('Replace existing shop records'),
-            subtitle:
-                const Text('Deletes current shop master data before import.'),
-            onChanged: (value) => setState(() => _replaceExisting = value),
-          ),
-          const SizedBox(height: 12),
-          FilledButton.icon(
-            onPressed: _working ? null : _pickAndImport,
-            icon: const Icon(Icons.file_open_outlined),
-            label: const Text('Pick CSV/TXT File'),
+          SectionCard(
+            title: 'Import options',
+            child: Column(
+              children: [
+                SwitchListTile.adaptive(
+                  value: _replaceExisting,
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Replace existing shop records'),
+                  subtitle: const Text('Deletes current shop master data before import.'),
+                  onChanged: (value) => setState(() => _replaceExisting = value),
+                ),
+                const SizedBox(height: 8),
+                FilledButton.icon(
+                  onPressed: _working ? null : _pickAndImport,
+                  icon: _working
+                      ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Icon(Icons.file_open_outlined),
+                  label: Text(_working ? 'Importing...' : 'Pick CSV/TXT file'),
+                ),
+              ],
+            ),
           ),
           if (_result != null) ...[
             const SizedBox(height: 20),
@@ -71,8 +79,7 @@ class _ShopImportScreenState extends State<ShopImportScreen> {
     final path = result?.files.single.path;
     if (path == null) return;
     setState(() => _working = true);
-    final importResult = await controller.importShopsFromFile(path,
-        replaceExisting: _replaceExisting);
+    final importResult = await controller.importShopsFromFile(path, replaceExisting: _replaceExisting);
     if (!mounted) return;
     setState(() {
       _working = false;
@@ -88,26 +95,24 @@ class _ImportSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(result.summary,
-                style: const TextStyle(fontWeight: FontWeight.w800)),
-            if (result.errors.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              const Text('Issues',
-                  style: TextStyle(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 8),
-              ...result.errors.take(10).map((entry) => Padding(
+    return SectionCard(
+      title: 'Import result',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(result.summary, style: const TextStyle(fontWeight: FontWeight.w800)),
+          if (result.errors.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            const Text('Issues', style: TextStyle(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 8),
+            ...result.errors.take(10).map(
+                  (entry) => Padding(
                     padding: const EdgeInsets.only(bottom: 6),
-                    child: Text('• $entry'),
-                  )),
-            ],
+                    child: Text('- $entry'),
+                  ),
+                ),
           ],
-        ),
+        ],
       ),
     );
   }

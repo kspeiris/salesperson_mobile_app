@@ -80,12 +80,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             SectionCard(
               title: 'Tools',
-              child: ListTile(
-                leading: const Icon(Icons.storage_outlined),
-                title: const Text('Data Management', style: TextStyle(fontWeight: FontWeight.w700)),
-                subtitle: const Text('Backup or restore SQLite, import masters, and manage desktop import files.'),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DataManagementScreen())),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF4F8F5),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFDDE8E0)),
+                ),
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.storage_outlined),
+                  title: const Text('Data Management', style: TextStyle(fontWeight: FontWeight.w700)),
+                  subtitle: const Text('Backup or restore SQLite, import masters, and manage desktop import files.'),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DataManagementScreen())),
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -95,20 +104,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   TextFormField(
                     controller: _companyController,
-                    decoration: const InputDecoration(labelText: 'Company name'),
+                    decoration: const InputDecoration(
+                      labelText: 'Company name',
+                      prefixIcon: Icon(Icons.business_outlined),
+                    ),
                     validator: (value) => (value == null || value.trim().isEmpty) ? 'Company name is required.' : null,
                   ),
                   const SizedBox(height: 14),
                   TextFormField(
                     controller: _salespersonController,
-                    decoration: const InputDecoration(labelText: 'Default salesperson'),
+                    decoration: const InputDecoration(
+                      labelText: 'Default salesperson',
+                      prefixIcon: Icon(Icons.badge_outlined),
+                    ),
                     validator: (value) =>
                         (value == null || value.trim().isEmpty) ? 'Default salesperson is required.' : null,
                   ),
                   const SizedBox(height: 14),
                   TextFormField(
                     controller: _paymentMethodsController,
-                    decoration: const InputDecoration(labelText: 'Payment methods', hintText: 'Cash, Bank, Cheque'),
+                    decoration: const InputDecoration(
+                      labelText: 'Payment methods',
+                      hintText: 'Cash, Bank, Cheque',
+                      prefixIcon: Icon(Icons.payments_outlined),
+                    ),
                     validator: (value) =>
                         (value == null || value.trim().isEmpty) ? 'At least one payment method is required.' : null,
                   ),
@@ -120,12 +139,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: 'Security',
               child: Column(
                 children: [
-                  SwitchListTile.adaptive(
-                    value: _pinEnabled,
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('Enable local PIN'),
-                    subtitle: const Text('Protect app access on this device.'),
-                    onChanged: (value) => setState(() => _pinEnabled = value),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF4F8F5),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: const Color(0xFFDDE8E0)),
+                    ),
+                    child: SwitchListTile.adaptive(
+                      value: _pinEnabled,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      title: const Text('Enable local PIN'),
+                      subtitle: const Text('Protect app access on this device.'),
+                      onChanged: (value) => setState(() => _pinEnabled = value),
+                    ),
                   ),
                   if (_pinEnabled) ...[
                     const SizedBox(height: 14),
@@ -133,7 +159,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       controller: _pinController,
                       obscureText: true,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'New PIN', hintText: 'Leave blank to keep current PIN'),
+                      decoration: const InputDecoration(
+                        labelText: 'New PIN',
+                        hintText: 'Leave blank to keep current PIN',
+                        prefixIcon: Icon(Icons.lock_outline_rounded),
+                      ),
                       validator: (value) {
                         if (!_pinEnabled) return null;
                         if (value == null || value.isEmpty) return null;
