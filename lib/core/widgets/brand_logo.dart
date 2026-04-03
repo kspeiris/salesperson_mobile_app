@@ -7,12 +7,14 @@ class BrandLogo extends StatelessWidget {
     this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
     this.showPlate = true,
     this.alignment = Alignment.centerLeft,
+    this.plateDecoration,
   });
 
   final double height;
   final EdgeInsetsGeometry padding;
   final bool showPlate;
   final Alignment alignment;
+  final BoxDecoration? plateDecoration;
 
   static const String assetPath = 'biocare logo1.png';
 
@@ -34,19 +36,20 @@ class BrandLogo extends StatelessWidget {
 
     if (showPlate) {
       content = Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFE8F5E9)),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x052E7D32),
-              blurRadius: 16,
-              offset: Offset(0, 4),
+        padding: padding,
+        decoration: plateDecoration ??
+            BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFE8F5E9)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x052E7D32),
+                  blurRadius: 16,
+                  offset: Offset(0, 4),
+                ),
+              ],
             ),
-          ],
-        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../app/app_controller.dart';
 import '../../core/theme/app_assets.dart';
+import '../../core/widgets/brand_logo.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -147,7 +148,7 @@ class _IntroPanel extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Container(
-      constraints: BoxConstraints(minHeight: compact ? 382 : 560),
+      constraints: BoxConstraints(minHeight: compact ? 336 : 500),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
         image: const DecorationImage(
@@ -187,10 +188,10 @@ class _IntroPanel extends StatelessWidget {
               children: [
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(16),
                     border:
                         Border.all(color: Colors.white.withValues(alpha: 0.22)),
                     boxShadow: const [
@@ -217,26 +218,30 @@ class _IntroPanel extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 22),
                 Text(
                   'Bio Care Sales App',
-                  style: textTheme.displaySmall?.copyWith(
+                  style: (compact
+                          ? textTheme.headlineLarge
+                          : textTheme.displaySmall)
+                      ?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w800,
                     height: 1.05,
                     letterSpacing: -0.9,
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 Text(
                   '"Pure Health. Trusted Quality."\nCapture orders, collections, and route actions in one beautifully focused workspace.',
                   style: textTheme.titleMedium?.copyWith(
                     color: Colors.white.withValues(alpha: 0.84),
-                    height: 1.45,
+                    height: 1.4,
                     fontWeight: FontWeight.w500,
+                    fontSize: compact ? 18 : null,
                   ),
                 ),
-                const SizedBox(height: 26),
+                const SizedBox(height: 20),
                 const Wrap(
                   spacing: 12,
                   runSpacing: 12,
@@ -350,7 +355,14 @@ class _LoginCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  const BrandLogo(
+                    height: 44,
+                    showPlate: false,
+                    alignment: Alignment.centerLeft,
+                  ),
+                  const Spacer(),
                   Container(
                     width: 46,
                     height: 46,
