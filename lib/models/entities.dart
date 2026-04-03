@@ -71,8 +71,10 @@ class Shop {
       creditLimit: ((map['credit_limit'] as num?) ?? 0).toDouble(),
       balance: ((map['balance'] as num?) ?? 0).toDouble(),
       isActive: (map['is_active'] as int? ?? 1) == 1,
-      createdAt: DateTime.tryParse(map['created_at'] as String? ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(map['updated_at'] as String? ?? '') ?? DateTime.now(),
+      createdAt: DateTime.tryParse(map['created_at'] as String? ?? '') ??
+          DateTime.now(),
+      updatedAt: DateTime.tryParse(map['updated_at'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 
@@ -159,8 +161,10 @@ class Product {
       description: map['description'] as String? ?? '',
       barcode: map['barcode'] as String? ?? '',
       isActive: (map['is_active'] as int? ?? 1) == 1,
-      createdAt: DateTime.tryParse(map['created_at'] as String? ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(map['updated_at'] as String? ?? '') ?? DateTime.now(),
+      createdAt: DateTime.tryParse(map['created_at'] as String? ?? '') ??
+          DateTime.now(),
+      updatedAt: DateTime.tryParse(map['updated_at'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 
@@ -304,7 +308,8 @@ class SaleRecord {
     );
   }
 
-  factory SaleRecord.fromMap(Map<String, Object?> map, {List<SaleItem> items = const []}) {
+  factory SaleRecord.fromMap(Map<String, Object?> map,
+      {List<SaleItem> items = const []}) {
     return SaleRecord(
       id: map['id'] as int?,
       shopId: map['shop_id'] as int? ?? 0,
@@ -316,7 +321,8 @@ class SaleRecord {
       total: ((map['total'] as num?) ?? 0).toDouble(),
       status: map['status'] as String? ?? 'active',
       voidReason: map['void_reason'] as String?,
-      createdAt: DateTime.tryParse(map['created_at'] as String? ?? '') ?? DateTime.now(),
+      createdAt: DateTime.tryParse(map['created_at'] as String? ?? '') ??
+          DateTime.now(),
       items: items,
     );
   }
@@ -397,7 +403,8 @@ class CollectionRecord {
       referenceNote: map['reference_note'] as String? ?? '',
       status: map['status'] as String? ?? 'active',
       voidReason: map['void_reason'] as String?,
-      createdAt: DateTime.tryParse(map['created_at'] as String? ?? '') ?? DateTime.now(),
+      createdAt: DateTime.tryParse(map['created_at'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 
@@ -441,6 +448,7 @@ class AppSettings {
     required this.paymentMethods,
     required this.pinEnabled,
     this.pinHash,
+    this.profileImagePath,
   });
 
   final String companyName;
@@ -448,6 +456,7 @@ class AppSettings {
   final List<String> paymentMethods;
   final bool pinEnabled;
   final String? pinHash;
+  final String? profileImagePath;
 
   AppSettings copyWith({
     String? companyName,
@@ -455,6 +464,7 @@ class AppSettings {
     List<String>? paymentMethods,
     bool? pinEnabled,
     String? pinHash,
+    String? profileImagePath,
   }) {
     return AppSettings(
       companyName: companyName ?? this.companyName,
@@ -462,6 +472,7 @@ class AppSettings {
       paymentMethods: paymentMethods ?? this.paymentMethods,
       pinEnabled: pinEnabled ?? this.pinEnabled,
       pinHash: pinHash ?? this.pinHash,
+      profileImagePath: profileImagePath ?? this.profileImagePath,
     );
   }
 }

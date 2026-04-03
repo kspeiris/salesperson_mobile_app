@@ -8,6 +8,7 @@ import '../../core/theme/app_assets.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/brand_logo.dart';
 import '../../core/widgets/metric_card.dart';
+import '../../core/widgets/salesperson_avatar.dart';
 import '../../core/widgets/section_card.dart';
 import '../../models/entities.dart';
 import '../collections/collection_entry_screen.dart';
@@ -104,6 +105,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         _HeroPanel(
                           salesperson: controller.currentSalesperson,
                           companyName: controller.settings.companyName,
+                          profileImagePath: controller.profileImagePath,
                           selectedDate: _selectedDate,
                           totalOrders: totalOrders,
                           todaySales: summary.totalSales,
@@ -502,6 +504,7 @@ class _HeroPanel extends StatelessWidget {
   const _HeroPanel({
     required this.salesperson,
     required this.companyName,
+    required this.profileImagePath,
     required this.selectedDate,
     required this.totalOrders,
     required this.todaySales,
@@ -512,6 +515,7 @@ class _HeroPanel extends StatelessWidget {
 
   final String salesperson;
   final String companyName;
+  final String? profileImagePath;
   final DateTime selectedDate;
   final int totalOrders;
   final double todaySales;
@@ -597,23 +601,44 @@ class _HeroPanel extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              Text(
-                '$greeting, $salesperson',
-                style: (compact
-                        ? textTheme.headlineSmall
-                        : textTheme.headlineMedium)
-                    ?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                companyName,
-                style: textTheme.bodyLarge?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.86),
-                    fontWeight: FontWeight.w500),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SalespersonAvatar(
+                    name: salesperson,
+                    imagePath: profileImagePath,
+                    size: compact ? 48 : 56,
+                    backgroundColor: Colors.white.withValues(alpha: 0.16),
+                    foregroundColor: Colors.white,
+                    borderColor: Colors.white.withValues(alpha: 0.32),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '$greeting, $salesperson',
+                          style: (compact
+                                  ? textTheme.headlineSmall
+                                  : textTheme.headlineMedium)
+                              ?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          companyName,
+                          style: textTheme.bodyLarge?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.86),
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               Text(
@@ -771,79 +796,6 @@ class _HeroStatChip extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HeroActionButton extends StatelessWidget {
-  const _HeroActionButton({
-    required this.label,
-    required this.icon,
-    required this.onTap,
-    this.filled = false,
-  });
-
-  final String label;
-  final IconData icon;
-  final VoidCallback onTap;
-  final bool filled;
-
-  @override
-  Widget build(BuildContext context) {
-    final foreground = filled ? const Color(0xFF103E2A) : Colors.white;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Ink(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-        decoration: BoxDecoration(
-          gradient: filled
-              ? const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFB9F0A5),
-                    Color(0xFF7ED957),
-                  ],
-                )
-              : null,
-          color: filled ? null : Colors.white.withValues(alpha: 0.10),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: filled
-                ? Colors.white.withValues(alpha: 0.0)
-                : Colors.white.withValues(alpha: 0.24),
-          ),
-          boxShadow: filled
-              ? const [
-                  BoxShadow(
-                    blurRadius: 22,
-                    offset: Offset(0, 12),
-                    color: Color(0x33143B1E),
-                  ),
-                ]
-              : const [
-                  BoxShadow(
-                    blurRadius: 16,
-                    offset: Offset(0, 8),
-                    color: Color(0x0D102D18),
-                  ),
-                ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: foreground, size: 22),
-            const SizedBox(width: 12),
-            Text(
-              label,
-              style: TextStyle(
-                  color: foreground, fontWeight: FontWeight.w800, fontSize: 16),
-            ),
-          ],
         ),
       ),
     );

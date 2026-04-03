@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../app/app_controller.dart';
 import '../../core/theme/app_assets.dart';
 import '../../core/widgets/app_shell.dart';
+import '../../core/widgets/salesperson_avatar.dart';
 import '../../core/widgets/section_card.dart';
 import '../data/data_management_screen.dart';
 import '../products/product_import_screen.dart';
@@ -22,7 +23,8 @@ class MoreScreen extends StatelessWidget {
     return AppShell(
       title: 'Management',
       showBack: false,
-      subtitle: 'Configure your company profile, manage master data, and perform system backups from one central hub.',
+      subtitle:
+          'Configure your company profile, manage master data, and perform system backups from one central hub.',
       headerImageAsset: AppAssets.settingsHero,
       pageBackgroundAsset: AppAssets.pageTexture,
       child: ListView(
@@ -31,9 +33,9 @@ class MoreScreen extends StatelessWidget {
           _ProfileHeader(
             salesperson: controller.currentSalesperson,
             companyName: controller.settings.companyName,
+            profileImagePath: controller.profileImagePath,
           ),
           const SizedBox(height: 24),
-          
           SectionCard(
             title: 'Master Data',
             child: Column(
@@ -41,21 +43,25 @@ class MoreScreen extends StatelessWidget {
                 _MoreTile(
                   icon: Icons.storefront_outlined,
                   title: 'Retailer Shops',
-                  subtitle: 'Manage shops, view current balances and route areas.',
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ShopsScreen())),
+                  subtitle:
+                      'Manage shops, view current balances and route areas.',
+                  onTap: () => Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => const ShopsScreen())),
                 ),
                 const SizedBox(height: 12),
                 _MoreTile(
                   icon: Icons.inventory_2_outlined,
                   title: 'Product Catalog',
                   subtitle: 'Manage items, pricing, and barcode identifiers.',
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductsScreen())),
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const ProductsScreen())),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 16),
-
           SectionCard(
             title: 'Import Operations',
             child: Column(
@@ -64,20 +70,25 @@ class MoreScreen extends StatelessWidget {
                   icon: Icons.file_upload_outlined,
                   title: 'Import Shops (CSV)',
                   subtitle: 'Update shop masters via bulk CSV upload.',
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ShopImportScreen())),
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const ShopImportScreen())),
                 ),
                 const SizedBox(height: 12),
                 _MoreTile(
                   icon: Icons.upload_file_outlined,
                   title: 'Import Products (CSV)',
                   subtitle: 'Update item masters and price lists via CSV.',
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductImportScreen())),
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const ProductImportScreen())),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 16),
-
           SectionCard(
             title: 'System & Security',
             child: Column(
@@ -85,21 +96,28 @@ class MoreScreen extends StatelessWidget {
                 _MoreTile(
                   icon: Icons.settings_backup_restore_rounded,
                   title: 'Data Management',
-                  subtitle: 'Create backups and restore previous database states.',
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DataManagementScreen())),
+                  subtitle:
+                      'Create backups and restore previous database states.',
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const DataManagementScreen())),
                 ),
                 const SizedBox(height: 12),
                 _MoreTile(
                   icon: Icons.tune_rounded,
                   title: 'App Settings',
-                  subtitle: 'Company profile, payment methods, and PIN security.',
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen())),
+                  subtitle:
+                      'Company profile, payment methods, and PIN security.',
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const SettingsScreen())),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 16),
-
           SectionCard(
             title: 'About Bio Care',
             child: Column(
@@ -113,11 +131,13 @@ class MoreScreen extends StatelessWidget {
                       context: context,
                       applicationName: 'Bio Care Sales',
                       applicationVersion: '2.0.4',
-                      applicationIcon: const Icon(Icons.eco_rounded, color: Color(0xFF2E7D32), size: 48),
+                      applicationIcon: const Icon(Icons.eco_rounded,
+                          color: Color(0xFF2E7D32), size: 48),
                       children: [
                         const Text('Pure Health. Trusted Quality.'),
                         const SizedBox(height: 10),
-                        const Text('A specialized field sales automation tool engineered for the Bio Care distribution network.'),
+                        const Text(
+                            'A specialized field sales automation tool engineered for the Bio Care distribution network.'),
                       ],
                     );
                   },
@@ -135,15 +155,15 @@ class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader({
     required this.salesperson,
     required this.companyName,
+    this.profileImagePath,
   });
 
   final String salesperson;
   final String companyName;
+  final String? profileImagePath;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -153,14 +173,11 @@ class _ProfileHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: scheme.primary.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.person_rounded, size: 32, color: scheme.primary),
+          SalespersonAvatar(
+            name: salesperson,
+            imagePath: profileImagePath,
+            size: 64,
+            borderColor: const Color(0xFFE8F5E9),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -169,11 +186,17 @@ class _ProfileHeader extends StatelessWidget {
               children: [
                 Text(
                   salesperson,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(fontWeight: FontWeight.w800),
                 ),
                 Text(
                   companyName,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.grey.shade600),
                 ),
               ],
             ),
@@ -230,7 +253,8 @@ class _MoreTile extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                   const SizedBox(height: 2),
                   Text(

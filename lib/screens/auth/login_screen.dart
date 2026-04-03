@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../app/app_controller.dart';
 import '../../core/theme/app_assets.dart';
 import '../../core/widgets/brand_logo.dart';
+import '../../core/widgets/salesperson_avatar.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -99,6 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             salespersonController: _salespersonController,
                             pinController: _pinController,
                             pinEnabled: controller.settings.pinEnabled,
+                            profileImagePath: controller.profileImagePath,
                             onSubmit: _submit,
                             compact: true,
                           ),
@@ -120,6 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               salespersonController: _salespersonController,
                               pinController: _pinController,
                               pinEnabled: controller.settings.pinEnabled,
+                              profileImagePath: controller.profileImagePath,
                               onSubmit: _submit,
                             ),
                           ),
@@ -307,6 +310,7 @@ class _LoginCard extends StatelessWidget {
     required this.salespersonController,
     required this.pinController,
     required this.pinEnabled,
+    required this.profileImagePath,
     required this.onSubmit,
     this.compact = false,
   });
@@ -315,21 +319,12 @@ class _LoginCard extends StatelessWidget {
   final TextEditingController salespersonController;
   final TextEditingController pinController;
   final bool pinEnabled;
+  final String? profileImagePath;
   final VoidCallback onSubmit;
   final bool compact;
 
   @override
   Widget build(BuildContext context) {
-    final initials = salespersonController.text.trim().isEmpty
-        ? 'BC'
-        : salespersonController.text
-            .trim()
-            .split(RegExp(r'\s+'))
-            .where((part) => part.isNotEmpty)
-            .take(2)
-            .map((part) => part.characters.first.toUpperCase())
-            .join();
-
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.92),
@@ -360,29 +355,15 @@ class _LoginCard extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                   ),
                   const Spacer(),
-                  Container(
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFF43A047),
-                          Color(0xFF1B5E20),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      initials.isEmpty ? 'BC' : initials,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
+                  SalespersonAvatar(
+                    name: salespersonController.text.trim().isEmpty
+                        ? 'Bio Care'
+                        : salespersonController.text.trim(),
+                    imagePath: profileImagePath,
+                    size: 48,
+                    backgroundColor: const Color(0xFFEAF6EC),
+                    foregroundColor: const Color(0xFF1B5E20),
+                    borderColor: const Color(0xFFD8E9DA),
                   ),
                 ],
               ),

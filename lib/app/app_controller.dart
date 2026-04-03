@@ -2,7 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../data/app_repository.dart';
@@ -45,6 +48,7 @@ class AppController extends ChangeNotifier {
   bool get authenticated => _authenticated;
   String get currentSalesperson => _currentSalesperson;
   AppSettings get settings => _settings;
+  String? get profileImagePath => _settings.profileImagePath;
   File? get lastGeneratedReport => _lastGeneratedReport;
   ExportBundle? get lastExportBundle => _lastExportBundle;
   String? get lastBackupPath => _lastBackupPath;
@@ -58,6 +62,12 @@ class AppController extends ChangeNotifier {
   Future<void> initialize() async {
     await _repository.initialize();
     _settings = await _repository.getSettings();
+    final seededImagePath = p.join(Directory.current.path, 'My Image.jpeg');
+    if ((_settings.profileImagePath ?? '').trim().isEmpty &&
+        await File(seededImagePath).exists()) {
+      _settings = _settings.copyWith(profileImagePath: seededImagePath);
+      await _repository.saveSettings(_settings);
+    }
     _currentSalesperson = _settings.defaultSalesperson;
     _initialized = true;
     notifyListeners();
@@ -70,7 +80,9 @@ class AppController extends ChangeNotifier {
         return 'Incorrect PIN. Please try again.';
       }
     }
-    _currentSalesperson = salesperson.trim().isEmpty ? _settings.defaultSalesperson : salesperson.trim();
+    _currentSalesperson = salesperson.trim().isEmpty
+        ? _settings.defaultSalesperson
+        : salesperson.trim();
     _authenticated = true;
     notifyListeners();
     return null;
@@ -81,13 +93,19 @@ class AppController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<DashboardSummary> dashboardFor(DateTime date) => _repository.getDashboardSummary(date);
-  Future<List<Shop>> fetchShops({String query = ''}) => _repository.getShops(query: query);
-  Future<List<Product>> fetchProducts({String query = ''}) => _repository.getProducts(query: query);
-  Future<Product?> findProductByBarcode(String barcode) => _repository.getProductByBarcode(barcode);
-  Future<List<SaleRecord>> fetchSales({DateTime? start, DateTime? end, int? shopId}) =>
+  Future<DashboardSummary> dashboardFor(DateTime date) =>
+      _repository.getDashboardSummary(date);
+  Future<List<Shop>> fetchShops({String query = ''}) =>
+      _repository.getShops(query: query);
+  Future<List<Product>> fetchProducts({String query = ''}) =>
+      _repository.getProducts(query: query);
+  Future<Product?> findProductByBarcode(String barcode) =>
+      _repository.getProductByBarcode(barcode);
+  Future<List<SaleRecord>> fetchSales(
+          {DateTime? start, DateTime? end, int? shopId}) =>
       _repository.getSales(start: start, end: end, shopId: shopId);
-  Future<List<CollectionRecord>> fetchCollections({DateTime? start, DateTime? end, int? shopId}) =>
+  Future<List<CollectionRecord>> fetchCollections(
+          {DateTime? start, DateTime? end, int? shopId}) =>
       _repository.getCollections(start: start, end: end, shopId: shopId);
 
   Future<void> saveShop(Shop shop) async {
@@ -136,9 +154,12 @@ class AppController extends ChangeNotifier {
     required List<String> paymentMethods,
     required bool pinEnabled,
     String? rawPin,
+    String? profileImagePath,
   }) async {
     final normalizedPin = rawPin?.trim() ?? '';
-    final pinHash = normalizedPin.isEmpty ? _settings.pinHash : sha256.convert(utf8.encode(normalizedPin)).toString();
+    final pinHash = normalizedPin.isEmpty
+        ? _settings.pinHash
+        : sha256.convert(utf8.encode(normalizedPin)).toString();
 
     _settings = _settings.copyWith(
       companyName: companyName.trim(),
@@ -146,13 +167,15 @@ class AppController extends ChangeNotifier {
       paymentMethods: paymentMethods,
       pinEnabled: pinEnabled,
       pinHash: pinEnabled ? pinHash : '',
+      profileImagePath: profileImagePath ?? _settings.profileImagePath,
     );
     _currentSalesperson = _settings.defaultSalesperson;
     await _repository.saveSettings(_settings);
     notifyListeners();
   }
 
-  Future<DailyReportData> reportPreview(DateTime date) => _repository.getDailyReportData(date);
+  Future<DailyReportData> reportPreview(DateTime date) =>
+      _repository.getDailyReportData(date);
 
   Future<File> generateReport(DateTime date) async {
     final report = await _repository.getDailyReportData(date);
@@ -169,7 +192,8 @@ class AppController extends ChangeNotifier {
   Future<void> shareLastReport() async {
     final file = _lastGeneratedReport;
     if (file == null) return;
-    await Share.shareXFiles([XFile(file.path)], text: 'Daily report from ${_settings.companyName}');
+    await Share.shareXFiles([XFile(file.path)],
+        text: 'Daily report from ${_settings.companyName}');
   }
 
   Future<ExportBundle> exportDesktopImportBundle(DateTime date) async {
@@ -193,7 +217,8 @@ class AppController extends ChangeNotifier {
     );
   }
 
-  Future<String?> saveExportCopy(String path) => _exportService.saveCopyToUserLocation(path);
+  Future<String?> saveExportCopy(String path) =>
+      _exportService.saveCopyToUserLocation(path);
 
   Future<String?> createBackup() async {
     final dbPath = await _repository.getDatabasePath();
@@ -203,7 +228,8 @@ class AppController extends ChangeNotifier {
     return backupPath;
   }
 
-  Future<String?> saveBackupCopy(String sourcePath) => _backupService.saveBackupCopy(sourcePath);
+  Future<String?> saveBackupCopy(String sourcePath) =>
+      _backupService.saveBackupCopy(sourcePath);
   Future<String?> pickBackupFile() => _backupService.pickBackupFile();
 
   Future<void> restoreBackup(String backupPath) async {
@@ -214,17 +240,68 @@ class AppController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<ImportResult> importShopsFromFile(String path, {bool replaceExisting = false}) async {
+  Future<ImportResult> importShopsFromFile(String path,
+      {bool replaceExisting = false}) async {
     final rawText = await File(path).readAsString();
-    final result = await _repository.importShopsFromText(rawText, replaceExisting: replaceExisting);
+    final result = await _repository.importShopsFromText(rawText,
+        replaceExisting: replaceExisting);
     notifyListeners();
     return result;
   }
 
-  Future<ImportResult> importProductsFromFile(String path, {bool replaceExisting = false}) async {
+  Future<ImportResult> importProductsFromFile(String path,
+      {bool replaceExisting = false}) async {
     final rawText = await File(path).readAsString();
-    final result = await _repository.importProductsFromText(rawText, replaceExisting: replaceExisting);
+    final result = await _repository.importProductsFromText(rawText,
+        replaceExisting: replaceExisting);
     notifyListeners();
     return result;
+  }
+
+  Future<String?> pickAndSaveProfileImage() async {
+    if (kIsWeb) return null;
+
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: false,
+    );
+    final sourcePath = result?.files.single.path;
+    if (sourcePath == null || sourcePath.trim().isEmpty) return null;
+
+    final sourceFile = File(sourcePath);
+    if (!await sourceFile.exists()) return null;
+
+    final appDir = await getApplicationDocumentsDirectory();
+    final ext = p.extension(sourcePath).toLowerCase();
+    final safeExt = ext.isEmpty ? '.png' : ext;
+    final targetPath = p.join(appDir.path, 'salesperson_avatar$safeExt');
+
+    if ((_settings.profileImagePath ?? '').isNotEmpty &&
+        _settings.profileImagePath != targetPath) {
+      final previousFile = File(_settings.profileImagePath!);
+      if (await previousFile.exists()) {
+        await previousFile.delete();
+      }
+    }
+
+    final copiedFile = await sourceFile.copy(targetPath);
+    _settings = _settings.copyWith(profileImagePath: copiedFile.path);
+    await _repository.saveSettings(_settings);
+    notifyListeners();
+    return copiedFile.path;
+  }
+
+  Future<void> clearProfileImage() async {
+    final currentPath = _settings.profileImagePath;
+    if (currentPath != null && currentPath.isNotEmpty) {
+      final file = File(currentPath);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    }
+
+    _settings = _settings.copyWith(profileImagePath: '');
+    await _repository.saveSettings(_settings);
+    notifyListeners();
   }
 }

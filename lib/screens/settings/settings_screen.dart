@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
 import '../../core/widgets/section_card.dart';
+import '../../core/widgets/salesperson_avatar.dart';
 import '../data/data_management_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -19,16 +20,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late final TextEditingController _paymentMethodsController;
   late final TextEditingController _pinController;
   bool _pinEnabled = false;
+  String? _profileImagePath;
 
   @override
   void initState() {
     super.initState();
     final settings = context.read<AppController>().settings;
     _companyController = TextEditingController(text: settings.companyName);
-    _salespersonController = TextEditingController(text: settings.defaultSalesperson);
-    _paymentMethodsController = TextEditingController(text: settings.paymentMethods.join(', '));
+    _salespersonController =
+        TextEditingController(text: settings.defaultSalesperson);
+    _paymentMethodsController =
+        TextEditingController(text: settings.paymentMethods.join(', '));
     _pinController = TextEditingController();
     _pinEnabled = settings.pinEnabled;
+    _profileImagePath = settings.profileImagePath;
   }
 
   @override
@@ -49,21 +54,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
         .toList();
 
     await context.read<AppController>().saveSettings(
-      companyName: _companyController.text,
-      defaultSalesperson: _salespersonController.text,
-      paymentMethods: methods,
-      pinEnabled: _pinEnabled,
-      rawPin: _pinController.text,
-    );
+          companyName: _companyController.text,
+          defaultSalesperson: _salespersonController.text,
+          paymentMethods: methods,
+          pinEnabled: _pinEnabled,
+          rawPin: _pinController.text,
+          profileImagePath: _profileImagePath,
+        );
 
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile saved locally.')));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Profile saved locally.')));
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final controller = context.watch<AppController>();
+    final currentImagePath = _profileImagePath ?? controller.profileImagePath;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FDF8), // Bio Care Background
@@ -81,22 +90,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Center(
               child: Column(
                 children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: scheme.primary.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.person_rounded, size: 50, color: scheme.primary),
+                  SalespersonAvatar(
+                    name: _salespersonController.text.trim().isEmpty
+                        ? controller.currentSalesperson
+                        : _salespersonController.text.trim(),
+                    imagePath: currentImagePath,
+                    size: 104,
+                    borderColor: const Color(0xFFE8F5E9),
                   ),
                   const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: _pickProfileImage,
+                        icon: const Icon(Icons.photo_camera_back_outlined),
+                        label: const Text('Upload Photo'),
+                      ),
+                      if ((currentImagePath ?? '').isNotEmpty)
+                        TextButton.icon(
+                          onPressed: _removeProfileImage,
+                          icon: const Icon(Icons.delete_outline_rounded),
+                          label: const Text('Remove'),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
                   Text(
                     'Bio Care Sales App',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
-                  const Text('v2.0 Premium Edition', style: TextStyle(color: Colors.grey)),
+                  const Text('v2.0 Premium Edition',
+                      style: TextStyle(color: Colors.grey)),
                 ],
               ),
             ),
@@ -121,15 +152,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   leading: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                       color: const Color(0xFFF8FDF8),
-                       borderRadius: BorderRadius.circular(12),
+                      color: const Color(0xFFF8FDF8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.settings_backup_restore_rounded, color: scheme.primary),
+                    child: Icon(Icons.settings_backup_restore_rounded,
+                        color: scheme.primary),
                   ),
-                  title: const Text('Import / Export Data', style: TextStyle(fontWeight: FontWeight.bold)),
+                  title: const Text('Import / Export Data',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: const Text('Manage masters and system backups.'),
                   trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DataManagementScreen())),
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const DataManagementScreen())),
                 ),
               ),
             ),
@@ -158,7 +194,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         labelText: 'Company Name',
                         prefixIcon: Icon(Icons.business_rounded),
                       ),
-                      validator: (value) => (value == null || value.trim().isEmpty) ? 'Company name is required.' : null,
+                      validator: (value) =>
+                          (value == null || value.trim().isEmpty)
+                              ? 'Company name is required.'
+                              : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -168,7 +207,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         prefixIcon: Icon(Icons.badge_rounded),
                       ),
                       validator: (value) =>
-                          (value == null || value.trim().isEmpty) ? 'Name is required.' : null,
+                          (value == null || value.trim().isEmpty)
+                              ? 'Name is required.'
+                              : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -179,7 +220,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         prefixIcon: Icon(Icons.payments_rounded),
                       ),
                       validator: (value) =>
-                          (value == null || value.trim().isEmpty) ? 'At least one payment method is required.' : null,
+                          (value == null || value.trim().isEmpty)
+                              ? 'At least one payment method is required.'
+                              : null,
                     ),
                   ],
                 ),
@@ -207,8 +250,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SwitchListTile.adaptive(
                       value: _pinEnabled,
                       contentPadding: EdgeInsets.zero,
-                      title: const Text('Enable local PIN', style: TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: const Text('Protect app access on this device.'),
+                      title: const Text('Enable local PIN',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle:
+                          const Text('Protect app access on this device.'),
                       onChanged: (value) => setState(() => _pinEnabled = value),
                     ),
                     if (_pinEnabled) ...[
@@ -225,7 +270,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         validator: (value) {
                           if (!_pinEnabled) return null;
                           if (value == null || value.isEmpty) return null;
-                          if (value.trim().length < 4) return 'PIN must be at least 4 digits.';
+                          if (value.trim().length < 4) {
+                            return 'PIN must be at least 4 digits.';
+                          }
                           return null;
                         },
                       ),
@@ -244,6 +291,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _pickProfileImage() async {
+    final path = await context.read<AppController>().pickAndSaveProfileImage();
+    if (!mounted || path == null) return;
+    setState(() => _profileImagePath = path);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Profile photo updated.')),
+    );
+  }
+
+  Future<void> _removeProfileImage() async {
+    await context.read<AppController>().clearProfileImage();
+    if (!mounted) return;
+    setState(() => _profileImagePath = null);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Profile photo removed.')),
     );
   }
 }

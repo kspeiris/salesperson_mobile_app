@@ -7,7 +7,8 @@ import '../models/entities.dart';
 import 'app_database.dart';
 
 class AppRepository {
-  AppRepository({AppDatabase? database}) : _database = database ?? AppDatabase.instance;
+  AppRepository({AppDatabase? database})
+      : _database = database ?? AppDatabase.instance;
 
   final AppDatabase _database;
 
@@ -21,10 +22,13 @@ class AppRepository {
 
   Future<String> getDatabasePath() => _database.databasePath;
   Future<void> closeDatabase() => _database.close();
-  Future<void> replaceDatabaseWithFilePath(String path) => _database.replaceWith(File(path));
+  Future<void> replaceDatabaseWithFilePath(String path) =>
+      _database.replaceWith(File(path));
 
   Future<void> _seedSettings(Database db) async {
-    final existing = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM settings')) ?? 0;
+    final existing = Sqflite.firstIntValue(
+            await db.rawQuery('SELECT COUNT(*) FROM settings')) ??
+        0;
     if (existing > 0) return;
 
     final defaults = <String, String>{
@@ -33,6 +37,7 @@ class AppRepository {
       'payment_methods': 'Cash,Bank,Cheque',
       'pin_enabled': '0',
       'pin_hash': '',
+      'profile_image_path': '',
     };
     final batch = db.batch();
     defaults.forEach((key, value) {
@@ -42,7 +47,9 @@ class AppRepository {
   }
 
   Future<void> _seedDemoData(Database db) async {
-    final shopCount = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM shops')) ?? 0;
+    final shopCount = Sqflite.firstIntValue(
+            await db.rawQuery('SELECT COUNT(*) FROM shops')) ??
+        0;
     if (shopCount == 0) {
       final now = DateTime.now().toIso8601String();
       final batch = db.batch();
@@ -82,7 +89,9 @@ class AppRepository {
       await batch.commit(noResult: true);
     }
 
-    final productCount = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM products')) ?? 0;
+    final productCount = Sqflite.firstIntValue(
+            await db.rawQuery('SELECT COUNT(*) FROM products')) ??
+        0;
     if (productCount == 0) {
       final now = DateTime.now().toIso8601String();
       final batch = db.batch();
@@ -137,6 +146,9 @@ class AppRepository {
           .toList(),
       pinEnabled: (map['pin_enabled'] ?? '0') == '1',
       pinHash: (map['pin_hash'] ?? '').isEmpty ? null : map['pin_hash'],
+      profileImagePath: (map['profile_image_path'] ?? '').trim().isEmpty
+          ? null
+          : map['profile_image_path'],
     );
   }
 
@@ -148,6 +160,7 @@ class AppRepository {
       'payment_methods': settings.paymentMethods.join(','),
       'pin_enabled': settings.pinEnabled ? '1' : '0',
       'pin_hash': settings.pinHash ?? '',
+      'profile_image_path': settings.profileImagePath ?? '',
     };
 
     final batch = db.batch();
@@ -161,7 +174,8 @@ class AppRepository {
     await batch.commit(noResult: true);
   }
 
-  Future<List<Shop>> getShops({String query = '', bool activeOnly = true}) async {
+  Future<List<Shop>> getShops(
+      {String query = '', bool activeOnly = true}) async {
     final db = await _db;
     final clauses = <String>[];
     final args = <Object?>[];
@@ -170,7 +184,10 @@ class AppRepository {
     if (query.trim().isNotEmpty) {
       clauses.add('(name LIKE ? OR area LIKE ? OR owner_contact LIKE ?)');
       final pattern = '%${query.trim()}%';
-      args..add(pattern)..add(pattern)..add(pattern);
+      args
+        ..add(pattern)
+        ..add(pattern)
+        ..add(pattern);
     }
 
     final rows = await db.query(
@@ -206,7 +223,8 @@ class AppRepository {
     );
   }
 
-  Future<List<Product>> getProducts({String query = '', bool activeOnly = true}) async {
+  Future<List<Product>> getProducts(
+      {String query = '', bool activeOnly = true}) async {
     final db = await _db;
     final clauses = <String>[];
     final args = <Object?>[];
@@ -215,7 +233,10 @@ class AppRepository {
     if (query.trim().isNotEmpty) {
       clauses.add('(name LIKE ? OR sku LIKE ? OR barcode LIKE ?)');
       final pattern = '%${query.trim()}%';
-      args..add(pattern)..add(pattern)..add(pattern);
+      args
+        ..add(pattern)
+        ..add(pattern)
+        ..add(pattern);
     }
 
     final rows = await db.query(
@@ -248,7 +269,8 @@ class AppRepository {
     if (product.id == null) {
       await db.insert('products', data);
     } else {
-      await db.update('products', data, where: 'id = ?', whereArgs: [product.id]);
+      await db
+          .update('products', data, where: 'id = ?', whereArgs: [product.id]);
     }
   }
 
@@ -270,7 +292,8 @@ class AppRepository {
     await db.transaction((txn) async {
       final saleId = await txn.insert('sales', sale.toMap()..remove('id'));
       for (final item in sale.items) {
-        await txn.insert('sale_items', item.copyWith(saleId: saleId).toMap()..remove('id'));
+        await txn.insert(
+            'sale_items', item.copyWith(saleId: saleId).toMap()..remove('id'));
       }
       if (sale.paymentType.toLowerCase() == 'credit') {
         await txn.rawUpdate(
@@ -281,7 +304,11 @@ class AppRepository {
     });
   }
 
-  Future<List<SaleRecord>> getSales({DateTime? start, DateTime? end, int? shopId, bool activeOnly = true}) async {
+  Future<List<SaleRecord>> getSales(
+      {DateTime? start,
+      DateTime? end,
+      int? shopId,
+      bool activeOnly = true}) async {
     final db = await _db;
     final clauses = <String>[];
     final args = <Object?>[];
@@ -318,7 +345,8 @@ class AppRepository {
         whereArgs: [row['id']],
         orderBy: 'id ASC',
       );
-      sales.add(SaleRecord.fromMap(row, items: itemsRows.map(SaleItem.fromMap).toList()));
+      sales.add(SaleRecord.fromMap(row,
+          items: itemsRows.map(SaleItem.fromMap).toList()));
     }
     return sales;
   }
@@ -326,12 +354,14 @@ class AppRepository {
   Future<void> voidSale(int id, String reason) async {
     final db = await _db;
     await db.transaction((txn) async {
-      final rows = await txn.query('sales', where: 'id = ?', whereArgs: [id], limit: 1);
+      final rows =
+          await txn.query('sales', where: 'id = ?', whereArgs: [id], limit: 1);
       if (rows.isEmpty) return;
       final sale = SaleRecord.fromMap(rows.first);
       if (sale.isVoided) return;
 
-      await txn.update('sales', {'status': 'voided', 'void_reason': reason}, where: 'id = ?', whereArgs: [id]);
+      await txn.update('sales', {'status': 'voided', 'void_reason': reason},
+          where: 'id = ?', whereArgs: [id]);
 
       if (sale.paymentType.toLowerCase() == 'credit') {
         await txn.rawUpdate(
@@ -348,12 +378,21 @@ class AppRepository {
       await txn.insert('collections', collection.toMap()..remove('id'));
       await txn.rawUpdate(
         'UPDATE shops SET balance = CASE WHEN balance - ? < 0 THEN 0 ELSE balance - ? END, updated_at = ? WHERE id = ?',
-        [collection.amount, collection.amount, DateTime.now().toIso8601String(), collection.shopId],
+        [
+          collection.amount,
+          collection.amount,
+          DateTime.now().toIso8601String(),
+          collection.shopId
+        ],
       );
     });
   }
 
-  Future<List<CollectionRecord>> getCollections({DateTime? start, DateTime? end, int? shopId, bool activeOnly = true}) async {
+  Future<List<CollectionRecord>> getCollections(
+      {DateTime? start,
+      DateTime? end,
+      int? shopId,
+      bool activeOnly = true}) async {
     final db = await _db;
     final clauses = <String>[];
     final args = <Object?>[];
@@ -388,15 +427,22 @@ class AppRepository {
   Future<void> voidCollection(int id, String reason) async {
     final db = await _db;
     await db.transaction((txn) async {
-      final rows = await txn.query('collections', where: 'id = ?', whereArgs: [id], limit: 1);
+      final rows = await txn.query('collections',
+          where: 'id = ?', whereArgs: [id], limit: 1);
       if (rows.isEmpty) return;
       final collection = CollectionRecord.fromMap(rows.first);
       if (collection.isVoided) return;
 
-      await txn.update('collections', {'status': 'voided', 'void_reason': reason}, where: 'id = ?', whereArgs: [id]);
+      await txn.update(
+          'collections', {'status': 'voided', 'void_reason': reason},
+          where: 'id = ?', whereArgs: [id]);
       await txn.rawUpdate(
         'UPDATE shops SET balance = balance + ?, updated_at = ? WHERE id = ?',
-        [collection.amount, DateTime.now().toIso8601String(), collection.shopId],
+        [
+          collection.amount,
+          DateTime.now().toIso8601String(),
+          collection.shopId
+        ],
       );
     });
   }
@@ -430,7 +476,8 @@ class AppRepository {
       totalSales: ((sales['total_sales'] as num?) ?? 0).toDouble(),
       cashSales: ((sales['cash_sales'] as num?) ?? 0).toDouble(),
       creditSales: ((sales['credit_sales'] as num?) ?? 0).toDouble(),
-      totalCollections: ((collections['total_collections'] as num?) ?? 0).toDouble(),
+      totalCollections:
+          ((collections['total_collections'] as num?) ?? 0).toDouble(),
       salesCount: (sales['sales_count'] as int?) ?? 0,
       collectionCount: (collections['collection_count'] as int?) ?? 0,
     );
@@ -441,8 +488,13 @@ class AppRepository {
     final end = start.add(const Duration(days: 1));
     final dashboard = await getDashboardSummary(date);
     final sales = await getSales(start: start, end: end, activeOnly: true);
-    final collections = await getCollections(start: start, end: end, activeOnly: true);
-    return DailyReportData(date: date, dashboard: dashboard, sales: sales, collections: collections);
+    final collections =
+        await getCollections(start: start, end: end, activeOnly: true);
+    return DailyReportData(
+        date: date,
+        dashboard: dashboard,
+        sales: sales,
+        collections: collections);
   }
 
   Future<Map<String, Object?>> getDailyExportMap(DateTime date) async {
@@ -468,10 +520,15 @@ class AppRepository {
     };
   }
 
-  Future<ImportResult> importShopsFromText(String rawText, {bool replaceExisting = false}) async {
+  Future<ImportResult> importShopsFromText(String rawText,
+      {bool replaceExisting = false}) async {
     final rows = _parseDelimitedText(rawText);
     if (rows.isEmpty) {
-      return const ImportResult(importedCount: 0, updatedCount: 0, skippedCount: 0, errors: ['No valid rows found.']);
+      return const ImportResult(
+          importedCount: 0,
+          updatedCount: 0,
+          skippedCount: 0,
+          errors: ['No valid rows found.']);
     }
 
     final db = await _db;
@@ -500,7 +557,8 @@ class AppRepository {
           continue;
         }
 
-        final existing = await txn.query('shops', where: 'LOWER(name) = LOWER(?)', whereArgs: [name], limit: 1);
+        final existing = await txn.query('shops',
+            where: 'LOWER(name) = LOWER(?)', whereArgs: [name], limit: 1);
         final now = DateTime.now().toIso8601String();
         final payload = {
           'name': name,
@@ -510,7 +568,9 @@ class AppRepository {
           'credit_limit': double.tryParse(row['credit_limit'] ?? '') ?? 0,
           'balance': double.tryParse(row['balance'] ?? '') ?? 0,
           'is_active': 1,
-          'created_at': existing.isEmpty ? now : (existing.first['created_at'] as String? ?? now),
+          'created_at': existing.isEmpty
+              ? now
+              : (existing.first['created_at'] as String? ?? now),
           'updated_at': now,
         };
 
@@ -518,19 +578,29 @@ class AppRepository {
           await txn.insert('shops', payload);
           imported++;
         } else {
-          await txn.update('shops', payload, where: 'id = ?', whereArgs: [existing.first['id']]);
+          await txn.update('shops', payload,
+              where: 'id = ?', whereArgs: [existing.first['id']]);
           updated++;
         }
       }
     });
 
-    return ImportResult(importedCount: imported, updatedCount: updated, skippedCount: skipped, errors: errors);
+    return ImportResult(
+        importedCount: imported,
+        updatedCount: updated,
+        skippedCount: skipped,
+        errors: errors);
   }
 
-  Future<ImportResult> importProductsFromText(String rawText, {bool replaceExisting = false}) async {
+  Future<ImportResult> importProductsFromText(String rawText,
+      {bool replaceExisting = false}) async {
     final rows = _parseDelimitedText(rawText);
     if (rows.isEmpty) {
-      return const ImportResult(importedCount: 0, updatedCount: 0, skippedCount: 0, errors: ['No valid rows found.']);
+      return const ImportResult(
+          importedCount: 0,
+          updatedCount: 0,
+          skippedCount: 0,
+          errors: ['No valid rows found.']);
     }
 
     final db = await _db;
@@ -550,13 +620,18 @@ class AppRepository {
         final sku = row['sku']?.trim() ?? '';
         final unitPrice = double.tryParse(row['unit_price'] ?? '');
 
-        if (name.isEmpty || sku.isEmpty || unitPrice == null || unitPrice <= 0) {
+        if (name.isEmpty ||
+            sku.isEmpty ||
+            unitPrice == null ||
+            unitPrice <= 0) {
           skipped++;
-          errors.add('Row ${i + 2}: name, sku, and a positive unit_price are required.');
+          errors.add(
+              'Row ${i + 2}: name, sku, and a positive unit_price are required.');
           continue;
         }
 
-        final existing = await txn.query('products', where: 'LOWER(sku) = LOWER(?)', whereArgs: [sku], limit: 1);
+        final existing = await txn.query('products',
+            where: 'LOWER(sku) = LOWER(?)', whereArgs: [sku], limit: 1);
         final now = DateTime.now().toIso8601String();
         final payload = {
           'name': name,
@@ -565,7 +640,9 @@ class AppRepository {
           'description': row['description']?.trim() ?? '',
           'barcode': row['barcode']?.trim() ?? '',
           'is_active': 1,
-          'created_at': existing.isEmpty ? now : (existing.first['created_at'] as String? ?? now),
+          'created_at': existing.isEmpty
+              ? now
+              : (existing.first['created_at'] as String? ?? now),
           'updated_at': now,
         };
 
@@ -573,24 +650,33 @@ class AppRepository {
           await txn.insert('products', payload);
           imported++;
         } else {
-          await txn.update('products', payload, where: 'id = ?', whereArgs: [existing.first['id']]);
+          await txn.update('products', payload,
+              where: 'id = ?', whereArgs: [existing.first['id']]);
           updated++;
         }
       }
     });
 
-    return ImportResult(importedCount: imported, updatedCount: updated, skippedCount: skipped, errors: errors);
+    return ImportResult(
+        importedCount: imported,
+        updatedCount: updated,
+        skippedCount: skipped,
+        errors: errors);
   }
 
   List<Map<String, String>> _parseDelimitedText(String text) {
     final normalized = text.trim();
     if (normalized.isEmpty) return [];
 
-    final lines = const LineSplitter().convert(normalized).where((line) => line.trim().isNotEmpty).toList();
+    final lines = const LineSplitter()
+        .convert(normalized)
+        .where((line) => line.trim().isNotEmpty)
+        .toList();
     if (lines.isEmpty) return [];
 
     final delimiter = lines.first.contains('\t') ? '\t' : ',';
-    final headers = _splitCsvLine(lines.first, delimiter).map(_normalizeHeader).toList();
+    final headers =
+        _splitCsvLine(lines.first, delimiter).map(_normalizeHeader).toList();
     final rows = <Map<String, String>>[];
 
     for (final line in lines.skip(1)) {
@@ -613,7 +699,8 @@ class AppRepository {
     for (var i = 0; i < line.length; i++) {
       final char = line[i];
       if (char == '"') {
-        final isEscapedQuote = inQuotes && i + 1 < line.length && line[i + 1] == '"';
+        final isEscapedQuote =
+            inQuotes && i + 1 < line.length && line[i + 1] == '"';
         if (isEscapedQuote) {
           buffer.write('"');
           i++;
