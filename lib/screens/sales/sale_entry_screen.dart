@@ -74,24 +74,6 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                 'Capture shop orders with product lines, payment type, and totals in one focused flow.',
             headerImageAsset: AppAssets.salesHero,
             pageBackgroundAsset: AppAssets.pageTexture,
-            header: Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                _EntryChip(
-                  icon: Icons.schedule_outlined,
-                  label: AppFormatters.dateTime(DateTime.now()),
-                ),
-                _EntryChip(
-                  icon: Icons.payments_outlined,
-                  label: _paymentType,
-                ),
-                _EntryChip(
-                  icon: Icons.inventory_2_outlined,
-                  label: '${_lines.length} line${_lines.length == 1 ? '' : 's'}',
-                ),
-              ],
-            ),
             bottomNavigationBar: SafeArea(
               child: Container(
                 padding: const EdgeInsets.all(16),
@@ -552,43 +534,5 @@ class _LineDraft {
 
   void dispose() {
     priceController.dispose();
-  }
-}
-
-class _EntryChip extends StatelessWidget {
-  const _EntryChip({
-    required this.icon,
-    required this.label,
-  });
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: scheme.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: scheme.primary.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 18, color: scheme.primary),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: scheme.primary,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

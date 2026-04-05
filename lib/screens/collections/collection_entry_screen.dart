@@ -70,24 +70,6 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                 'Capture payments received from shops and preserve a clean collection trail for reporting.',
             headerImageAsset: AppAssets.collectionsHero,
             pageBackgroundAsset: AppAssets.pageTexture,
-            header: Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                _CollectionChip(
-                  icon: Icons.schedule_outlined,
-                  label: AppFormatters.dateTime(DateTime.now()),
-                ),
-                _CollectionChip(
-                  icon: Icons.account_balance_wallet_outlined,
-                  label: _paymentMethod ?? 'Cash',
-                ),
-                _CollectionChip(
-                  icon: Icons.storefront_outlined,
-                  label: _selectedShop?.name ?? 'No shop selected',
-                ),
-              ],
-            ),
             bottomNavigationBar: SafeArea(
               child: Container(
                 padding: const EdgeInsets.all(16),
@@ -311,44 +293,6 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
         ),
         Text(value, style: const TextStyle(fontWeight: FontWeight.w700)),
       ],
-    );
-  }
-}
-
-class _CollectionChip extends StatelessWidget {
-  const _CollectionChip({
-    required this.icon,
-    required this.label,
-  });
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: scheme.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: scheme.primary.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 18, color: scheme.primary),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: scheme.primary,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
