@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -44,9 +44,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
       child: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         children: [
-          _ReportsDateCard(
-            selectedDate: _selectedDate,
-            onTap: _pickDate,
+          SectionCard(
+            title: 'Report Date',
+            subtitle:
+                'Pick the business date before generating a PDF or export bundle.',
+            child: _ReportsDateCard(
+              selectedDate: _selectedDate,
+              onTap: _pickDate,
+            ),
           ),
           const SizedBox(height: 20),
           FutureBuilder(
@@ -62,14 +67,22 @@ class _ReportsScreenState extends State<ReportsScreen> {
               final preview = snapshot.data!;
               return Column(
                 children: [
-                  _ReportsSummaryCard(
-                    salesTotal: preview.dashboard.totalSales,
-                    collectionsTotal: preview.dashboard.totalCollections,
+                  SectionCard(
+                    title: 'Preview',
+                    subtitle:
+                        'Check the recorded totals for the selected day before exporting.',
+                    child: _ReportsSummaryCard(
+                      salesTotal: preview.dashboard.totalSales,
+                      collectionsTotal: preview.dashboard.totalCollections,
+                    ),
                   ),
                   const SizedBox(height: 18),
-                  Row(
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
                     children: [
-                      Expanded(
+                      SizedBox(
+                        width: 220,
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -93,8 +106,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                           label: const Text('Generate PDF'),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
+                      SizedBox(
+                        width: 220,
                         child: OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -112,7 +125,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   ),
                                 )
                               : const Icon(Icons.upload_file_outlined),
-                          label: const Text('Export CSV'),
+                          label: const Text('Export Bundle'),
                         ),
                       ),
                     ],
@@ -131,8 +144,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   _PathCard(path: _lastFile!.path, label: 'Saved file'),
                   const SizedBox(height: 12),
                   FilledButton.icon(
-                    onPressed: () =>
-                        context.read<AppController>().shareLastReport(),
+                    onPressed: _shareLastReport,
                     icon: const Icon(Icons.share_outlined),
                     label: const Text('Share PDF'),
                   ),
@@ -161,8 +173,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     runSpacing: 8,
                     children: [
                       FilledButton.icon(
-                        onPressed: () =>
-                            context.read<AppController>().shareExportBundle(),
+                        onPressed: _shareExportBundle,
                         icon: const Icon(Icons.share_outlined),
                         label: const Text('Share files'),
                       ),
@@ -203,43 +214,83 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   Future<void> _generateReport() async {
     setState(() => _isGenerating = true);
-    final file =
-        await context.read<AppController>().generateReport(_selectedDate);
-    if (!mounted) return;
-    setState(() {
-      _isGenerating = false;
-      _lastFile = file;
-    });
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('PDF saved to ${file.path}')));
+    try {
+      final file =
+          await context.read<AppController>().generateReport(_selectedDate);
+      if (!mounted) return;
+      setState(() {
+        _isGenerating = false;
+        _lastFile = file;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('PDF saved to ${file.path}')));
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _isGenerating = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 
   Future<void> _exportBundle() async {
     setState(() => _isExporting = true);
-    final bundle = await context
-        .read<AppController>()
-        .exportDesktopImportBundle(_selectedDate);
-    if (!mounted) return;
-    setState(() => _isExporting = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Exported ${bundle.csvFile.split('/').last} and ${bundle.jsonFile.split('/').last}',
+    try {
+      final bundle = await context
+          .read<AppController>()
+          .exportDesktopImportBundle(_selectedDate);
+      if (!mounted) return;
+      setState(() => _isExporting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Exported ${bundle.csvFile.split('/').last} and ${bundle.jsonFile.split('/').last}',
+          ),
         ),
-      ),
-    );
+      );
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _isExporting = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 
   Future<void> _saveExportCopy(String path) async {
-    final savedPath = await context.read<AppController>().saveExportCopy(path);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content:
-            Text(savedPath == null ? 'Save cancelled.' : 'Saved to $savedPath'),
-      ),
-    );
+    try {
+      final savedPath = await context.read<AppController>().saveExportCopy(path);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text(savedPath == null ? 'Save cancelled.' : 'Saved to $savedPath'),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
+  }
+
+  Future<void> _shareLastReport() async {
+    try {
+      await context.read<AppController>().shareLastReport();
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
+  }
+
+  Future<void> _shareExportBundle() async {
+    try {
+      await context.read<AppController>().shareExportBundle();
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 }
 
@@ -558,3 +609,4 @@ class _PathCard extends StatelessWidget {
     );
   }
 }
+

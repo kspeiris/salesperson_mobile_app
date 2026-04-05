@@ -98,6 +98,7 @@ class _ShopImportScreenState extends State<ShopImportScreen> {
 
   Future<void> _pickAndImport() async {
     final controller = context.read<AppController>();
+    final messenger = ScaffoldMessenger.of(context);
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['csv', 'txt'],
@@ -106,13 +107,22 @@ class _ShopImportScreenState extends State<ShopImportScreen> {
     final path = result?.files.single.path;
     if (path == null) return;
     setState(() => _working = true);
-    final importResult = await controller.importShopsFromFile(path,
-        replaceExisting: _replaceExisting);
-    if (!mounted) return;
-    setState(() {
-      _working = false;
-      _result = importResult;
-    });
+    try {
+      final importResult = await controller.importShopsFromFile(path,
+          replaceExisting: _replaceExisting);
+      if (!mounted) return;
+      setState(() {
+        _working = false;
+        _result = importResult;
+      });
+      messenger.showSnackBar(
+        SnackBar(content: Text(importResult.summary)),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _working = false);
+      messenger.showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 }
 

@@ -6,6 +6,7 @@ import '../../core/theme/app_assets.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/section_card.dart';
 import '../../models/entities.dart';
 import 'product_form_screen.dart';
 import 'product_import_screen.dart';
@@ -59,7 +60,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
     final scheme = Theme.of(context).colorScheme;
-    final compact = MediaQuery.of(context).size.width < 640;
 
     return AppShell(
       title: 'Products',
@@ -69,14 +69,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
       pageBackgroundAsset: AppAssets.pageTexture,
       actions: [
         IconButton(
-          onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const ProductImportScreen())),
+          onPressed: _openImport,
           icon: const Icon(Icons.download_for_offline_outlined),
           tooltip: 'Import Products',
         ),
         IconButton(
-          onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const ProductFormScreen())),
+          onPressed: _openCreate,
           icon: const Icon(Icons.add_box_outlined),
           tooltip: 'Add Product',
         ),
@@ -90,21 +88,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: const EdgeInsets.only(bottom: 24),
             children: [
-              Container(
-                padding: EdgeInsets.all(compact ? 16 : 18),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE8F5E9)),
-                ),
+              SectionCard(
+                title: 'Workspace',
+                subtitle:
+                    'Search the catalog quickly, then import or add products without leaving this screen.',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Search the catalog quickly, then import or add products without leaving this screen.',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    const SizedBox(height: 16),
                     TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
@@ -124,24 +114,33 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     ),
                     const SizedBox(height: 14),
                     Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        if (products != null)
+                          _ProductBadge(
+                            icon: Icons.inventory_2_outlined,
+                            label: '${products.length} active products',
+                          ),
+                        if (_query.isNotEmpty)
+                          _ProductBadge(
+                            icon: Icons.tune_rounded,
+                            label: 'Filtered by "${_query.trim()}"',
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    Wrap(
                       spacing: 12,
                       runSpacing: 12,
                       children: [
                         OutlinedButton.icon(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const ProductImportScreen()),
-                          ),
+                          onPressed: _openImport,
                           icon: const Icon(Icons.download_for_offline_outlined),
                           label: const Text('Import'),
                         ),
                         FilledButton.icon(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const ProductFormScreen()),
-                          ),
+                          onPressed: _openCreate,
                           icon: const Icon(Icons.add_box_outlined),
                           label: const Text('Add Product'),
                         ),
@@ -261,6 +260,22 @@ class _ProductsScreenState extends State<ProductsScreen> {
         },
       ),
     );
+  }
+
+  Future<void> _openImport() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ProductImportScreen()),
+    );
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _openCreate() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ProductFormScreen()),
+    );
+    if (mounted) setState(() {});
   }
 
   Future<void> _handleAction(String value, Product product) async {

@@ -36,7 +36,12 @@ class _MainLayoutState extends State<MainLayout> {
         children: _screens,
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        padding: EdgeInsets.fromLTRB(
+          12,
+          0,
+          12,
+          12 + MediaQuery.of(context).padding.bottom,
+        ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(28),
           child: BackdropFilter(

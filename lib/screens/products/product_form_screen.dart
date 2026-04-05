@@ -63,11 +63,17 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
     );
-    await context.read<AppController>().saveProduct(product);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Product saved locally.')));
-    Navigator.pop(context);
+    try {
+      await context.read<AppController>().saveProduct(product);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Product saved locally.')));
+      Navigator.pop(context);
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 
   Future<void> _scanBarcode() async {

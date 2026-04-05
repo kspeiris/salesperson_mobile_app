@@ -203,6 +203,16 @@ class AppRepository {
   Future<void> saveShop(Shop shop) async {
     final db = await _db;
     final data = shop.toMap()..remove('id');
+    final duplicate = await db.query(
+      'shops',
+      columns: ['id'],
+      where: 'LOWER(name) = LOWER(?) AND id != ?',
+      whereArgs: [shop.name.trim(), shop.id ?? -1],
+      limit: 1,
+    );
+    if (duplicate.isNotEmpty) {
+      throw StateError('A shop with this name already exists.');
+    }
     if (shop.id == null) {
       await db.insert('shops', data);
     } else {
@@ -266,6 +276,28 @@ class AppRepository {
   Future<void> saveProduct(Product product) async {
     final db = await _db;
     final data = product.toMap()..remove('id');
+    final duplicateSku = await db.query(
+      'products',
+      columns: ['id'],
+      where: 'LOWER(sku) = LOWER(?) AND id != ?',
+      whereArgs: [product.sku.trim(), product.id ?? -1],
+      limit: 1,
+    );
+    if (duplicateSku.isNotEmpty) {
+      throw StateError('A product with this SKU already exists.');
+    }
+    if (product.barcode.trim().isNotEmpty) {
+      final duplicateBarcode = await db.query(
+        'products',
+        columns: ['id'],
+        where: 'barcode = ? AND id != ?',
+        whereArgs: [product.barcode.trim(), product.id ?? -1],
+        limit: 1,
+      );
+      if (duplicateBarcode.isNotEmpty) {
+        throw StateError('A product with this barcode already exists.');
+      }
+    }
     if (product.id == null) {
       await db.insert('products', data);
     } else {

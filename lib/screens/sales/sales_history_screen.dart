@@ -6,6 +6,7 @@ import '../../core/theme/app_assets.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/section_card.dart';
 import '../../models/entities.dart';
 import 'sale_entry_screen.dart';
 
@@ -29,7 +30,6 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
-    final compact = MediaQuery.of(context).size.width < 640;
     final theme = Theme.of(context);
     final start =
         DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
@@ -47,12 +47,15 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
           headerImageAsset: AppAssets.salesHero,
           pageBackgroundAsset: AppAssets.pageTexture,
           floatingActionButton: _PremiumSalesFab(
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const SaleEntryScreen())),
+            onPressed: _openCreate,
           ),
           child: FutureBuilder<List<SaleRecord>>(
             future:
-                controller.fetchSales(start: start, end: end, shopId: _shopId),
+                controller.fetchSales(
+                    start: start,
+                    end: end,
+                    shopId: _shopId,
+                    activeOnly: false),
             builder: (context, snapshot) {
               final sales = snapshot.data;
 
@@ -61,55 +64,13 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                     ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.only(bottom: 96),
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(compact ? 18 : 22),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF8FCF8).withValues(alpha: 0.92),
-                      borderRadius: BorderRadius.circular(28),
-                      border: Border.all(color: const Color(0xFFD8E9DA)),
-                      boxShadow: const [
-                        BoxShadow(
-                          blurRadius: 24,
-                          offset: Offset(0, 14),
-                          color: Color(0x102E7D32),
-                        ),
-                      ],
-                    ),
+                  SectionCard(
+                    title: 'Filters',
+                    subtitle:
+                        'Narrow the list by date or shop to review the right sales quickly.',
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFFEEF8EF),
-                                    Color(0xFFDCEFD9)
-                                  ],
-                                ),
-                              ),
-                              child: const Icon(
-                                Icons.tune_rounded,
-                                color: Color(0xFF2E7D32),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Text('Filters',
-                                style: theme.textTheme.titleMedium
-                                    ?.copyWith(fontWeight: FontWeight.w800)),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Narrow the list by date or shop to review the correct sales quickly.',
-                          style: theme.textTheme.bodySmall
-                              ?.copyWith(color: const Color(0xFF6E8472)),
-                        ),
-                        const SizedBox(height: 18),
                         _FilterField(
                           label: 'Date',
                           icon: Icons.calendar_month_rounded,
@@ -202,6 +163,14 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
     if (picked != null) {
       setState(() => _selectedDate = picked);
     }
+  }
+
+  Future<void> _openCreate() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const SaleEntryScreen()),
+    );
+    if (mounted) setState(() {});
   }
 
   Future<void> _voidSale(SaleRecord sale) async {

@@ -48,7 +48,7 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
                     runSpacing: 8,
                     children: [
                       OutlinedButton.icon(
-                        onPressed: _working ? null : () => controller.shareExportBundle(),
+                        onPressed: _working ? null : _shareExportFiles,
                         icon: const Icon(Icons.share_outlined),
                         label: const Text('Share files'),
                       ),
@@ -134,32 +134,67 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
 
   Future<void> _saveExport(String path) async {
     setState(() => _working = true);
-    final savedPath = await context.read<AppController>().saveExportCopy(path);
-    if (!mounted) return;
-    setState(() => _working = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(savedPath == null ? 'Save cancelled.' : 'Saved to $savedPath')),
-    );
+    try {
+      final savedPath = await context.read<AppController>().saveExportCopy(path);
+      if (!mounted) return;
+      setState(() => _working = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(savedPath == null ? 'Save cancelled.' : 'Saved to $savedPath')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _working = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
+  }
+
+  Future<void> _shareExportFiles() async {
+    setState(() => _working = true);
+    try {
+      await context.read<AppController>().shareExportBundle();
+      if (!mounted) return;
+      setState(() => _working = false);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _working = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 
   Future<void> _createBackup() async {
     setState(() => _working = true);
-    final backupPath = await context.read<AppController>().createBackup();
-    if (!mounted) return;
-    setState(() => _working = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(backupPath == null ? 'Backup failed.' : 'Backup created at $backupPath')),
-    );
+    try {
+      final backupPath = await context.read<AppController>().createBackup();
+      if (!mounted) return;
+      setState(() => _working = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(backupPath == null ? 'Backup failed.' : 'Backup created at $backupPath')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _working = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 
   Future<void> _saveBackup(String path) async {
     setState(() => _working = true);
-    final savedPath = await context.read<AppController>().saveBackupCopy(path);
-    if (!mounted) return;
-    setState(() => _working = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(savedPath == null ? 'Save cancelled.' : 'Backup copy saved to $savedPath')),
-    );
+    try {
+      final savedPath = await context.read<AppController>().saveBackupCopy(path);
+      if (!mounted) return;
+      setState(() => _working = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(savedPath == null ? 'Save cancelled.' : 'Backup copy saved to $savedPath')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _working = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 
   Future<void> _restoreBackup() async {
@@ -183,12 +218,18 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
     if (backupPath == null) return;
 
     setState(() => _working = true);
-    await controller.restoreBackup(backupPath);
-    if (!mounted) return;
-    setState(() => _working = false);
-    messenger.showSnackBar(
-      SnackBar(content: Text('Backup restored from ${File(backupPath).uri.pathSegments.last}')),
-    );
+    try {
+      await controller.restoreBackup(backupPath);
+      if (!mounted) return;
+      setState(() => _working = false);
+      messenger.showSnackBar(
+        SnackBar(content: Text('Backup restored from ${File(backupPath).uri.pathSegments.last}')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _working = false);
+      messenger.showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 }
 

@@ -42,17 +42,22 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final controller = context.read<AppController>();
-    final error = controller.login(
-      salesperson: _salespersonController.text,
-      pin: _pinController.text,
-    );
-    if (error != null && mounted) {
+    try {
+      final error = controller.login(
+        salesperson: _salespersonController.text,
+        pin: _pinController.text,
+      );
+      if (error != null && mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error)));
+        return;
+      }
+      if (!mounted) return;
+    } catch (error) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(error)));
-      return;
+          .showSnackBar(SnackBar(content: Text(error.toString())));
     }
-    if (!mounted) return;
-    // Removed explicit push. app.dart handles switching based on controller.authenticated state.
   }
 
   @override

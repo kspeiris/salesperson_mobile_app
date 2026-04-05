@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/theme/app_assets.dart';
+import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/section_card.dart';
 import '../../core/widgets/salesperson_avatar.dart';
 import '../data/data_management_screen.dart';
@@ -34,15 +36,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _pinController = TextEditingController();
     _pinEnabled = settings.pinEnabled;
     _profileImagePath = settings.profileImagePath;
+    _companyController.addListener(_refreshPreview);
+    _salespersonController.addListener(_refreshPreview);
   }
 
   @override
   void dispose() {
+    _companyController.removeListener(_refreshPreview);
+    _salespersonController.removeListener(_refreshPreview);
     _companyController.dispose();
     _salespersonController.dispose();
     _paymentMethodsController.dispose();
     _pinController.dispose();
     super.dispose();
+  }
+
+  void _refreshPreview() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _save() async {
@@ -53,19 +65,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
         .where((entry) => entry.isNotEmpty)
         .toList();
 
-    await context.read<AppController>().saveSettings(
-          companyName: _companyController.text,
-          defaultSalesperson: _salespersonController.text,
-          paymentMethods: methods,
-          pinEnabled: _pinEnabled,
-          rawPin: _pinController.text,
-          profileImagePath: _profileImagePath,
-        );
+    try {
+      await context.read<AppController>().saveSettings(
+            companyName: _companyController.text,
+            defaultSalesperson: _salespersonController.text,
+            paymentMethods: methods,
+            pinEnabled: _pinEnabled,
+            rawPin: _pinController.text,
+            profileImagePath: _profileImagePath,
+          );
 
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Profile saved locally.')));
-    Navigator.pop(context);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Profile saved locally.')));
+      Navigator.pop(context);
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 
   @override
@@ -74,18 +92,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final controller = context.watch<AppController>();
     final currentImagePath = _profileImagePath ?? controller.profileImagePath;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FDF8), // Bio Care Background
-      appBar: AppBar(
-        title: const Text('Profile & Settings'),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: Form(
-        key: _formKey,
+    return Form(
+      key: _formKey,
+      child: AppShell(
+        title: 'Profile & Settings',
+        subtitle:
+            'Update company details, payment methods, profile photo, and local device security from one place.',
+        headerImageAsset: AppAssets.settingsHero,
+        pageBackgroundAsset: AppAssets.pageTexture,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: const EdgeInsets.only(bottom: 24),
           children: [
             Center(
               child: Column(

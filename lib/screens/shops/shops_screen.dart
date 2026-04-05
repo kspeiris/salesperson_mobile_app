@@ -6,6 +6,7 @@ import '../../core/theme/app_assets.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/section_card.dart';
 import '../../models/entities.dart';
 import 'shop_form_screen.dart';
 import 'shop_import_screen.dart';
@@ -31,7 +32,6 @@ class _ShopsScreenState extends State<ShopsScreen> {
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
     final scheme = Theme.of(context).colorScheme;
-    final compact = MediaQuery.of(context).size.width < 640;
 
     return AppShell(
       title: 'Customer Management',
@@ -41,14 +41,12 @@ class _ShopsScreenState extends State<ShopsScreen> {
       pageBackgroundAsset: AppAssets.pageTexture,
       actions: [
         IconButton(
-          onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const ShopImportScreen())),
+          onPressed: _openImport,
           icon: const Icon(Icons.download_for_offline_outlined),
           tooltip: 'Import Shops',
         ),
         IconButton(
-          onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const ShopFormScreen())),
+          onPressed: _openCreate,
           icon: const Icon(Icons.add_business_outlined),
           tooltip: 'Add Shop',
         ),
@@ -62,21 +60,13 @@ class _ShopsScreenState extends State<ShopsScreen> {
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: const EdgeInsets.only(bottom: 24),
             children: [
-              Container(
-                padding: EdgeInsets.all(compact ? 16 : 18),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE8F5E9)),
-                ),
+              SectionCard(
+                title: 'Workspace',
+                subtitle:
+                    'Search customer records quickly, then import shops or add a new account from the same workspace.',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Search customer records quickly, then import shops or add a new account from the same workspace.',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    const SizedBox(height: 16),
                     TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
@@ -96,24 +86,33 @@ class _ShopsScreenState extends State<ShopsScreen> {
                     ),
                     const SizedBox(height: 14),
                     Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        if (shops != null)
+                          _MiniBadge(
+                            icon: Icons.storefront_outlined,
+                            label: '${shops.length} active shops',
+                          ),
+                        if (_query.isNotEmpty)
+                          _MiniBadge(
+                            icon: Icons.tune_rounded,
+                            label: 'Filtered by "${_query.trim()}"',
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    Wrap(
                       spacing: 12,
                       runSpacing: 12,
                       children: [
                         OutlinedButton.icon(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const ShopImportScreen()),
-                          ),
+                          onPressed: _openImport,
                           icon: const Icon(Icons.download_for_offline_outlined),
                           label: const Text('Import'),
                         ),
                         FilledButton.icon(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const ShopFormScreen()),
-                          ),
+                          onPressed: _openCreate,
                           icon: const Icon(Icons.add_business_outlined),
                           label: const Text('Add Shop'),
                         ),
@@ -260,6 +259,22 @@ class _ShopsScreenState extends State<ShopsScreen> {
         },
       ),
     );
+  }
+
+  Future<void> _openImport() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ShopImportScreen()),
+    );
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _openCreate() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ShopFormScreen()),
+    );
+    if (mounted) setState(() {});
   }
 
   Future<void> _handleAction(String value, Shop shop) async {

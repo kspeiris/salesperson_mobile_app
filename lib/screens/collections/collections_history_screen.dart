@@ -6,6 +6,7 @@ import '../../core/theme/app_assets.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/app_shell.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/section_card.dart';
 import '../../models/entities.dart';
 import 'collection_entry_screen.dart';
 
@@ -30,7 +31,6 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
-    final compact = MediaQuery.of(context).size.width < 640;
     final start =
         DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
     final end = start.add(const Duration(days: 1));
@@ -38,7 +38,7 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
     return FutureBuilder<List<Shop>>(
       future: controller.fetchShops(),
       builder: (context, shopSnapshot) {
-        final shops = shopSnapshot.data ?? const <Shop>[];
+        final shops = _distinctShops(shopSnapshot.data ?? const <Shop>[]);
         return AppShell(
           title: 'Collections History',
           subtitle:
@@ -46,10 +46,7 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
           headerImageAsset: AppAssets.collectionsHero,
           pageBackgroundAsset: AppAssets.pageTexture,
           floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const CollectionEntryScreen())),
+            onPressed: _openCreate,
             icon: const Icon(Icons.request_quote_rounded),
             label: const Text('Add Collection'),
             backgroundColor: const Color(0xFF2E7D32),
@@ -57,7 +54,10 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
           ),
           child: FutureBuilder<List<CollectionRecord>>(
             future: controller.fetchCollections(
-                start: start, end: end, shopId: _shopId),
+                start: start,
+                end: end,
+                shopId: _shopId,
+                activeOnly: false),
             builder: (context, snapshot) {
               final collections = snapshot.data;
 
@@ -66,27 +66,13 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                     ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.only(bottom: 96),
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(compact ? 16 : 18),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.78),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: const Color(0xFFDDE6DF)),
-                    ),
+                  SectionCard(
+                    title: 'Filters',
+                    subtitle:
+                        'Choose a day or shop to focus on the right collection records.',
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Filters',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w800)),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Choose a day or shop to focus on the right collection records.',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        const SizedBox(height: 16),
                         InkWell(
                           borderRadius: BorderRadius.circular(18),
                           onTap: _pickDate,
@@ -260,6 +246,14 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
     }
   }
 
+  Future<void> _openCreate() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const CollectionEntryScreen()),
+    );
+    if (mounted) setState(() {});
+  }
+
   Future<void> _voidCollection(CollectionRecord entry) async {
     final controller = context.read<AppController>();
     final reasonController = TextEditingController();
@@ -291,6 +285,20 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
     }
     reasonController.dispose();
   }
+}
+
+List<Shop> _distinctShops(List<Shop> shops) {
+  final seen = <String>{};
+  final unique = <Shop>[];
+
+  for (final shop in shops) {
+    final key = '${shop.id ?? 'null'}|${shop.name}|${shop.area}';
+    if (seen.add(key)) {
+      unique.add(shop);
+    }
+  }
+
+  return unique;
 }
 
 class _HistoryChip extends StatelessWidget {

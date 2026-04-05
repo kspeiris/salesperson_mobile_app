@@ -31,12 +31,21 @@ class ExportService {
   }
 
   Future<String?> saveCopyToUserLocation(String sourcePath) async {
+    final sourceFile = File(sourcePath);
+    if (!await sourceFile.exists()) {
+      throw FileSystemException('Export file not found.', sourcePath);
+    }
     final selected = await FilePicker.platform.saveFile(
       dialogTitle: 'Save exported file',
       fileName: p.basename(sourcePath),
     );
     if (selected == null) return null;
-    await File(sourcePath).copy(selected);
+    if (p.equals(selected, sourcePath)) return selected;
+    final targetFile = File(selected);
+    if (await targetFile.exists()) {
+      await targetFile.delete();
+    }
+    await sourceFile.copy(selected);
     return selected;
   }
 

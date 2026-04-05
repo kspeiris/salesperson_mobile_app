@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
+import '../../core/theme/app_assets.dart';
+import '../../core/widgets/app_shell.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/widgets/section_card.dart';
 import '../../models/entities.dart';
@@ -64,26 +66,86 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
           }
         }
 
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('New Sale'),
-            centerTitle: true,
-          ),
-          body: Form(
-            key: _formKey,
+        return Form(
+          key: _formKey,
+          child: AppShell(
+            title: 'New Sale',
+            subtitle:
+                'Capture shop orders with product lines, payment type, and totals in one focused flow.',
+            headerImageAsset: AppAssets.salesHero,
+            pageBackgroundAsset: AppAssets.pageTexture,
+            header: Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                _EntryChip(
+                  icon: Icons.schedule_outlined,
+                  label: AppFormatters.dateTime(DateTime.now()),
+                ),
+                _EntryChip(
+                  icon: Icons.payments_outlined,
+                  label: _paymentType,
+                ),
+                _EntryChip(
+                  icon: Icons.inventory_2_outlined,
+                  label: '${_lines.length} line${_lines.length == 1 ? '' : 's'}',
+                ),
+              ],
+            ),
+            bottomNavigationBar: SafeArea(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color(0x0A000000),
+                        offset: Offset(0, -4),
+                        blurRadius: 16),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Grand total',
+                            style: Theme.of(context).textTheme.labelMedium),
+                        const SizedBox(height: 2),
+                        Text(
+                          AppFormatters.currency(_grandTotal),
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
+                                  color: scheme.primary,
+                                  fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 24),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _saveSale(),
+                        icon: const Icon(Icons.check_circle_rounded),
+                        label: const Text('Save Record'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+              padding: const EdgeInsets.only(bottom: 24),
               children: [
                 SectionCard(
                   title: 'Select Shop',
+                  subtitle:
+                      'Choose the customer before adding line items so totals stay linked to the right account.',
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Choose the shop before adding line items so pricing and totals stay attached to the right customer.',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      const SizedBox(height: 16),
                       DropdownButtonFormField<Shop>(
                         initialValue: selectedShop,
                         isExpanded: true,
@@ -108,6 +170,8 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                 const SizedBox(height: 20),
                 SectionCard(
                   title: 'Add Products',
+                  subtitle:
+                      'Build the sale with one or more products, then adjust quantity or price when needed.',
                   trailing: TextButton.icon(
                     onPressed: () => _scanAndAttachProduct(products),
                     icon: const Icon(Icons.qr_code_scanner_rounded),
@@ -116,11 +180,6 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Build the sale with one or more products, then adjust quantity or unit price when needed.',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      const SizedBox(height: 16),
                       for (var index = 0; index < _lines.length; index++) ...[
                         _SaleLineCard(
                           index: index,
@@ -152,14 +211,11 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                 const SizedBox(height: 20),
                 SectionCard(
                   title: 'Payment Details',
+                  subtitle:
+                      'Confirm payment type, discount, and any internal note before saving.',
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Confirm how the sale is being paid and record any discount or invoice note for later review.',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      const SizedBox(height: 16),
                       Text('Payment method',
                           style: Theme.of(context).textTheme.labelMedium),
                       const SizedBox(height: 10),
@@ -220,50 +276,6 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                 ),
                 if (!compact) const SizedBox(height: 8),
               ],
-            ),
-          ),
-          bottomNavigationBar: SafeArea(
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                      color: Color(0x0A000000),
-                      offset: Offset(0, -4),
-                      blurRadius: 16),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Grand total',
-                          style: Theme.of(context).textTheme.labelMedium),
-                      const SizedBox(height: 2),
-                      Text(
-                        AppFormatters.currency(_grandTotal),
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall
-                            ?.copyWith(
-                                color: scheme.primary,
-                                fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 24),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () => _saveSale(),
-                      icon: const Icon(Icons.check_circle_rounded),
-                      label: const Text('Save Record'),
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
         );
@@ -357,11 +369,16 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
 
     final controller = context.read<AppController>();
 
-    await controller.createSale(sale);
-    if (!mounted) return;
-    messenger
-        .showSnackBar(const SnackBar(content: Text('Sale saved offline.')));
-    Navigator.pop(context);
+    try {
+      await controller.createSale(sale);
+      if (!mounted) return;
+      messenger
+          .showSnackBar(const SnackBar(content: Text('Sale saved offline.')));
+      Navigator.pop(context);
+    } catch (error) {
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(content: Text(error.toString())));
+    }
   }
 }
 
@@ -444,44 +461,53 @@ class _SaleLineCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Row(
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Text('Qty', style: Theme.of(context).textTheme.labelMedium),
-              const SizedBox(width: 12),
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FDF8),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE8F5E9)),
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.remove_rounded),
-                      onPressed: () {
-                        if (line.quantity > 1) {
-                          line.qty = line.quantity - 1;
-                          onChanged();
-                        }
-                      },
-                      color: scheme.primary,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Qty', style: Theme.of(context).textTheme.labelMedium),
+                  const SizedBox(width: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8FDF8),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFE8F5E9)),
                     ),
-                    Text('${line.quantity}',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
-                    IconButton(
-                      icon: const Icon(Icons.add_rounded),
-                      onPressed: () {
-                        line.qty = line.quantity + 1;
-                        onChanged();
-                      },
-                      color: scheme.primary,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove_rounded),
+                          onPressed: () {
+                            if (line.quantity > 1) {
+                              line.qty = line.quantity - 1;
+                              onChanged();
+                            }
+                          },
+                          color: scheme.primary,
+                        ),
+                        Text('${line.quantity}',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16)),
+                        IconButton(
+                          icon: const Icon(Icons.add_rounded),
+                          onPressed: () {
+                            line.qty = line.quantity + 1;
+                            onChanged();
+                          },
+                          color: scheme.primary,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const Spacer(),
-              Expanded(
+              SizedBox(
+                width: 220,
                 child: TextFormField(
                   controller: line.priceController,
                   keyboardType:
@@ -526,5 +552,43 @@ class _LineDraft {
 
   void dispose() {
     priceController.dispose();
+  }
+}
+
+class _EntryChip extends StatelessWidget {
+  const _EntryChip({
+    required this.icon,
+    required this.label,
+  });
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: scheme.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: scheme.primary.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 18, color: scheme.primary),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+              color: scheme.primary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

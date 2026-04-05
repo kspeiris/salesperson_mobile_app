@@ -9,6 +9,7 @@ class AppShell extends StatelessWidget {
     required this.child,
     this.actions,
     this.bottom,
+    this.bottomNavigationBar,
     this.showBack = true,
     this.subtitle,
     this.header,
@@ -21,6 +22,7 @@ class AppShell extends StatelessWidget {
   final Widget child;
   final List<Widget>? actions;
   final PreferredSizeWidget? bottom;
+  final Widget? bottomNavigationBar;
   final bool showBack;
   final String? subtitle;
   final Widget? header;
@@ -32,6 +34,8 @@ class AppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final compact = width < 560;
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final bottomSafeArea = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -42,6 +46,8 @@ class AppShell extends StatelessWidget {
         bottom: bottom,
       ),
       floatingActionButton: floatingActionButton,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      bottomNavigationBar: bottomNavigationBar,
       body: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: () => FocusScope.of(context).unfocus(),
@@ -66,10 +72,9 @@ class AppShell extends StatelessWidget {
                   curve: Curves.easeOut,
                   padding: EdgeInsets.fromLTRB(
                     compact ? 16 : 24,
-                    8,
+                    12,
                     compact ? 16 : 24,
-                    (compact ? 16 : 24) +
-                        MediaQuery.of(context).viewInsets.bottom,
+                    (compact ? 20 : 28) + bottomSafeArea + bottomInset,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +121,7 @@ class _ShellHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasImage = headerImageAsset != null;
-    final imageMinHeight = compact ? 156.0 : 196.0;
+    final imageMinHeight = compact ? 176.0 : 208.0;
     final panelRadius = BorderRadius.circular(24);
 
     return Container(
@@ -203,7 +208,7 @@ class _ShellHeaderCard extends StatelessWidget {
                     child: Container(
                       constraints: BoxConstraints(
                         maxWidth:
-                            hasImage ? (compact ? 226 : 392) : double.infinity,
+                            hasImage ? (compact ? 280 : 420) : double.infinity,
                       ),
                       padding: EdgeInsets.all(compact ? 16 : 20),
                       decoration: BoxDecoration(

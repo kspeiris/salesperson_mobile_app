@@ -102,13 +102,19 @@ class AppController extends ChangeNotifier {
   Future<Product?> findProductByBarcode(String barcode) =>
       _repository.getProductByBarcode(barcode);
   Future<List<SaleRecord>> fetchSales(
-          {DateTime? start, DateTime? end, int? shopId}) =>
-      _repository.getSales(start: start, end: end, shopId: shopId);
+          {DateTime? start, DateTime? end, int? shopId, bool activeOnly = true}) =>
+      _repository.getSales(
+          start: start, end: end, shopId: shopId, activeOnly: activeOnly);
   Future<List<CollectionRecord>> fetchCollections(
-          {DateTime? start, DateTime? end, int? shopId}) =>
-      _repository.getCollections(start: start, end: end, shopId: shopId);
+          {DateTime? start,
+          DateTime? end,
+          int? shopId,
+          bool activeOnly = true}) =>
+      _repository.getCollections(
+          start: start, end: end, shopId: shopId, activeOnly: activeOnly);
 
   Future<void> saveShop(Shop shop) async {
+    _validateShop(shop);
     await _repository.saveShop(shop);
     notifyListeners();
   }
@@ -119,6 +125,7 @@ class AppController extends ChangeNotifier {
   }
 
   Future<void> saveProduct(Product product) async {
+    _validateProduct(product);
     await _repository.saveProduct(product);
     notifyListeners();
   }
@@ -129,6 +136,7 @@ class AppController extends ChangeNotifier {
   }
 
   Future<void> createSale(SaleRecord sale) async {
+    _validateSale(sale);
     await _repository.createSale(sale);
     notifyListeners();
   }
@@ -139,6 +147,7 @@ class AppController extends ChangeNotifier {
   }
 
   Future<void> createCollection(CollectionRecord collection) async {
+    _validateCollection(collection);
     await _repository.createCollection(collection);
     notifyListeners();
   }
@@ -156,15 +165,39 @@ class AppController extends ChangeNotifier {
     String? rawPin,
     String? profileImagePath,
   }) async {
+    final trimmedCompany = companyName.trim();
+    final trimmedSalesperson = defaultSalesperson.trim();
+    final normalizedMethods = paymentMethods
+        .map((entry) => entry.trim())
+        .where((entry) => entry.isNotEmpty)
+        .toSet()
+        .toList();
     final normalizedPin = rawPin?.trim() ?? '';
+    if (trimmedCompany.isEmpty) {
+      throw ArgumentError('Company name is required.');
+    }
+    if (trimmedSalesperson.isEmpty) {
+      throw ArgumentError('Default salesperson is required.');
+    }
+    if (normalizedMethods.isEmpty) {
+      throw ArgumentError('At least one payment method is required.');
+    }
+    if (pinEnabled &&
+        normalizedPin.isEmpty &&
+        (_settings.pinHash == null || _settings.pinHash!.isEmpty)) {
+      throw ArgumentError('Set a PIN before enabling device protection.');
+    }
+    if (normalizedPin.isNotEmpty && normalizedPin.length < 4) {
+      throw ArgumentError('PIN must be at least 4 digits.');
+    }
     final pinHash = normalizedPin.isEmpty
         ? _settings.pinHash
         : sha256.convert(utf8.encode(normalizedPin)).toString();
 
     _settings = _settings.copyWith(
-      companyName: companyName.trim(),
-      defaultSalesperson: defaultSalesperson.trim(),
-      paymentMethods: paymentMethods,
+      companyName: trimmedCompany,
+      defaultSalesperson: trimmedSalesperson,
+      paymentMethods: normalizedMethods,
       pinEnabled: pinEnabled,
       pinHash: pinEnabled ? pinHash : '',
       profileImagePath: profileImagePath ?? _settings.profileImagePath,
@@ -192,6 +225,9 @@ class AppController extends ChangeNotifier {
   Future<void> shareLastReport() async {
     final file = _lastGeneratedReport;
     if (file == null) return;
+    if (!await file.exists()) {
+      throw FileSystemException('The generated PDF could not be found.', file.path);
+    }
     await Share.shareXFiles([XFile(file.path)],
         text: 'Daily report from ${_settings.companyName}');
   }
@@ -211,6 +247,11 @@ class AppController extends ChangeNotifier {
   Future<void> shareExportBundle() async {
     final bundle = _lastExportBundle;
     if (bundle == null) return;
+    if (!await File(bundle.csvFile).exists() ||
+        !await File(bundle.jsonFile).exists()) {
+      throw FileSystemException(
+          'One or more export files could not be found.');
+    }
     await Share.shareXFiles(
       [XFile(bundle.csvFile), XFile(bundle.jsonFile)],
       text: 'Desktop import files from ${_settings.companyName}',
@@ -233,16 +274,25 @@ class AppController extends ChangeNotifier {
   Future<String?> pickBackupFile() => _backupService.pickBackupFile();
 
   Future<void> restoreBackup(String backupPath) async {
+    final backupFile = File(backupPath);
+    if (!await backupFile.exists()) {
+      throw ArgumentError('Selected backup file could not be found.');
+    }
     await _repository.closeDatabase();
     await _repository.replaceDatabaseWithFilePath(backupPath);
     _settings = await _repository.getSettings();
     _currentSalesperson = _settings.defaultSalesperson;
+    _lastBackupPath = backupPath;
     notifyListeners();
   }
 
   Future<ImportResult> importShopsFromFile(String path,
       {bool replaceExisting = false}) async {
-    final rawText = await File(path).readAsString();
+    final file = File(path);
+    if (!await file.exists()) {
+      throw ArgumentError('Selected import file could not be found.');
+    }
+    final rawText = await file.readAsString();
     final result = await _repository.importShopsFromText(rawText,
         replaceExisting: replaceExisting);
     notifyListeners();
@@ -251,7 +301,11 @@ class AppController extends ChangeNotifier {
 
   Future<ImportResult> importProductsFromFile(String path,
       {bool replaceExisting = false}) async {
-    final rawText = await File(path).readAsString();
+    final file = File(path);
+    if (!await file.exists()) {
+      throw ArgumentError('Selected import file could not be found.');
+    }
+    final rawText = await file.readAsString();
     final result = await _repository.importProductsFromText(rawText,
         replaceExisting: replaceExisting);
     notifyListeners();
@@ -303,5 +357,73 @@ class AppController extends ChangeNotifier {
     _settings = _settings.copyWith(profileImagePath: '');
     await _repository.saveSettings(_settings);
     notifyListeners();
+  }
+
+  void _validateShop(Shop shop) {
+    if (shop.name.trim().isEmpty) {
+      throw ArgumentError('Shop name is required.');
+    }
+    if (shop.ownerContact.trim().isEmpty) {
+      throw ArgumentError('Owner/contact is required.');
+    }
+    if (shop.area.trim().isEmpty) {
+      throw ArgumentError('Area is required.');
+    }
+    if (shop.phone.trim().isEmpty) {
+      throw ArgumentError('Phone number is required.');
+    }
+    if (shop.creditLimit < 0) {
+      throw ArgumentError('Credit limit cannot be negative.');
+    }
+    if (shop.balance < 0) {
+      throw ArgumentError('Shop balance cannot be negative.');
+    }
+  }
+
+  void _validateProduct(Product product) {
+    if (product.name.trim().isEmpty) {
+      throw ArgumentError('Product name is required.');
+    }
+    if (product.sku.trim().isEmpty) {
+      throw ArgumentError('SKU is required.');
+    }
+    if (product.unitPrice <= 0) {
+      throw ArgumentError('Unit price must be greater than zero.');
+    }
+  }
+
+  void _validateSale(SaleRecord sale) {
+    if (sale.shopId <= 0 || sale.shopName.trim().isEmpty) {
+      throw ArgumentError('A valid shop is required.');
+    }
+    if (sale.items.isEmpty) {
+      throw ArgumentError('Add at least one item to the sale.');
+    }
+    if (sale.discount < 0) {
+      throw ArgumentError('Discount cannot be negative.');
+    }
+    for (final item in sale.items) {
+      if (item.productId <= 0 || item.productName.trim().isEmpty) {
+        throw ArgumentError('Each sale item must reference a valid product.');
+      }
+      if (item.quantity <= 0) {
+        throw ArgumentError('Item quantity must be greater than zero.');
+      }
+      if (item.unitPrice < 0 || item.lineTotal < 0) {
+        throw ArgumentError('Item prices cannot be negative.');
+      }
+    }
+  }
+
+  void _validateCollection(CollectionRecord collection) {
+    if (collection.shopId <= 0 || collection.shopName.trim().isEmpty) {
+      throw ArgumentError('A valid shop is required.');
+    }
+    if (collection.amount <= 0) {
+      throw ArgumentError('Collection amount must be greater than zero.');
+    }
+    if (collection.paymentMethod.trim().isEmpty) {
+      throw ArgumentError('Payment method is required.');
+    }
   }
 }

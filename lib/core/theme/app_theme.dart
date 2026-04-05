@@ -27,6 +27,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: canvas,
+      visualDensity: VisualDensity.standard,
       textTheme: baseTextTheme.copyWith(
         displaySmall: baseTextTheme.displaySmall?.copyWith(
             fontSize: 34,
@@ -90,6 +91,17 @@ class AppTheme {
           fontSize: 20,
           fontWeight: FontWeight.w700,
           letterSpacing: -0.3,
+        ),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          foregroundColor: primary,
+          backgroundColor: const Color(0xFFF3FAF3),
+          minimumSize: const Size(44, 44),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+            side: const BorderSide(color: outline),
+          ),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
@@ -205,6 +217,44 @@ class AppTheme {
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
       ),
+      dropdownMenuTheme: DropdownMenuThemeData(
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: outline),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: outline),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide:
+                BorderSide(color: secondary.withValues(alpha: 0.5), width: 2),
+          ),
+        ),
+        menuStyle: MenuStyle(
+          backgroundColor: const WidgetStatePropertyAll(Colors.white),
+          elevation: const WidgetStatePropertyAll(10),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          ),
+        ),
+      ),
+      menuTheme: MenuThemeData(
+        style: MenuStyle(
+          backgroundColor: const WidgetStatePropertyAll(Colors.white),
+          surfaceTintColor:
+              const WidgetStatePropertyAll(Colors.transparent),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          ),
+        ),
+      ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: card,
         surfaceTintColor: Colors.transparent,
@@ -238,6 +288,8 @@ class AppTheme {
         foregroundColor: Colors.white,
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        extendedTextStyle:
+            GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700),
       ),
     );
   }

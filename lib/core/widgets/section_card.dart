@@ -6,11 +6,13 @@ class SectionCard extends StatelessWidget {
     required this.title,
     required this.child,
     this.trailing,
+    this.subtitle,
   });
 
   final String title;
   final Widget child;
   final Widget? trailing;
+  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +37,28 @@ class SectionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: const Color(0xFF1E293B),
-                          letterSpacing: -0.2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF1E293B),
+                              letterSpacing: -0.2,
+                            ),
+                      ),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle!,
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
+                      ],
+                    ],
                   ),
                 ),
                 if (trailing != null) ...[

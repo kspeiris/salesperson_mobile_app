@@ -110,29 +110,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           totalOrders: totalOrders,
                           todaySales: summary.totalSales,
                           onDateTap: _pickDate,
-                          onNewSale: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const SaleEntryScreen()),
-                          ),
-                          onNewCollection: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const CollectionEntryScreen()),
-                          ),
+                          onNewSale: _openSaleEntry,
+                          onNewCollection: _openCollectionEntry,
                         ),
                         const SizedBox(height: 24),
                         _SmartSuggestionBanner(
-                          onNewSale: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const SaleEntryScreen()),
-                          ),
-                          onNewCollection: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const CollectionEntryScreen()),
-                          ),
+                          onNewSale: _openSaleEntry,
+                          onNewCollection: _openCollectionEntry,
                         ),
                         const SizedBox(height: 20),
                         SectionCard(
@@ -295,6 +279,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (picked != null) {
       setState(() => _selectedDate = picked);
     }
+  }
+
+  Future<void> _openSaleEntry() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const SaleEntryScreen()),
+    );
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _openCollectionEntry() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const CollectionEntryScreen()),
+    );
+    if (mounted) setState(() {});
   }
 }
 
