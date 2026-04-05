@@ -444,16 +444,24 @@ class _LoginCard extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
+                  clipBehavior: Clip.antiAlias,
                   onPressed: onSubmit,
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF2E7D32),
+                    backgroundColor: Colors.transparent,
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shadowColor: const Color(0x332E7D32),
-                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    padding: EdgeInsets.zero,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18),
                     ),
+                  ).copyWith(
+                    overlayColor:
+                        const WidgetStatePropertyAll(Color(0x142E7D32)),
+                    backgroundColor:
+                        const WidgetStatePropertyAll(Colors.transparent),
+                    shadowColor:
+                        const WidgetStatePropertyAll(Colors.transparent),
                   ),
                   child: Ink(
                     decoration: BoxDecoration(
@@ -475,7 +483,8 @@ class _LoginCard extends StatelessWidget {
                       ],
                     ),
                     child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 4),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                       child: Center(
                         child: Text(
                           'Access Workspace',
