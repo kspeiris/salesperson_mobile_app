@@ -13,7 +13,7 @@ class SalespersonApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Salesperson Daily Recorder',
+      title: 'Bio Care Sales',
       theme: AppTheme.lightTheme,
       home: Consumer<AppController>(
         builder: (context, controller, _) {

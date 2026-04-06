@@ -17,7 +17,6 @@ class AppRepository {
   Future<void> initialize() async {
     final db = await _db;
     await _seedSettings(db);
-    await _seedDemoData(db);
   }
 
   Future<String> getDatabasePath() => _database.databasePath;
@@ -32,8 +31,8 @@ class AppRepository {
     if (existing > 0) return;
 
     final defaults = <String, String>{
-      'company_name': 'Acme Distribution',
-      'default_salesperson': 'Kavindu Peiris',
+      'company_name': 'Bio Care Sales',
+      'default_salesperson': 'Route Salesperson',
       'payment_methods': 'Cash,Bank,Cheque',
       'pin_enabled': '0',
       'pin_hash': '',
@@ -44,89 +43,6 @@ class AppRepository {
       batch.insert('settings', {'key': key, 'value': value});
     });
     await batch.commit(noResult: true);
-  }
-
-  Future<void> _seedDemoData(Database db) async {
-    final shopCount = Sqflite.firstIntValue(
-            await db.rawQuery('SELECT COUNT(*) FROM shops')) ??
-        0;
-    if (shopCount == 0) {
-      final now = DateTime.now().toIso8601String();
-      final batch = db.batch();
-      batch.insert('shops', {
-        'name': 'Sunrise Stores',
-        'owner_contact': 'S. Perera',
-        'area': 'Colombo 05',
-        'phone': '0771234567',
-        'credit_limit': 25000,
-        'balance': 12500,
-        'is_active': 1,
-        'created_at': now,
-        'updated_at': now,
-      });
-      batch.insert('shops', {
-        'name': 'Metro Mart',
-        'owner_contact': 'M. Fernando',
-        'area': 'Nugegoda',
-        'phone': '0777654321',
-        'credit_limit': 20000,
-        'balance': 8200,
-        'is_active': 1,
-        'created_at': now,
-        'updated_at': now,
-      });
-      batch.insert('shops', {
-        'name': 'City Traders',
-        'owner_contact': 'R. Silva',
-        'area': 'Maharagama',
-        'phone': '0715551234',
-        'credit_limit': 40000,
-        'balance': 21400,
-        'is_active': 1,
-        'created_at': now,
-        'updated_at': now,
-      });
-      await batch.commit(noResult: true);
-    }
-
-    final productCount = Sqflite.firstIntValue(
-            await db.rawQuery('SELECT COUNT(*) FROM products')) ??
-        0;
-    if (productCount == 0) {
-      final now = DateTime.now().toIso8601String();
-      final batch = db.batch();
-      batch.insert('products', {
-        'name': 'Fresh Milk 1L',
-        'sku': 'MILK-001',
-        'unit_price': 480,
-        'description': '1 litre fresh milk pack',
-        'barcode': '479000100001',
-        'is_active': 1,
-        'created_at': now,
-        'updated_at': now,
-      });
-      batch.insert('products', {
-        'name': 'Yogurt Cup',
-        'sku': 'YOG-014',
-        'unit_price': 160,
-        'description': 'Individual yogurt cup',
-        'barcode': '479000100014',
-        'is_active': 1,
-        'created_at': now,
-        'updated_at': now,
-      });
-      batch.insert('products', {
-        'name': 'Butter 250g',
-        'sku': 'BTR-250',
-        'unit_price': 920,
-        'description': 'Premium butter 250g',
-        'barcode': '479000100250',
-        'is_active': 1,
-        'created_at': now,
-        'updated_at': now,
-      });
-      await batch.commit(noResult: true);
-    }
   }
 
   Future<AppSettings> getSettings() async {

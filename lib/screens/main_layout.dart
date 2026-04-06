@@ -69,9 +69,6 @@ class _MainLayoutState extends State<MainLayout> {
                 labelBehavior: compact
                     ? NavigationDestinationLabelBehavior.alwaysHide
                     : NavigationDestinationLabelBehavior.alwaysShow,
-                destinationsPadding: EdgeInsets.symmetric(
-                  horizontal: compact ? 4 : 8,
-                ),
                 selectedIndex: controller.currentTab,
                 onDestinationSelected: (index) => controller.currentTab = index,
                 destinations: const [
