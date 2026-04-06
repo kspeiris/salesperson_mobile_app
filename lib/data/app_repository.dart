@@ -336,6 +336,69 @@ class AppRepository {
     });
   }
 
+  Future<void> updateSale(SaleRecord sale) async {
+    final db = await _db;
+    if (sale.id == null) {
+      throw ArgumentError('Sale id is required for updates.');
+    }
+
+    await db.transaction((txn) async {
+      final existingRows = await txn.query(
+        'sales',
+        where: 'id = ?',
+        whereArgs: [sale.id],
+        limit: 1,
+      );
+      if (existingRows.isEmpty) {
+        throw StateError('The selected sale could not be found.');
+      }
+
+      final existing = SaleRecord.fromMap(existingRows.first);
+      if (existing.isVoided) {
+        throw StateError('Voided sales cannot be edited.');
+      }
+
+      if (existing.paymentType.toLowerCase() == 'credit') {
+        await txn.rawUpdate(
+          'UPDATE shops SET balance = CASE WHEN balance - ? < 0 THEN 0 ELSE balance - ? END, updated_at = ? WHERE id = ?',
+          [
+            existing.total,
+            existing.total,
+            DateTime.now().toIso8601String(),
+            existing.shopId,
+          ],
+        );
+      }
+
+      await txn.update(
+        'sales',
+        sale.toMap()..remove('id'),
+        where: 'id = ?',
+        whereArgs: [sale.id],
+      );
+
+      await txn.delete(
+        'sale_items',
+        where: 'sale_id = ?',
+        whereArgs: [sale.id],
+      );
+
+      for (final item in sale.items) {
+        await txn.insert(
+          'sale_items',
+          item.copyWith(saleId: sale.id).toMap()..remove('id'),
+        );
+      }
+
+      if (sale.paymentType.toLowerCase() == 'credit') {
+        await txn.rawUpdate(
+          'UPDATE shops SET balance = balance + ?, updated_at = ? WHERE id = ?',
+          [sale.total, DateTime.now().toIso8601String(), sale.shopId],
+        );
+      }
+    });
+  }
+
   Future<List<SaleRecord>> getSales(
       {DateTime? start,
       DateTime? end,
@@ -415,6 +478,56 @@ class AppRepository {
           collection.amount,
           DateTime.now().toIso8601String(),
           collection.shopId
+        ],
+      );
+    });
+  }
+
+  Future<void> updateCollection(CollectionRecord collection) async {
+    final db = await _db;
+    if (collection.id == null) {
+      throw ArgumentError('Collection id is required for updates.');
+    }
+
+    await db.transaction((txn) async {
+      final existingRows = await txn.query(
+        'collections',
+        where: 'id = ?',
+        whereArgs: [collection.id],
+        limit: 1,
+      );
+      if (existingRows.isEmpty) {
+        throw StateError('The selected collection could not be found.');
+      }
+
+      final existing = CollectionRecord.fromMap(existingRows.first);
+      if (existing.isVoided) {
+        throw StateError('Voided collections cannot be edited.');
+      }
+
+      await txn.rawUpdate(
+        'UPDATE shops SET balance = balance + ?, updated_at = ? WHERE id = ?',
+        [
+          existing.amount,
+          DateTime.now().toIso8601String(),
+          existing.shopId,
+        ],
+      );
+
+      await txn.update(
+        'collections',
+        collection.toMap()..remove('id'),
+        where: 'id = ?',
+        whereArgs: [collection.id],
+      );
+
+      await txn.rawUpdate(
+        'UPDATE shops SET balance = CASE WHEN balance - ? < 0 THEN 0 ELSE balance - ? END, updated_at = ? WHERE id = ?',
+        [
+          collection.amount,
+          collection.amount,
+          DateTime.now().toIso8601String(),
+          collection.shopId,
         ],
       );
     });

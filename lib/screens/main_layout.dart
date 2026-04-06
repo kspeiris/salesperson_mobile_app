@@ -30,6 +30,7 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
     final compact = MediaQuery.of(context).size.width < 430;
+    final bottomInset = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
       body: IndexedStack(
@@ -38,19 +39,19 @@ class _MainLayoutState extends State<MainLayout> {
       ),
       bottomNavigationBar: Padding(
         padding: EdgeInsets.fromLTRB(
-          12,
+          compact ? 10 : 12,
           0,
-          12,
-          12 + MediaQuery.of(context).padding.bottom,
+          compact ? 10 : 12,
+          (compact ? 8 : 12) + bottomInset,
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(compact ? 24 : 28),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.86),
-                borderRadius: BorderRadius.circular(28),
+                borderRadius: BorderRadius.circular(compact ? 24 : 28),
                 border: Border.all(color: const Color(0xD8E7DADB)),
                 boxShadow: const [
                   BoxShadow(
@@ -61,13 +62,16 @@ class _MainLayoutState extends State<MainLayout> {
                 ],
               ),
               child: NavigationBar(
-                height: compact ? 66 : 72,
+                height: compact ? 58 : 72,
                 backgroundColor: Colors.transparent,
                 surfaceTintColor: Colors.transparent,
                 indicatorColor: const Color(0x1A2E7D32),
                 labelBehavior: compact
                     ? NavigationDestinationLabelBehavior.alwaysHide
                     : NavigationDestinationLabelBehavior.alwaysShow,
+                destinationsPadding: EdgeInsets.symmetric(
+                  horizontal: compact ? 4 : 8,
+                ),
                 selectedIndex: controller.currentTab,
                 onDestinationSelected: (index) => controller.currentTab = index,
                 destinations: const [

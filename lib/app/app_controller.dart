@@ -141,6 +141,12 @@ class AppController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateSale(SaleRecord sale) async {
+    _validateSale(sale);
+    await _repository.updateSale(sale);
+    notifyListeners();
+  }
+
   Future<void> voidSale(int id, String reason) async {
     await _repository.voidSale(id, reason);
     notifyListeners();
@@ -149,6 +155,12 @@ class AppController extends ChangeNotifier {
   Future<void> createCollection(CollectionRecord collection) async {
     _validateCollection(collection);
     await _repository.createCollection(collection);
+    notifyListeners();
+  }
+
+  Future<void> updateCollection(CollectionRecord collection) async {
+    _validateCollection(collection);
+    await _repository.updateCollection(collection);
     notifyListeners();
   }
 

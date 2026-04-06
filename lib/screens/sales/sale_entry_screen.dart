@@ -10,7 +10,9 @@ import '../../models/entities.dart';
 import '../shared/barcode_scanner_screen.dart';
 
 class SaleEntryScreen extends StatefulWidget {
-  const SaleEntryScreen({super.key});
+  const SaleEntryScreen({super.key, this.sale});
+
+  final SaleRecord? sale;
 
   @override
   State<SaleEntryScreen> createState() => _SaleEntryScreenState();
@@ -19,10 +21,29 @@ class SaleEntryScreen extends StatefulWidget {
 class _SaleEntryScreenState extends State<SaleEntryScreen> {
   final _formKey = GlobalKey<FormState>();
   final _noteController = TextEditingController();
-  final _discountController = TextEditingController(text: '0');
+  final _discountController = TextEditingController();
   Shop? _selectedShop;
   String _paymentType = 'Cash';
   final List<_LineDraft> _lines = [_LineDraft()];
+
+  @override
+  void initState() {
+    super.initState();
+    final existing = widget.sale;
+    _discountController.text = existing?.discount.toStringAsFixed(2) ?? '0';
+    _noteController.text = existing?.note ?? '';
+
+    if (existing != null) {
+      _paymentType = existing.paymentType;
+      _lines
+        ..clear()
+        ..addAll(
+          existing.items.isEmpty
+              ? [_LineDraft()]
+              : existing.items.map(_LineDraft.fromSaleItem),
+        );
+    }
+  }
 
   @override
   void dispose() {
@@ -56,20 +77,38 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
         final shops = _distinctShops(snapshot.data![0] as List<Shop>);
         final products = snapshot.data![1] as List<Product>;
 
+        for (final line in _lines) {
+          final productId = line.product?.id;
+          if (productId == null) continue;
+          Product? matchedProduct;
+          for (final product in products) {
+            if (product.id == productId) {
+              matchedProduct = product;
+              if (line.priceController.text.trim().isEmpty) {
+                line.priceController.text = product.unitPrice.toStringAsFixed(2);
+              }
+              break;
+            }
+          }
+          line.product = matchedProduct;
+        }
+
         Shop? selectedShop;
-        if (_selectedShop != null) {
+        final selectedShopId = _selectedShop?.id ?? widget.sale?.shopId;
+        if (selectedShopId != null) {
           for (final shop in shops) {
-            if (shop.id == _selectedShop!.id) {
+            if (shop.id == selectedShopId) {
               selectedShop = shop;
               break;
             }
           }
         }
+        _selectedShop ??= selectedShop;
 
         return Form(
           key: _formKey,
           child: AppShell(
-            title: 'New Sale',
+            title: widget.sale == null ? 'New Sale' : 'Edit Sale',
             subtitle:
                 'Capture shop orders with product lines, payment type, and totals in one focused flow.',
             headerImageAsset: AppAssets.salesHero,
@@ -350,6 +389,7 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
         .toList();
 
     final sale = SaleRecord(
+      id: widget.sale?.id,
       shopId: _selectedShop!.id!,
       shopName: _selectedShop!.name,
       paymentType: _paymentType,
@@ -357,18 +397,27 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
       subtotal: _subtotal,
       discount: _discount,
       total: _grandTotal,
-      status: 'active',
-      createdAt: DateTime.now(),
+      status: widget.sale?.status ?? 'active',
+      createdAt: widget.sale?.createdAt ?? DateTime.now(),
       items: items,
     );
 
     final controller = context.read<AppController>();
 
     try {
-      await controller.createSale(sale);
+      if (widget.sale == null) {
+        await controller.createSale(sale);
+      } else {
+        await controller.updateSale(sale);
+      }
       if (!mounted) return;
-      messenger
-          .showSnackBar(const SnackBar(content: Text('Sale saved offline.')));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(widget.sale == null
+              ? 'Sale saved offline.'
+              : 'Sale updated offline.'),
+        ),
+      );
       Navigator.pop(context);
     } catch (error) {
       if (!mounted) return;
@@ -535,6 +584,26 @@ class _LineDraft {
   Product? product;
   int _qty = 1;
   final priceController = TextEditingController();
+
+  _LineDraft();
+
+  factory _LineDraft.fromSaleItem(SaleItem item) {
+    final draft = _LineDraft();
+    draft.product = Product(
+      id: item.productId,
+      name: item.productName,
+      sku: '',
+      unitPrice: item.unitPrice,
+      description: '',
+      barcode: '',
+      isActive: true,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+    draft.qty = item.quantity;
+    draft.priceController.text = item.unitPrice.toStringAsFixed(2);
+    return draft;
+  }
 
   int get quantity => _qty;
 

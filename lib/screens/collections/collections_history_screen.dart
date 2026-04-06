@@ -179,11 +179,17 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                                   PopupMenuButton<String>(
                                     enabled: !entry.isVoided,
                                     onSelected: (value) {
+                                      if (value == 'edit') {
+                                        _openEdit(entry);
+                                      }
                                       if (value == 'void') {
                                         _voidCollection(entry);
                                       }
                                     },
                                     itemBuilder: (_) => const [
+                                      PopupMenuItem(
+                                          value: 'edit',
+                                          child: Text('Edit collection')),
                                       PopupMenuItem(
                                           value: 'void',
                                           child: Text('Void collection')),
@@ -251,6 +257,16 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
     await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const CollectionEntryScreen()),
+    );
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _openEdit(CollectionRecord entry) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CollectionEntryScreen(collection: entry),
+      ),
     );
     if (mounted) setState(() {});
   }

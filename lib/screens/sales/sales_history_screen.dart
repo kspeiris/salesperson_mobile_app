@@ -140,6 +140,7 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                         padding: const EdgeInsets.only(bottom: 16),
                         child: _SaleHistoryCard(
                           sale: sale,
+                          onEdit: sale.isVoided ? null : () => _openEdit(sale),
                           onVoid: sale.isVoided ? null : () => _voidSale(sale),
                         ),
                       ),
@@ -170,6 +171,14 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
     await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const SaleEntryScreen()),
+    );
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _openEdit(SaleRecord sale) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => SaleEntryScreen(sale: sale)),
     );
     if (mounted) setState(() {});
   }
@@ -351,10 +360,12 @@ class _FilterField extends StatelessWidget {
 class _SaleHistoryCard extends StatelessWidget {
   const _SaleHistoryCard({
     required this.sale,
+    required this.onEdit,
     required this.onVoid,
   });
 
   final SaleRecord sale;
+  final VoidCallback? onEdit;
   final VoidCallback? onVoid;
 
   @override
@@ -494,9 +505,14 @@ class _SaleHistoryCard extends StatelessWidget {
                         color: Colors.white,
                         surfaceTintColor: Colors.transparent,
                         onSelected: (value) {
+                          if (value == 'edit' && onEdit != null) onEdit!();
                           if (value == 'void' && onVoid != null) onVoid!();
                         },
                         itemBuilder: (_) => const [
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: Text('Edit sale'),
+                          ),
                           PopupMenuItem(
                             value: 'void',
                             child: Text('Void sale'),

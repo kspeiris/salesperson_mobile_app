@@ -9,7 +9,9 @@ import '../../core/widgets/section_card.dart';
 import '../../models/entities.dart';
 
 class CollectionEntryScreen extends StatefulWidget {
-  const CollectionEntryScreen({super.key});
+  const CollectionEntryScreen({super.key, this.collection});
+
+  final CollectionRecord? collection;
 
   @override
   State<CollectionEntryScreen> createState() => _CollectionEntryScreenState();
@@ -21,6 +23,17 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
   final _referenceController = TextEditingController();
   Shop? _selectedShop;
   String? _paymentMethod;
+
+  @override
+  void initState() {
+    super.initState();
+    final existing = widget.collection;
+    if (existing != null) {
+      _amountController.text = existing.amount.toStringAsFixed(2);
+      _referenceController.text = existing.referenceNote;
+      _paymentMethod = existing.paymentMethod;
+    }
+  }
 
   @override
   void dispose() {
@@ -48,14 +61,16 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
         final methods = controller.settings.paymentMethods;
 
         Shop? selectedShop;
-        if (_selectedShop != null) {
+        final selectedShopId = _selectedShop?.id ?? widget.collection?.shopId;
+        if (selectedShopId != null) {
           for (final shop in shops) {
-            if (shop.id == _selectedShop!.id) {
+            if (shop.id == selectedShopId) {
               selectedShop = shop;
               break;
             }
           }
         }
+        _selectedShop ??= selectedShop;
 
         _paymentMethod ??= methods.isNotEmpty ? methods.first : 'Cash';
 
@@ -66,7 +81,9 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
         return Form(
           key: _formKey,
           child: AppShell(
-            title: 'New Collection',
+            title: widget.collection == null
+                ? 'New Collection'
+                : 'Edit Collection',
             subtitle:
                 'Capture payments received from shops and preserve a clean collection trail for reporting.',
             headerImageAsset: AppAssets.collectionsHero,
@@ -292,20 +309,29 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
     if (_selectedShop == null || _paymentMethod == null) return;
 
     final collection = CollectionRecord(
+      id: widget.collection?.id,
       shopId: _selectedShop!.id!,
       shopName: _selectedShop!.name,
       amount: double.parse(_amountController.text.trim()),
       paymentMethod: _paymentMethod!,
       referenceNote: _referenceController.text.trim(),
-      status: 'active',
-      createdAt: DateTime.now(),
+      status: widget.collection?.status ?? 'active',
+      createdAt: widget.collection?.createdAt ?? DateTime.now(),
     );
 
     try {
-      await context.read<AppController>().createCollection(collection);
+      if (widget.collection == null) {
+        await context.read<AppController>().createCollection(collection);
+      } else {
+        await context.read<AppController>().updateCollection(collection);
+      }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Collection saved offline.')),
+        SnackBar(
+          content: Text(widget.collection == null
+              ? 'Collection saved offline.'
+              : 'Collection updated offline.'),
+        ),
       );
       Navigator.pop(context);
     } catch (error) {
