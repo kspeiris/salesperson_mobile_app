@@ -33,6 +33,7 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
     final compact = MediaQuery.of(context).size.width < 640;
+    final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return FutureBuilder<List<Shop>>(
       future: controller.fetchShops(),
@@ -70,36 +71,40 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                 'Capture payments received from shops and preserve a clean collection trail for reporting.',
             headerImageAsset: AppAssets.collectionsHero,
             pageBackgroundAsset: AppAssets.pageTexture,
-            bottomNavigationBar: SafeArea(
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0x0F000000),
-                      blurRadius: 10,
-                      offset: Offset(0, -4),
-                    ),
-                  ],
-                ),
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+            bottomNavigationBar: keyboardOpen
+                ? null
+                : SafeArea(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0x0F000000),
+                            blurRadius: 10,
+                            offset: Offset(0, -4),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        onPressed: _saveCollection,
+                        icon: const Icon(Icons.check_circle_rounded),
+                        label: const Text(
+                          'Confirm Payment',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                      ),
                     ),
                   ),
-                  onPressed: _saveCollection,
-                  icon: const Icon(Icons.check_circle_rounded),
-                  label: const Text(
-                    'Confirm Payment',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ),
-              ),
-            ),
             child: ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.only(bottom: 24),
               children: [
                 SectionCard(
@@ -203,25 +208,50 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _BalanceMetric(
-                              label: 'Outstanding now',
-                              value: AppFormatters.currency(currentBalance),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _BalanceMetric(
-                              label: 'After payment',
-                              value: AppFormatters.currency(
-                                balanceAfter < 0 ? 0 : balanceAfter,
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final stacked = constraints.maxWidth < 420;
+
+                          if (stacked) {
+                            return Column(
+                              children: [
+                                _BalanceMetric(
+                                  label: 'Outstanding now',
+                                  value: AppFormatters.currency(currentBalance),
+                                ),
+                                const SizedBox(height: 12),
+                                _BalanceMetric(
+                                  label: 'After payment',
+                                  value: AppFormatters.currency(
+                                    balanceAfter < 0 ? 0 : balanceAfter,
+                                  ),
+                                  emphasized: true,
+                                ),
+                              ],
+                            );
+                          }
+
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: _BalanceMetric(
+                                  label: 'Outstanding now',
+                                  value: AppFormatters.currency(currentBalance),
+                                ),
                               ),
-                              emphasized: true,
-                            ),
-                          ),
-                        ],
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: _BalanceMetric(
+                                  label: 'After payment',
+                                  value: AppFormatters.currency(
+                                    balanceAfter < 0 ? 0 : balanceAfter,
+                                  ),
+                                  emphasized: true,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                       const SizedBox(height: 14),
                       Container(
@@ -366,3 +396,4 @@ List<Shop> _distinctShops(List<Shop> shops) {
 
   return unique;
 }
+

@@ -235,6 +235,7 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
   }
 
   Future<void> _pickDate() async {
+    FocusScope.of(context).unfocus();
     final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
@@ -257,13 +258,30 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
   Future<void> _voidCollection(CollectionRecord entry) async {
     final controller = context.read<AppController>();
     final reasonController = TextEditingController();
+    FocusScope.of(context).unfocus();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         title: const Text('Void collection'),
-        content: TextField(
-          controller: reasonController,
-          decoration: const InputDecoration(labelText: 'Reason'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Add a short reason so this void stays clear in the audit trail.',
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: reasonController,
+              autofocus: true,
+              textInputAction: TextInputAction.done,
+              minLines: 1,
+              maxLines: 3,
+              decoration: const InputDecoration(labelText: 'Reason'),
+            ),
+          ],
         ),
         actions: [
           TextButton(

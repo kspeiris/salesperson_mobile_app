@@ -42,6 +42,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       headerImageAsset: AppAssets.reportsHero,
       pageBackgroundAsset: AppAssets.pageTexture,
       child: ListView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         children: [
           SectionCard(
@@ -203,6 +204,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
   }
 
   Future<void> _pickDate() async {
+    FocusScope.of(context).unfocus();
     final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
@@ -539,42 +541,63 @@ class _SummaryMetric extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Row(
+    final iconCard = Container(
+      width: 42,
+      height: 42,
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Icon(icon, color: accent),
+    );
+
+    final textBlock = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: accent.withValues(alpha: 0.10),
-            borderRadius: BorderRadius.circular(14),
+        Text(
+          label,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: const Color(0xFF6A8070),
           ),
-          child: Icon(icon, color: accent),
         ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: const Color(0xFF6A8070),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 28,
-                  letterSpacing: -0.6,
-                  color: const Color(0xFF203126),
-                ),
-              ),
-            ],
+        const SizedBox(height: 4),
+        FittedBox(
+          alignment: Alignment.centerLeft,
+          fit: BoxFit.scaleDown,
+          child: Text(
+            value,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+              fontSize: 28,
+              letterSpacing: -0.6,
+              color: const Color(0xFF203126),
+            ),
           ),
         ),
       ],
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 360) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              iconCard,
+              const SizedBox(height: 12),
+              textBlock,
+            ],
+          );
+        }
+
+        return Row(
+          children: [
+            iconCard,
+            const SizedBox(width: 14),
+            Expanded(child: textBlock),
+          ],
+        );
+      },
     );
   }
 }
@@ -603,7 +626,10 @@ class _PathCard extends StatelessWidget {
         children: [
           Text(label, style: Theme.of(context).textTheme.bodySmall),
           const SizedBox(height: 6),
-          Text(path, style: Theme.of(context).textTheme.bodySmall),
+          SelectableText(
+            path,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
         ],
       ),
     );

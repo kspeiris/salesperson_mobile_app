@@ -29,6 +29,7 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
       headerImageAsset: AppAssets.settingsHero,
       pageBackgroundAsset: AppAssets.pageTexture,
       child: ListView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         children: [
           SectionCard(
             title: 'Desktop import files',
@@ -200,10 +201,13 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
   Future<void> _restoreBackup() async {
     final controller = context.read<AppController>();
     final messenger = ScaffoldMessenger.of(context);
+    FocusScope.of(context).unfocus();
 
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         title: const Text('Restore database backup?'),
         content: const Text('This replaces the current local SQLite database with the selected backup file.'),
         actions: [

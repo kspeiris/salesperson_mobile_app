@@ -29,6 +29,7 @@ class _ShopImportScreenState extends State<ShopImportScreen> {
       headerImageAsset: AppAssets.shopsHero,
       pageBackgroundAsset: AppAssets.pageTexture,
       child: ListView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         children: [
           SectionCard(
             title: 'Expected columns',
@@ -154,10 +155,17 @@ class _ImportSummaryCard extends StatelessWidget {
             ...result.errors.take(10).map(
                   (entry) => Padding(
                     padding: const EdgeInsets.only(bottom: 6),
-                    child: Text('- $entry',
+                    child: SelectableText('- $entry',
                         style: Theme.of(context).textTheme.bodySmall),
                   ),
                 ),
+            if (result.errors.length > 10) ...[
+              const SizedBox(height: 6),
+              Text(
+                '${result.errors.length - 10} more issue(s) not shown.',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
           ],
         ],
       ),

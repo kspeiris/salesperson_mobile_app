@@ -289,9 +289,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
 
     if (value == 'deactivate') {
+      FocusScope.of(context).unfocus();
       final confirm = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
+          scrollable: true,
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           title: const Text('Deactivate product?'),
           content: Text('This will hide ${product.name} from sales entry.'),
           actions: [

@@ -101,6 +101,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       child: Form(
         key: _formKey,
         child: ListView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: const EdgeInsets.only(bottom: 24),
           children: [
             SectionCard(
               title: 'Catalog details',

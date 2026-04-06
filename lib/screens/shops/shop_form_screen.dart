@@ -86,6 +86,8 @@ class _ShopFormScreenState extends State<ShopFormScreen> {
       child: Form(
         key: _formKey,
         child: ListView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: const EdgeInsets.only(bottom: 24),
           children: [
             SectionCard(
               title: 'Shop details',

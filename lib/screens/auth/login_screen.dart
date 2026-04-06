@@ -88,6 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: EdgeInsets.fromLTRB(
                   stacked ? 16 : 32, 20, stacked ? 16 : 32, 32),
               child: ConstrainedBox(
@@ -505,17 +506,20 @@ class _LoginCard extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 6,
                   children: [
                     Icon(
                       Icons.shield_outlined,
                       size: 16,
                       color: const Color(0xFF94A3B8).withValues(alpha: 0.90),
                     ),
-                    const SizedBox(width: 8),
                     Text(
                       'End-to-end encrypted local storage',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: const Color(0xFF94A3B8).withValues(alpha: 0.88),
                         fontSize: 13,
@@ -532,3 +536,4 @@ class _LoginCard extends StatelessWidget {
     );
   }
 }
+

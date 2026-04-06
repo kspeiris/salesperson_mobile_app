@@ -33,45 +33,82 @@ class SectionCard extends StatelessWidget {
       ),
       child: Padding(
         padding: EdgeInsets.all(compact ? 20 : 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final stackHeader = trailing != null && constraints.maxWidth < 520;
+
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
+                if (stackHeader) ...[
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF1E293B),
-                              letterSpacing: -0.2,
-                            ),
+                      _SectionHeaderText(title: title, subtitle: subtitle),
+                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: trailing!,
                       ),
-                      if (subtitle != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          subtitle!,
-                          style: Theme.of(context).textTheme.bodySmall,
+                    ],
+                  ),
+                ] else
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _SectionHeaderText(
+                          title: title,
+                          subtitle: subtitle,
                         ),
+                      ),
+                      if (trailing != null) ...[
+                        const SizedBox(width: 12),
+                        trailing!,
                       ],
                     ],
                   ),
-                ),
-                if (trailing != null) ...[
-                  const SizedBox(width: 12),
-                  trailing!,
-                ],
+                SizedBox(height: compact ? 16 : 18),
+                child,
               ],
-            ),
-            SizedBox(height: compact ? 16 : 18),
-            child,
-          ],
+            );
+          },
         ),
       ),
+    );
+  }
+}
+
+class _SectionHeaderText extends StatelessWidget {
+  const _SectionHeaderText({
+    required this.title,
+    required this.subtitle,
+  });
+
+  final String title;
+  final String? subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF1E293B),
+                letterSpacing: -0.2,
+              ),
+        ),
+        if (subtitle != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            subtitle!,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
+      ],
     );
   }
 }

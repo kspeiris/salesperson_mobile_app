@@ -29,6 +29,7 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
+    final compact = MediaQuery.of(context).size.width < 430;
 
     return Scaffold(
       body: IndexedStack(
@@ -60,10 +61,13 @@ class _MainLayoutState extends State<MainLayout> {
                 ],
               ),
               child: NavigationBar(
-                height: 72,
+                height: compact ? 66 : 72,
                 backgroundColor: Colors.transparent,
                 surfaceTintColor: Colors.transparent,
                 indicatorColor: const Color(0x1A2E7D32),
+                labelBehavior: compact
+                    ? NavigationDestinationLabelBehavior.alwaysHide
+                    : NavigationDestinationLabelBehavior.alwaysShow,
                 selectedIndex: controller.currentTab,
                 onDestinationSelected: (index) => controller.currentTab = index,
                 destinations: const [

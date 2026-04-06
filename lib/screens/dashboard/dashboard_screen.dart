@@ -100,6 +100,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                     child: ListView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
                       padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
                       children: [
                         _HeroPanel(
@@ -270,6 +272,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _pickDate() async {
+    FocusScope.of(context).unfocus();
     final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
@@ -447,7 +450,7 @@ class _SmartSuggestionBanner extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Your area "Colombo 07" has 3 shops with overdue balances. Prioritize collections today to maintain account limits.',
+                        "Review today's sales and collections to decide which shops need follow-up first, then capture the next route action from here.",
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: Colors.grey.shade800,
                           height: 1.5,
@@ -886,3 +889,4 @@ class _InsightCard extends StatelessWidget {
     );
   }
 }
+

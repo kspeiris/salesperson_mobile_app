@@ -28,6 +28,7 @@ class MoreScreen extends StatelessWidget {
       headerImageAsset: AppAssets.settingsHero,
       pageBackgroundAsset: AppAssets.pageTexture,
       child: ListView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.only(bottom: 32),
         children: [
           _ProfileHeader(
@@ -125,12 +126,12 @@ class MoreScreen extends StatelessWidget {
                 _MoreTile(
                   icon: Icons.info_outline_rounded,
                   title: 'App Version',
-                  subtitle: 'v2.0.4 Premium - Bio Care Field Systems',
+                  subtitle: 'v1.1.0 - Bio Care Field Systems',
                   onTap: () {
                     showAboutDialog(
                       context: context,
                       applicationName: 'Bio Care Sales',
-                      applicationVersion: '2.0.4',
+                      applicationVersion: '1.1.0',
                       applicationIcon: const Icon(Icons.eco_rounded,
                           color: Color(0xFF2E7D32), size: 48),
                       children: [
@@ -271,3 +272,4 @@ class _MoreTile extends StatelessWidget {
     );
   }
 }
+

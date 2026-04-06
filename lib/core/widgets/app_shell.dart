@@ -36,6 +36,8 @@ class AppShell extends StatelessWidget {
     final compact = width < 560;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final bottomSafeArea = MediaQuery.of(context).padding.bottom;
+    final keyboardOpen = bottomInset > 0;
+    final showHeaderCard = !keyboardOpen && (subtitle != null || header != null);
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -74,12 +76,12 @@ class AppShell extends StatelessWidget {
                     compact ? 16 : 24,
                     12,
                     compact ? 16 : 24,
-                    (compact ? 20 : 28) + bottomSafeArea + bottomInset,
+                    (compact ? 20 : 28) + bottomSafeArea,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (subtitle != null || header != null)
+                      if (showHeaderCard)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 24),
                           child: _ShellHeaderCard(

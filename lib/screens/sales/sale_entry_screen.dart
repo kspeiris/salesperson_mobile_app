@@ -74,51 +74,8 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                 'Capture shop orders with product lines, payment type, and totals in one focused flow.',
             headerImageAsset: AppAssets.salesHero,
             pageBackgroundAsset: AppAssets.pageTexture,
-            bottomNavigationBar: SafeArea(
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Color(0x0A000000),
-                        offset: Offset(0, -4),
-                        blurRadius: 16),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Grand total',
-                            style: Theme.of(context).textTheme.labelMedium),
-                        const SizedBox(height: 2),
-                        Text(
-                          AppFormatters.currency(_grandTotal),
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(
-                                  color: scheme.primary,
-                                  fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () => _saveSale(),
-                        icon: const Icon(Icons.check_circle_rounded),
-                        label: const Text('Save Record'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
             child: ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.only(bottom: 24),
               children: [
                 SectionCard(
@@ -254,6 +211,62 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                         ),
                       ),
                     ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SectionCard(
+                  title: 'Review & Save',
+                  subtitle:
+                      'Confirm the total before saving this sale to the device.',
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final stacked = constraints.maxWidth < 380;
+
+                      final totalBlock = Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Grand total',
+                              style: Theme.of(context).textTheme.labelMedium),
+                          const SizedBox(height: 2),
+                          Text(
+                            AppFormatters.currency(_grandTotal),
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
+                                  color: scheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ],
+                      );
+
+                      final saveButton = ElevatedButton.icon(
+                        onPressed: () => _saveSale(),
+                        icon: const Icon(Icons.check_circle_rounded),
+                        label: const Text('Save Record'),
+                      );
+
+                      if (stacked) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            totalBlock,
+                            const SizedBox(height: 14),
+                            saveButton,
+                          ],
+                        );
+                      }
+
+                      return Row(
+                        children: [
+                          totalBlock,
+                          const SizedBox(width: 24),
+                          Expanded(child: saveButton),
+                        ],
+                      );
+                    },
                   ),
                 ),
                 if (!compact) const SizedBox(height: 8),
@@ -536,3 +549,4 @@ class _LineDraft {
     priceController.dispose();
   }
 }
+

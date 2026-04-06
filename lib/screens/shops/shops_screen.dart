@@ -219,10 +219,12 @@ class _ShopsScreenState extends State<ShopsScreen> {
                           Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                final stacked = constraints.maxWidth < 360;
+
+                                final balanceLabel = Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(Icons.account_balance_wallet_outlined,
                                         size: 16, color: Colors.grey.shade600),
@@ -234,8 +236,9 @@ class _ShopsScreenState extends State<ShopsScreen> {
                                             ?.copyWith(
                                                 color: Colors.grey.shade700)),
                                   ],
-                                ),
-                                Text(
+                                );
+
+                                final balanceValue = Text(
                                   AppFormatters.currency(shop.balance),
                                   style: Theme.of(context)
                                       .textTheme
@@ -245,8 +248,29 @@ class _ShopsScreenState extends State<ShopsScreen> {
                                           color: shop.balance > 0
                                               ? Colors.red.shade700
                                               : scheme.primary),
-                                ),
-                              ],
+                                );
+
+                                if (stacked) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      balanceLabel,
+                                      const SizedBox(height: 8),
+                                      balanceValue,
+                                    ],
+                                  );
+                                }
+
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    balanceLabel,
+                                    balanceValue,
+                                  ],
+                                );
+                              },
                             ),
                           ),
                         ],
@@ -286,9 +310,13 @@ class _ShopsScreenState extends State<ShopsScreen> {
     }
 
     if (value == 'deactivate') {
+      FocusScope.of(context).unfocus();
       final confirm = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
+          scrollable: true,
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           title: const Text('Deactivate shop?'),
           content: Text('This will hide ${shop.name} from active entry lists.'),
           actions: [
