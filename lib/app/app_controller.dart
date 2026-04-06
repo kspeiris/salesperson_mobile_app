@@ -43,6 +43,10 @@ class AppController extends ChangeNotifier {
   ExportBundle? _lastExportBundle;
   String? _lastBackupPath;
   int _currentTab = 0;
+  int _shopsRevision = 0;
+  int _productsRevision = 0;
+  int _salesRevision = 0;
+  int _collectionsRevision = 0;
 
   bool get initialized => _initialized;
   bool get authenticated => _authenticated;
@@ -53,6 +57,10 @@ class AppController extends ChangeNotifier {
   ExportBundle? get lastExportBundle => _lastExportBundle;
   String? get lastBackupPath => _lastBackupPath;
   int get currentTab => _currentTab;
+  int get shopsRevision => _shopsRevision;
+  int get productsRevision => _productsRevision;
+  int get salesRevision => _salesRevision;
+  int get collectionsRevision => _collectionsRevision;
 
   set currentTab(int index) {
     _currentTab = index;
@@ -116,56 +124,72 @@ class AppController extends ChangeNotifier {
   Future<void> saveShop(Shop shop) async {
     _validateShop(shop);
     await _repository.saveShop(shop);
+    _shopsRevision++;
     notifyListeners();
   }
 
   Future<void> deactivateShop(int id) async {
     await _repository.deactivateShop(id);
+    _shopsRevision++;
     notifyListeners();
   }
 
   Future<void> saveProduct(Product product) async {
     _validateProduct(product);
     await _repository.saveProduct(product);
+    _productsRevision++;
     notifyListeners();
   }
 
   Future<void> deactivateProduct(int id) async {
     await _repository.deactivateProduct(id);
+    _productsRevision++;
     notifyListeners();
   }
 
   Future<void> createSale(SaleRecord sale) async {
     _validateSale(sale);
     await _repository.createSale(sale);
+    _salesRevision++;
+    _shopsRevision++;
     notifyListeners();
   }
 
   Future<void> updateSale(SaleRecord sale) async {
     _validateSale(sale);
     await _repository.updateSale(sale);
+    _salesRevision++;
+    _shopsRevision++;
     notifyListeners();
   }
 
   Future<void> voidSale(int id, String reason) async {
     await _repository.voidSale(id, reason);
+    _salesRevision++;
+    _shopsRevision++;
     notifyListeners();
   }
 
   Future<void> createCollection(CollectionRecord collection) async {
     _validateCollection(collection);
     await _repository.createCollection(collection);
+    _collectionsRevision++;
+    _shopsRevision++;
     notifyListeners();
   }
 
   Future<void> updateCollection(CollectionRecord collection) async {
     _validateCollection(collection);
     await _repository.updateCollection(collection);
+    _collectionsRevision++;
+    _shopsRevision++;
     notifyListeners();
   }
 
   Future<void> voidCollection(int id, String reason) async {
     await _repository.voidCollection(id, reason);
+    _collectionsRevision++;
+    _shopsRevision++;
     notifyListeners();
   }
 
@@ -295,6 +319,10 @@ class AppController extends ChangeNotifier {
     _settings = await _repository.getSettings();
     _currentSalesperson = _settings.defaultSalesperson;
     _lastBackupPath = backupPath;
+    _shopsRevision++;
+    _productsRevision++;
+    _salesRevision++;
+    _collectionsRevision++;
     notifyListeners();
   }
 
@@ -307,6 +335,7 @@ class AppController extends ChangeNotifier {
     final rawText = await file.readAsString();
     final result = await _repository.importShopsFromText(rawText,
         replaceExisting: replaceExisting);
+    _shopsRevision++;
     notifyListeners();
     return result;
   }
@@ -320,6 +349,7 @@ class AppController extends ChangeNotifier {
     final rawText = await file.readAsString();
     final result = await _repository.importProductsFromText(rawText,
         replaceExisting: replaceExisting);
+    _productsRevision++;
     notifyListeners();
     return result;
   }

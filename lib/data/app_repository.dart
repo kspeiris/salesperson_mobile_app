@@ -348,18 +348,38 @@ class AppRepository {
       orderBy: 'created_at DESC',
     );
 
-    final sales = <SaleRecord>[];
-    for (final row in rows) {
-      final itemsRows = await db.query(
-        'sale_items',
-        where: 'sale_id = ?',
-        whereArgs: [row['id']],
-        orderBy: 'id ASC',
-      );
-      sales.add(SaleRecord.fromMap(row,
-          items: itemsRows.map(SaleItem.fromMap).toList()));
+    if (rows.isEmpty) {
+      return const <SaleRecord>[];
     }
-    return sales;
+
+    final saleIds = rows
+        .map((row) => row['id'])
+        .whereType<int>()
+        .toList(growable: false);
+    final placeholders = List.filled(saleIds.length, '?').join(',');
+    final itemsRows = await db.query(
+      'sale_items',
+      where: 'sale_id IN ($placeholders)',
+      whereArgs: saleIds,
+      orderBy: 'sale_id ASC, id ASC',
+    );
+
+    final itemsBySaleId = <int, List<SaleItem>>{};
+    for (final itemRow in itemsRows) {
+      final item = SaleItem.fromMap(itemRow);
+      final saleId = item.saleId;
+      if (saleId == null) continue;
+      itemsBySaleId.putIfAbsent(saleId, () => <SaleItem>[]).add(item);
+    }
+
+    return rows
+        .map(
+          (row) => SaleRecord.fromMap(
+            row,
+            items: itemsBySaleId[row['id']] ?? const <SaleItem>[],
+          ),
+        )
+        .toList(growable: false);
   }
 
   Future<void> voidSale(int id, String reason) async {

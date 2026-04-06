@@ -21,22 +21,39 @@ class CollectionsHistoryScreen extends StatefulWidget {
 class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
   late DateTime _selectedDate;
   int? _shopId;
+  late Future<List<Shop>> _shopsFuture;
+  late Future<List<CollectionRecord>> _collectionsFuture;
+  int? _lastShopsRevision;
+  int? _lastCollectionsRevision;
 
   @override
   void initState() {
     super.initState();
     _selectedDate = DateTime.now();
+    _shopsFuture = _loadShops();
+    _collectionsFuture = _loadCollections();
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<AppController>();
-    final start =
-        DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
-    final end = start.add(const Duration(days: 1));
+    final shopsRevision = context.select<AppController, int>(
+      (value) => value.shopsRevision,
+    );
+    final collectionsRevision = context.select<AppController, int>(
+      (value) => value.collectionsRevision,
+    );
+
+    if (_lastShopsRevision != shopsRevision) {
+      _lastShopsRevision = shopsRevision;
+      _shopsFuture = _loadShops();
+    }
+    if (_lastCollectionsRevision != collectionsRevision) {
+      _lastCollectionsRevision = collectionsRevision;
+      _collectionsFuture = _loadCollections();
+    }
 
     return FutureBuilder<List<Shop>>(
-      future: controller.fetchShops(),
+      future: _shopsFuture,
       builder: (context, shopSnapshot) {
         final shops = _distinctShops(shopSnapshot.data ?? const <Shop>[]);
         return AppShell(
@@ -53,11 +70,7 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
             foregroundColor: Colors.white,
           ),
           child: FutureBuilder<List<CollectionRecord>>(
-            future: controller.fetchCollections(
-                start: start,
-                end: end,
-                shopId: _shopId,
-                activeOnly: false),
+            future: _collectionsFuture,
             builder: (context, snapshot) {
               final collections = snapshot.data;
 
@@ -98,7 +111,7 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                             ...shops.map((shop) => DropdownMenuItem<int?>(
                                 value: shop.id, child: Text(shop.name))),
                           ],
-                          onChanged: (value) => setState(() => _shopId = value),
+                          onChanged: _updateShopFilter,
                         ),
                       ],
                     ),
@@ -249,7 +262,7 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
       lastDate: DateTime(2100),
     );
     if (picked != null) {
-      setState(() => _selectedDate = picked);
+      _updateSelectedDate(picked);
     }
   }
 
@@ -318,6 +331,40 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
       if (mounted) setState(() {});
     }
     reasonController.dispose();
+  }
+}
+
+extension on _CollectionsHistoryScreenState {
+  Future<List<Shop>> _loadShops() {
+    return context.read<AppController>().fetchShops();
+  }
+
+  Future<List<CollectionRecord>> _loadCollections() {
+    final start =
+        DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final end = start.add(const Duration(days: 1));
+    return context.read<AppController>().fetchCollections(
+          start: start,
+          end: end,
+          shopId: _shopId,
+          activeOnly: false,
+        );
+  }
+
+  void _updateSelectedDate(DateTime value) {
+    if (!mounted) return;
+    setState(() {
+      _selectedDate = value;
+      _collectionsFuture = _loadCollections();
+    });
+  }
+
+  void _updateShopFilter(int? value) {
+    if (!mounted) return;
+    setState(() {
+      _shopId = value;
+      _collectionsFuture = _loadCollections();
+    });
   }
 }
 

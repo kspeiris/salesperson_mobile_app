@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,18 +22,35 @@ class ShopsScreen extends StatefulWidget {
 
 class _ShopsScreenState extends State<ShopsScreen> {
   final _searchController = TextEditingController();
+  Timer? _searchDebounce;
   String _query = '';
+  late Future<List<Shop>> _shopsFuture;
+  int? _lastRevision;
+
+  @override
+  void initState() {
+    super.initState();
+    _shopsFuture = _loadShops();
+  }
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<AppController>();
+    final revision = context.select<AppController, int>(
+      (value) => value.shopsRevision,
+    );
     final scheme = Theme.of(context).colorScheme;
+
+    if (_lastRevision != revision) {
+      _lastRevision = revision;
+      _shopsFuture = _loadShops();
+    }
 
     return AppShell(
       title: 'Customer Management',
@@ -52,7 +71,7 @@ class _ShopsScreenState extends State<ShopsScreen> {
         ),
       ],
       child: FutureBuilder<List<Shop>>(
-        future: controller.fetchShops(query: _query),
+        future: _shopsFuture,
         builder: (context, snapshot) {
           final shops = snapshot.data;
 
@@ -77,12 +96,12 @@ class _ShopsScreenState extends State<ShopsScreen> {
                             : IconButton(
                                 onPressed: () {
                                   _searchController.clear();
-                                  setState(() => _query = '');
+                                  _updateQuery('');
                                 },
                                 icon: const Icon(Icons.close_rounded),
                               ),
                       ),
-                      onChanged: (value) => setState(() => _query = value),
+                      onChanged: _onSearchChanged,
                     ),
                     const SizedBox(height: 14),
                     Wrap(
@@ -291,6 +310,28 @@ class _ShopsScreenState extends State<ShopsScreen> {
       MaterialPageRoute(builder: (_) => const ShopImportScreen()),
     );
     if (mounted) setState(() {});
+  }
+
+  Future<List<Shop>> _loadShops() {
+    return context.read<AppController>().fetchShops(query: _query);
+  }
+
+  void _onSearchChanged(String value) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(
+      const Duration(milliseconds: 250),
+      () => _updateQuery(value),
+    );
+  }
+
+  void _updateQuery(String value) {
+    if (!mounted) return;
+    final normalized = value.trim();
+    if (normalized == _query) return;
+    setState(() {
+      _query = normalized;
+      _shopsFuture = _loadShops();
+    });
   }
 
   Future<void> _openCreate() async {

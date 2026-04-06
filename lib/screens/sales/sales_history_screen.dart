@@ -20,23 +20,40 @@ class SalesHistoryScreen extends StatefulWidget {
 class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
   late DateTime _selectedDate;
   int? _shopId;
+  late Future<List<Shop>> _shopsFuture;
+  late Future<List<SaleRecord>> _salesFuture;
+  int? _lastShopsRevision;
+  int? _lastSalesRevision;
 
   @override
   void initState() {
     super.initState();
     _selectedDate = DateTime.now();
+    _shopsFuture = _loadShops();
+    _salesFuture = _loadSales();
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<AppController>();
+    final shopsRevision = context.select<AppController, int>(
+      (value) => value.shopsRevision,
+    );
+    final salesRevision = context.select<AppController, int>(
+      (value) => value.salesRevision,
+    );
     final theme = Theme.of(context);
-    final start =
-        DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
-    final end = start.add(const Duration(days: 1));
+
+    if (_lastShopsRevision != shopsRevision) {
+      _lastShopsRevision = shopsRevision;
+      _shopsFuture = _loadShops();
+    }
+    if (_lastSalesRevision != salesRevision) {
+      _lastSalesRevision = salesRevision;
+      _salesFuture = _loadSales();
+    }
 
     return FutureBuilder<List<Shop>>(
-      future: controller.fetchShops(),
+      future: _shopsFuture,
       builder: (context, shopSnapshot) {
         final shops = _distinctShops(shopSnapshot.data ?? const <Shop>[]);
 
@@ -50,12 +67,7 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
             onPressed: _openCreate,
           ),
           child: FutureBuilder<List<SaleRecord>>(
-            future:
-                controller.fetchSales(
-                    start: start,
-                    end: end,
-                    shopId: _shopId,
-                    activeOnly: false),
+            future: _salesFuture,
             builder: (context, snapshot) {
               final sales = snapshot.data;
 
@@ -114,7 +126,7 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                                     value: shop.id, child: Text(shop.name))),
                               ],
                               onChanged: (value) =>
-                                  setState(() => _shopId = value),
+                                  _updateShopFilter(value),
                             ),
                           ),
                         ),
@@ -163,7 +175,7 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
       lastDate: DateTime(2100),
     );
     if (picked != null) {
-      setState(() => _selectedDate = picked);
+      _updateSelectedDate(picked);
     }
   }
 
@@ -230,6 +242,40 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
       if (mounted) setState(() {});
     }
     reasonController.dispose();
+  }
+}
+
+extension on _SalesHistoryScreenState {
+  Future<List<Shop>> _loadShops() {
+    return context.read<AppController>().fetchShops();
+  }
+
+  Future<List<SaleRecord>> _loadSales() {
+    final start =
+        DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final end = start.add(const Duration(days: 1));
+    return context.read<AppController>().fetchSales(
+          start: start,
+          end: end,
+          shopId: _shopId,
+          activeOnly: false,
+        );
+  }
+
+  void _updateSelectedDate(DateTime value) {
+    if (!mounted) return;
+    setState(() {
+      _selectedDate = value;
+      _salesFuture = _loadSales();
+    });
+  }
+
+  void _updateShopFilter(int? value) {
+    if (!mounted) return;
+    setState(() {
+      _shopId = value;
+      _salesFuture = _loadSales();
+    });
   }
 }
 

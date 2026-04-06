@@ -8,7 +8,7 @@ class AppDatabase {
 
   static final AppDatabase instance = AppDatabase._();
   static const _dbName = 'salesperson_recorder.db';
-  static const _dbVersion = 1;
+  static const _dbVersion = 2;
 
   Database? _database;
 
@@ -24,6 +24,7 @@ class AppDatabase {
       fullPath,
       version: _dbVersion,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
@@ -128,5 +129,46 @@ class AppDatabase {
         value TEXT NOT NULL
       )
     ''');
+
+    await _createIndexes(db);
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await _createIndexes(db);
+    }
+  }
+
+  Future<void> _createIndexes(Database db) async {
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_shops_active_name ON shops(is_active, name COLLATE NOCASE)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_products_active_name ON products(is_active, name COLLATE NOCASE)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_products_active_barcode ON products(is_active, barcode)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_sales_created_at ON sales(created_at DESC)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_sales_shop_created_at ON sales(shop_id, created_at DESC)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_sales_status_created_at ON sales(status, created_at DESC)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_sale_items_sale_id ON sale_items(sale_id, id)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_collections_created_at ON collections(created_at DESC)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_collections_shop_created_at ON collections(shop_id, created_at DESC)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_collections_status_created_at ON collections(status, created_at DESC)',
+    );
   }
 }
