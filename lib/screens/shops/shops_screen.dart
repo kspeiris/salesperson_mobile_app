@@ -45,6 +45,7 @@ class _ShopsScreenState extends State<ShopsScreen> {
     final revision = context.select<AppController, int>(
       (value) => value.shopsRevision,
     );
+    final theme = Theme.of(context);
     final scheme = Theme.of(context).colorScheme;
 
     if (_lastRevision != revision) {
@@ -58,6 +59,7 @@ class _ShopsScreenState extends State<ShopsScreen> {
           'Manage Bio Care customer shops and outstanding credit balances.',
       headerImageAsset: AppAssets.shopsHero,
       pageBackgroundAsset: AppAssets.pageTexture,
+      showHeaderImage: false,
       actions: [
         IconButton(
           onPressed: _openImport,
@@ -160,12 +162,16 @@ class _ShopsScreenState extends State<ShopsScreen> {
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: scheme.surface,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE8F5E9)),
-                        boxShadow: const [
+                        border: Border.all(color: scheme.outlineVariant),
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x052E7D32),
+                            color: Colors.black.withValues(
+                              alpha: theme.brightness == Brightness.dark
+                                  ? 0.18
+                                  : 0.02,
+                            ),
                             blurRadius: 8,
                             offset: Offset(0, 2),
                           )
@@ -234,7 +240,7 @@ class _ShopsScreenState extends State<ShopsScreen> {
                               ],
                             ),
                           ),
-                          const Divider(height: 1, color: Color(0xFFE8F5E9)),
+                          Divider(height: 1, color: scheme.outlineVariant),
                           Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 12),
@@ -246,14 +252,13 @@ class _ShopsScreenState extends State<ShopsScreen> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(Icons.account_balance_wallet_outlined,
-                                        size: 16, color: Colors.grey.shade600),
+                                        size: 16, color: theme.hintColor),
                                     const SizedBox(width: 6),
                                     Text('Outstanding credit',
                                         style: Theme.of(context)
                                             .textTheme
                                             .labelMedium
-                                            ?.copyWith(
-                                                color: Colors.grey.shade700)),
+                                            ?.copyWith(color: theme.hintColor)),
                                   ],
                                 );
 
@@ -392,20 +397,22 @@ class _MiniBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FDF8),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Theme.of(context).colorScheme.surfaceContainerHighest
+            : const Color(0xFFF8FDF8),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0xFFE8F5E9)),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: const Color(0xFF263238)),
+          Icon(icon, size: 16, color: Theme.of(context).colorScheme.onSurface),
           const SizedBox(width: 6),
           Text(label,
               style: Theme.of(context)
                   .textTheme
                   .bodySmall
-                  ?.copyWith(color: const Color(0xFF263238))),
+                  ?.copyWith(color: Theme.of(context).colorScheme.onSurface)),
         ],
       ),
     );

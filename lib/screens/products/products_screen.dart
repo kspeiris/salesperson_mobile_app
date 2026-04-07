@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,10 +22,20 @@ class ProductsScreen extends StatefulWidget {
 
 class _ProductsScreenState extends State<ProductsScreen> {
   final _searchController = TextEditingController();
+  Timer? _searchDebounce;
   String _query = '';
+  late Future<List<Product>> _productsFuture;
+  int? _lastRevision;
+
+  @override
+  void initState() {
+    super.initState();
+    _productsFuture = _loadProducts();
+  }
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -58,8 +70,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<AppController>();
+    final revision = context.select<AppController, int>(
+      (value) => value.productsRevision,
+    );
+    final theme = Theme.of(context);
     final scheme = Theme.of(context).colorScheme;
+
+    if (_lastRevision != revision) {
+      _lastRevision = revision;
+      _productsFuture = _loadProducts();
+    }
 
     return AppShell(
       title: 'Products',
@@ -80,7 +100,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         ),
       ],
       child: FutureBuilder<List<Product>>(
-        future: controller.fetchProducts(query: _query),
+        future: _productsFuture,
         builder: (context, snapshot) {
           final products = snapshot.data;
 
@@ -105,12 +125,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
                             : IconButton(
                                 onPressed: () {
                                   _searchController.clear();
-                                  setState(() => _query = '');
+                                  _updateQuery('');
                                 },
                                 icon: const Icon(Icons.close_rounded),
                               ),
                       ),
-                      onChanged: (value) => setState(() => _query = value),
+                      onChanged: _onSearchChanged,
                     ),
                     const SizedBox(height: 14),
                     Wrap(
@@ -173,12 +193,16 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: scheme.surface,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE8F5E9)),
-                        boxShadow: const [
+                        border: Border.all(color: scheme.outlineVariant),
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x052E7D32),
+                            color: Colors.black.withValues(
+                              alpha: theme.brightness == Brightness.dark
+                                  ? 0.18
+                                  : 0.02,
+                            ),
                             blurRadius: 8,
                             offset: Offset(0, 2),
                           )
@@ -270,6 +294,28 @@ class _ProductsScreenState extends State<ProductsScreen> {
     if (mounted) setState(() {});
   }
 
+  Future<List<Product>> _loadProducts() {
+    return context.read<AppController>().fetchProducts(query: _query);
+  }
+
+  void _onSearchChanged(String value) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(
+      const Duration(milliseconds: 250),
+      () => _updateQuery(value),
+    );
+  }
+
+  void _updateQuery(String value) {
+    if (!mounted) return;
+    final normalized = value.trim();
+    if (normalized == _query) return;
+    setState(() {
+      _query = normalized;
+      _productsFuture = _loadProducts();
+    });
+  }
+
   Future<void> _openCreate() async {
     await Navigator.push(
       context,
@@ -330,20 +376,22 @@ class _ProductBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FDF8),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Theme.of(context).colorScheme.surfaceContainerHighest
+            : const Color(0xFFF8FDF8),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0xFFE8F5E9)),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: const Color(0xFF263238)),
+          Icon(icon, size: 16, color: Theme.of(context).colorScheme.onSurface),
           const SizedBox(width: 6),
           Text(label,
               style: Theme.of(context)
                   .textTheme
                   .bodySmall
-                  ?.copyWith(color: const Color(0xFF263238)),
+                  ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
               overflow: TextOverflow.ellipsis),
         ],
       ),

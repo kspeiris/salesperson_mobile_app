@@ -28,19 +28,31 @@ class AppRepository {
     final existing = Sqflite.firstIntValue(
             await db.rawQuery('SELECT COUNT(*) FROM settings')) ??
         0;
-    if (existing > 0) return;
+    if (existing > 0) {
+      await db.insert(
+        'settings',
+        {'key': 'theme_mode', 'value': 'system'},
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+      return;
+    }
 
     final defaults = <String, String>{
       'company_name': 'Bio Care Sales',
       'default_salesperson': 'Route Salesperson',
       'payment_methods': 'Cash,Bank,Cheque',
       'pin_enabled': '0',
+      'theme_mode': 'system',
       'pin_hash': '',
       'profile_image_path': '',
     };
     final batch = db.batch();
     defaults.forEach((key, value) {
-      batch.insert('settings', {'key': key, 'value': value});
+      batch.insert(
+        'settings',
+        {'key': key, 'value': value},
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
     });
     await batch.commit(noResult: true);
   }
@@ -61,6 +73,7 @@ class AppRepository {
           .where((entry) => entry.isNotEmpty)
           .toList(),
       pinEnabled: (map['pin_enabled'] ?? '0') == '1',
+      themeMode: map['theme_mode'] ?? 'system',
       pinHash: (map['pin_hash'] ?? '').isEmpty ? null : map['pin_hash'],
       profileImagePath: (map['profile_image_path'] ?? '').trim().isEmpty
           ? null
@@ -75,6 +88,7 @@ class AppRepository {
       'default_salesperson': settings.defaultSalesperson,
       'payment_methods': settings.paymentMethods.join(','),
       'pin_enabled': settings.pinEnabled ? '1' : '0',
+      'theme_mode': settings.themeMode,
       'pin_hash': settings.pinHash ?? '',
       'profile_image_path': settings.profileImagePath ?? '',
     };

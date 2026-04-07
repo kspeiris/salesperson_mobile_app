@@ -16,10 +16,15 @@ class BrandLogo extends StatelessWidget {
   final Alignment alignment;
   final BoxDecoration? plateDecoration;
 
-  static const String assetPath = 'biocare logo1.png';
+  static const String lightAssetPath = 'biocare logo1.png';
+  static const String darkAssetPath = 'biocare logo1_dark.png';
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final assetPath =
+        theme.brightness == Brightness.dark ? darkAssetPath : lightAssetPath;
     final image = Image.asset(
       assetPath,
       height: height,
@@ -39,12 +44,14 @@ class BrandLogo extends StatelessWidget {
         padding: padding,
         decoration: plateDecoration ??
             BoxDecoration(
-              color: Colors.white,
+              color: scheme.surface,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFE8F5E9)),
-              boxShadow: const [
+              border: Border.all(color: scheme.outlineVariant),
+              boxShadow: [
                 BoxShadow(
-                  color: Color(0x052E7D32),
+                  color: Colors.black.withValues(
+                    alpha: theme.brightness == Brightness.dark ? 0.18 : 0.02,
+                  ),
                   blurRadius: 16,
                   offset: Offset(0, 4),
                 ),

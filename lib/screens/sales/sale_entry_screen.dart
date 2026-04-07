@@ -62,6 +62,7 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = context.read<AppController>();
+    final theme = Theme.of(context);
     final scheme = Theme.of(context).colorScheme;
     final compact = MediaQuery.of(context).size.width < 640;
 
@@ -216,7 +217,7 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                         },
                         showSelectedIcon: false,
                         style: SegmentedButton.styleFrom(
-                          backgroundColor: Colors.white,
+                          backgroundColor: scheme.surface,
                           selectedBackgroundColor:
                               scheme.primary.withValues(alpha: 0.1),
                           selectedForegroundColor: scheme.primary,
@@ -453,14 +454,15 @@ class _SaleLineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final scheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: scheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE8F5E9)),
+        border: Border.all(color: scheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -500,7 +502,7 @@ class _SaleLineCard extends StatelessWidget {
               if (onRemove != null)
                 IconButton(
                   onPressed: onRemove,
-                  icon: const Icon(Icons.close_rounded, color: Colors.grey),
+                  icon: Icon(Icons.close_rounded, color: theme.hintColor),
                 ),
             ],
           ),
@@ -517,9 +519,11 @@ class _SaleLineCard extends StatelessWidget {
                   const SizedBox(width: 12),
                   Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FDF8),
+                      color: theme.brightness == Brightness.dark
+                          ? scheme.surfaceContainerHighest
+                          : const Color(0xFFF8FDF8),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE8F5E9)),
+                      border: Border.all(color: scheme.outlineVariant),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,

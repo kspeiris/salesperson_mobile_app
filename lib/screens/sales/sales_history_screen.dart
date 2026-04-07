@@ -42,6 +42,7 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
       (value) => value.salesRevision,
     );
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     if (_lastShopsRevision != shopsRevision) {
       _lastShopsRevision = shopsRevision;
@@ -95,7 +96,7 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                                 AppFormatters.date(_selectedDate),
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w700,
-                                  color: const Color(0xFF35533B),
+                                  color: scheme.onSurface,
                                 ),
                               ),
                             ),
@@ -105,19 +106,19 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                         _FilterField(
                           label: 'Shop filter',
                           icon: Icons.store_rounded,
-                          trailing: const Icon(
+                          trailing: Icon(
                               Icons.keyboard_arrow_down_rounded,
-                              color: Color(0xFF4E6B53)),
+                              color: theme.hintColor),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<int?>(
                               value: _shopId,
                               isExpanded: true,
-                              dropdownColor: Colors.white,
+                              dropdownColor: scheme.surface,
                               borderRadius: BorderRadius.circular(18),
                               icon: const SizedBox.shrink(),
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: const Color(0xFF223327),
+                                color: scheme.onSurface,
                               ),
                               items: [
                                 const DropdownMenuItem<int?>(
@@ -308,12 +309,20 @@ class _StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       decoration: BoxDecoration(
-        color: accentColor,
+        color: accentColor.withValues(
+          alpha: theme.brightness == Brightness.dark ? 0.28 : 1,
+        ),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
+        border: Border.all(
+          color: theme.brightness == Brightness.dark
+              ? scheme.outlineVariant
+              : Colors.white.withValues(alpha: 0.7),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -350,17 +359,23 @@ class _FilterField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3FAF4),
+        color: theme.brightness == Brightness.dark
+            ? scheme.surfaceContainerHighest
+            : const Color(0xFFF3FAF4),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFDDEDDC)),
-        boxShadow: const [
+        border: Border.all(color: scheme.outlineVariant),
+        boxShadow: [
           BoxShadow(
             blurRadius: 16,
             offset: Offset(0, 8),
-            color: Color(0x082E7D32),
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.dark ? 0.18 : 0.03,
+            ),
           ),
         ],
       ),
@@ -370,10 +385,12 @@ class _FilterField extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.9),
+              color: scheme.surface.withValues(
+                alpha: theme.brightness == Brightness.dark ? 0.92 : 0.9,
+              ),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(icon, color: const Color(0xFF2E7D32)),
+            child: Icon(icon, color: scheme.primary),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -384,7 +401,7 @@ class _FilterField extends StatelessWidget {
                 Text(
                   label,
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: const Color(0xFF6C8370),
+                        color: theme.hintColor,
                         fontWeight: FontWeight.w700,
                       ),
                 ),
@@ -417,22 +434,30 @@ class _SaleHistoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final isVoided = sale.isVoided;
 
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFFFFFFF), Color(0xFFF5FBF6)],
+          colors: [
+            scheme.surface,
+            theme.brightness == Brightness.dark
+                ? scheme.surfaceContainerHighest
+                : const Color(0xFFF5FBF6),
+          ],
         ),
-        border: Border.all(color: const Color(0xFFDCEADF)),
-        boxShadow: const [
+        border: Border.all(color: scheme.outlineVariant),
+        boxShadow: [
           BoxShadow(
             blurRadius: 24,
             offset: Offset(0, 14),
-            color: Color(0x0D214B2B),
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.dark ? 0.2 : 0.05,
+            ),
           ),
         ],
       ),
@@ -448,7 +473,9 @@ class _SaleHistoryCard extends StatelessWidget {
                 height: 120,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFFB7DDBA).withValues(alpha: 0.18),
+                  color: scheme.primary.withValues(
+                    alpha: theme.brightness == Brightness.dark ? 0.10 : 0.18,
+                  ),
                 ),
               ),
             ),
@@ -458,7 +485,9 @@ class _SaleHistoryCard extends StatelessWidget {
               child: Icon(
                 Icons.receipt_long_rounded,
                 size: 44,
-                color: const Color(0xFF9CCAA3).withValues(alpha: 0.28),
+                color: scheme.primary.withValues(
+                  alpha: theme.brightness == Brightness.dark ? 0.16 : 0.28,
+                ),
               ),
             ),
             Positioned.fill(
@@ -469,7 +498,7 @@ class _SaleHistoryCard extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.white.withValues(alpha: 0.0),
-                      const Color(0xFFEAF5EC).withValues(alpha: 0.26),
+                      scheme.primary.withValues(alpha: 0.10),
                     ],
                   ),
                 ),
@@ -488,12 +517,19 @@ class _SaleHistoryCard extends StatelessWidget {
                         height: 52,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(18),
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
-                            colors: [Color(0xFFF0F7F1), Color(0xFFDDEEDF)],
+                            colors: [
+                              theme.brightness == Brightness.dark
+                                  ? scheme.surfaceContainerHighest
+                                  : const Color(0xFFF0F7F1),
+                              theme.brightness == Brightness.dark
+                                  ? scheme.surface
+                                  : const Color(0xFFDDEEDF),
+                            ],
                           ),
-                          border: Border.all(color: Colors.white),
+                          border: Border.all(color: scheme.outlineVariant),
                         ),
                         child: Icon(
                           isVoided
@@ -513,7 +549,7 @@ class _SaleHistoryCard extends StatelessWidget {
                               sale.shopName,
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w800,
-                                color: const Color(0xFF223327),
+                                color: scheme.onSurface,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -548,7 +584,7 @@ class _SaleHistoryCard extends StatelessWidget {
                       ),
                       PopupMenuButton<String>(
                         enabled: !isVoided,
-                        color: Colors.white,
+                        color: scheme.surface,
                         surfaceTintColor: Colors.transparent,
                         onSelected: (value) {
                           if (value == 'edit' && onEdit != null) onEdit!();
@@ -571,13 +607,13 @@ class _SaleHistoryCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     child: Divider(
                       height: 1,
-                      color: const Color(0xFFDCE9DE).withValues(alpha: 0.9),
+                      color: scheme.outlineVariant,
                     ),
                   ),
                   Text(
                     'Grand total',
                     style: theme.textTheme.labelMedium?.copyWith(
-                      color: const Color(0xFF6C8370),
+                      color: theme.hintColor,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -586,7 +622,7 @@ class _SaleHistoryCard extends StatelessWidget {
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.6,
-                      color: const Color(0xFF1D2F22),
+                      color: scheme.onSurface,
                     ),
                   ),
                   if (sale.note.isNotEmpty) ...[
@@ -594,7 +630,7 @@ class _SaleHistoryCard extends StatelessWidget {
                     Text(
                       sale.note,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: const Color(0xFF607565),
+                        color: theme.textTheme.bodyMedium?.color,
                       ),
                     ),
                   ],
@@ -607,7 +643,9 @@ class _SaleHistoryCard extends StatelessWidget {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF9EEEE),
+                        color: theme.brightness == Brightness.dark
+                            ? const Color(0xFF3A2222)
+                            : const Color(0xFFF9EEEE),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
@@ -639,11 +677,11 @@ class _PremiumSalesFab extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
             blurRadius: 24,
             offset: Offset(0, 12),
-            color: Color(0x22357F3A),
+            color: Colors.black.withValues(alpha: 0.12),
           ),
         ],
       ),

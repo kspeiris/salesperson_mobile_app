@@ -22,6 +22,8 @@ class _ProductImportScreenState extends State<ProductImportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return AppShell(
       title: 'Import Products',
       subtitle:
@@ -45,9 +47,11 @@ class _ProductImportScreenState extends State<ProductImportScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF8FDF8),
+                    color: theme.brightness == Brightness.dark
+                        ? scheme.surfaceContainerHighest
+                        : const Color(0xFFF8FDF8),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFE8F5E9)),
+                    border: Border.all(color: scheme.outlineVariant),
                   ),
                   child: const SelectableText(
                       'name,sku,unit_price,description,barcode'),

@@ -15,6 +15,10 @@ class SalespersonApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Bio Care Sales',
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: context.select<AppController, ThemeMode>(
+        (controller) => controller.resolvedThemeMode,
+      ),
       home: Consumer<AppController>(
         builder: (context, controller, _) {
           if (!controller.initialized) {

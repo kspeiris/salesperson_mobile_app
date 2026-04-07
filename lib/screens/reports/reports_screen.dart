@@ -92,7 +92,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
                             ),
                             elevation: 0,
                             backgroundColor: scheme.primary,
-                            shadowColor: const Color(0x1A2E7D32),
+                            shadowColor: Colors.black.withValues(
+                              alpha: theme.brightness == Brightness.dark
+                                  ? 0.12
+                                  : 0.10,
+                            ),
                           ),
                           onPressed: _isGenerating ? null : _generateReport,
                           icon: _isGenerating
@@ -308,13 +312,16 @@ class _HeaderChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       decoration: BoxDecoration(
-        color: const Color(0xFFEAF5EC).withValues(alpha: 0.82),
+        color: theme.brightness == Brightness.dark
+            ? scheme.surfaceContainerHighest
+            : const Color(0xFFEAF5EC).withValues(alpha: 0.82),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
+        border: Border.all(color: scheme.outlineVariant),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -347,18 +354,23 @@ class _ReportsDateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.88),
+        color: scheme.surface.withValues(
+          alpha: theme.brightness == Brightness.dark ? 0.94 : 0.88,
+        ),
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0xFFDCEADB)),
-        boxShadow: const [
+        border: Border.all(color: scheme.outlineVariant),
+        boxShadow: [
           BoxShadow(
             blurRadius: 22,
             offset: Offset(0, 12),
-            color: Color(0x102E7D32),
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.dark ? 0.2 : 0.06,
+            ),
           ),
         ],
       ),
@@ -371,12 +383,14 @@ class _ReportsDateCard extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F8F2),
+                  color: theme.brightness == Brightness.dark
+                      ? scheme.surfaceContainerHighest
+                      : const Color(0xFFF1F8F2),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.event_note_rounded,
-                  color: Color(0xFF2E7D32),
+                  color: scheme.primary,
                 ),
               ),
               const SizedBox(width: 12),
@@ -395,14 +409,18 @@ class _ReportsDateCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
-                color: const Color(0xFFF5FBF6),
+                color: theme.brightness == Brightness.dark
+                    ? scheme.surfaceContainerHighest
+                    : const Color(0xFFF5FBF6),
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: const Color(0xFFDDEEDD)),
-                boxShadow: const [
+                border: Border.all(color: scheme.outlineVariant),
+                boxShadow: [
                   BoxShadow(
                     blurRadius: 16,
                     offset: Offset(0, 8),
-                    color: Color(0x082E7D32),
+                    color: Colors.black.withValues(
+                      alpha: theme.brightness == Brightness.dark ? 0.18 : 0.03,
+                    ),
                   ),
                 ],
               ),
@@ -412,12 +430,12 @@ class _ReportsDateCard extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: scheme.surface,
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.calendar_month_rounded,
-                      color: Color(0xFF2E7D32),
+                      color: scheme.primary,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -426,13 +444,13 @@ class _ReportsDateCard extends StatelessWidget {
                       AppFormatters.date(selectedDate),
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF4E6870),
+                        color: scheme.onSurface,
                       ),
                     ),
                   ),
-                  const Icon(
+                  Icon(
                     Icons.keyboard_arrow_down_rounded,
-                    color: Color(0xFF7C8C7E),
+                    color: theme.hintColor,
                   ),
                 ],
               ),
@@ -456,22 +474,30 @@ class _ReportsSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFFFFFFF), Color(0xFFF5FBF6)],
+          colors: [
+            scheme.surface,
+            theme.brightness == Brightness.dark
+                ? scheme.surfaceContainerHighest
+                : const Color(0xFFF5FBF6),
+          ],
         ),
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0xFFDCEADB)),
-        boxShadow: const [
+        border: Border.all(color: scheme.outlineVariant),
+        boxShadow: [
           BoxShadow(
             blurRadius: 24,
             offset: Offset(0, 14),
-            color: Color(0x10204E2A),
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.dark ? 0.2 : 0.06,
+            ),
           ),
         ],
       ),
@@ -484,12 +510,14 @@ class _ReportsSummaryCard extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F8F2),
+                  color: theme.brightness == Brightness.dark
+                      ? scheme.surfaceContainerHighest
+                      : const Color(0xFFF1F8F2),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.insert_chart_outlined_rounded,
-                  color: Color(0xFF2E7D32),
+                  color: scheme.primary,
                 ),
               ),
               const SizedBox(width: 12),
@@ -508,9 +536,9 @@ class _ReportsSummaryCard extends StatelessWidget {
             accent: const Color(0xFF2E7D32),
             icon: Icons.trending_up_rounded,
           ),
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 14),
-            child: Divider(height: 1, color: Color(0xFFE1EEE3)),
+            child: Divider(height: 1, color: scheme.outlineVariant),
           ),
           _SummaryMetric(
             label: 'Collections',
@@ -557,7 +585,7 @@ class _SummaryMetric extends StatelessWidget {
         Text(
           label,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: const Color(0xFF6A8070),
+            color: theme.hintColor,
           ),
         ),
         const SizedBox(height: 4),
@@ -570,7 +598,7 @@ class _SummaryMetric extends StatelessWidget {
               fontWeight: FontWeight.w800,
               fontSize: 28,
               letterSpacing: -0.6,
-              color: const Color(0xFF203126),
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),
@@ -613,13 +641,17 @@ class _PathCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF4F8F5),
+        color: theme.brightness == Brightness.dark
+            ? scheme.surfaceContainerHighest
+            : const Color(0xFFF4F8F5),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFDDE8E0)),
+        border: Border.all(color: scheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

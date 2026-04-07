@@ -165,12 +165,14 @@ class _ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: scheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE8F5E9)),
+        border: Border.all(color: scheme.outlineVariant),
       ),
       child: Row(
         children: [
@@ -178,7 +180,7 @@ class _ProfileHeader extends StatelessWidget {
             name: salesperson,
             imagePath: profileImagePath,
             size: 64,
-            borderColor: const Color(0xFFE8F5E9),
+            borderColor: scheme.outlineVariant,
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -197,7 +199,7 @@ class _ProfileHeader extends StatelessWidget {
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium
-                      ?.copyWith(color: Colors.grey.shade600),
+                      ?.copyWith(color: theme.hintColor),
                 ),
               ],
             ),
@@ -223,6 +225,7 @@ class _MoreTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final scheme = Theme.of(context).colorScheme;
 
     return InkWell(
@@ -231,9 +234,11 @@ class _MoreTile extends StatelessWidget {
       child: Ink(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FDF8),
+          color: theme.brightness == Brightness.dark
+              ? scheme.surfaceContainerHighest
+              : const Color(0xFFF8FDF8),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE8F5E9)),
+          border: Border.all(color: scheme.outlineVariant),
         ),
         child: Row(
           children: [
@@ -241,9 +246,9 @@ class _MoreTile extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: scheme.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE8F5E9)),
+                border: Border.all(color: scheme.outlineVariant),
               ),
               child: Icon(icon, color: scheme.primary, size: 22),
             ),
@@ -260,12 +265,12 @@ class _MoreTile extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                    style: TextStyle(color: theme.hintColor, fontSize: 13),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: Colors.grey),
+            Icon(Icons.chevron_right_rounded, color: theme.hintColor),
           ],
         ),
       ),

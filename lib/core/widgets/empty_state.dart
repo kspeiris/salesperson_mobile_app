@@ -16,6 +16,7 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final scheme = Theme.of(context).colorScheme;
 
     return Center(
@@ -29,14 +30,16 @@ class EmptyState extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Colors.white,
+                scheme.surface,
                 scheme.primary.withValues(alpha: 0.05),
               ],
             ),
             border: Border.all(color: scheme.primary.withValues(alpha: 0.10)),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Color(0x0A10241D),
+                color: Colors.black.withValues(
+                  alpha: theme.brightness == Brightness.dark ? 0.18 : 0.04,
+                ),
                 blurRadius: 24,
                 offset: Offset(0, 10),
               ),

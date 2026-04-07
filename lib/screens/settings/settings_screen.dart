@@ -23,6 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late final TextEditingController _pinController;
   bool _pinEnabled = false;
   String? _profileImagePath;
+  String _themeMode = 'system';
 
   @override
   void initState() {
@@ -36,6 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _pinController = TextEditingController();
     _pinEnabled = settings.pinEnabled;
     _profileImagePath = settings.profileImagePath;
+    _themeMode = settings.themeMode;
     _companyController.addListener(_refreshPreview);
     _salespersonController.addListener(_refreshPreview);
   }
@@ -71,6 +73,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             defaultSalesperson: _salespersonController.text,
             paymentMethods: methods,
             pinEnabled: _pinEnabled,
+            themeMode: _themeMode,
             rawPin: _pinController.text,
             profileImagePath: _profileImagePath,
           );
@@ -88,7 +91,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final controller = context.watch<AppController>();
     final currentImagePath = _profileImagePath ?? controller.profileImagePath;
 
@@ -143,8 +147,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
-                  const Text('v2.0 Premium Edition',
-                      style: TextStyle(color: Colors.grey)),
+                  Text('v2.0 Premium Edition',
+                      style: TextStyle(color: Theme.of(context).hintColor)),
                 ],
               ),
             ),
@@ -153,12 +157,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: 'Data Management',
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: scheme.surface,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE8F5E9)),
-                  boxShadow: const [
+                  border: Border.all(color: scheme.outlineVariant),
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x052E7D32),
+                      color: Colors.black.withValues(
+                        alpha: theme.brightness == Brightness.dark ? 0.18 : 0.02,
+                      ),
                       blurRadius: 8,
                       offset: Offset(0, 2),
                     )
@@ -169,7 +175,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   leading: Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FDF8),
+                      color: theme.brightness == Brightness.dark
+                          ? scheme.surfaceContainerHighest
+                          : const Color(0xFFF8FDF8),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(Icons.settings_backup_restore_rounded,
@@ -192,12 +200,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: scheme.surface,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE8F5E9)),
-                  boxShadow: const [
+                  border: Border.all(color: scheme.outlineVariant),
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x052E7D32),
+                      color: Colors.black.withValues(
+                        alpha: theme.brightness == Brightness.dark ? 0.18 : 0.02,
+                      ),
                       blurRadius: 8,
                       offset: Offset(0, 2),
                     )
@@ -247,16 +257,72 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             SectionCard(
+              title: 'Appearance',
+              subtitle:
+                  'Choose how the app looks on this device. System mode follows the phone setting automatically.',
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: scheme.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: scheme.outlineVariant),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(
+                        alpha: theme.brightness == Brightness.dark ? 0.18 : 0.02,
+                      ),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    )
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    RadioListTile<String>(
+                      value: 'system',
+                      groupValue: _themeMode,
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('System default'),
+                      subtitle:
+                          const Text('Match the phone light or dark appearance.'),
+                      onChanged: (value) => setState(() => _themeMode = value!),
+                    ),
+                    Divider(color: scheme.outlineVariant),
+                    RadioListTile<String>(
+                      value: 'light',
+                      groupValue: _themeMode,
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Light mode'),
+                      subtitle: const Text('Bright professional workspace.'),
+                      onChanged: (value) => setState(() => _themeMode = value!),
+                    ),
+                    Divider(color: scheme.outlineVariant),
+                    RadioListTile<String>(
+                      value: 'dark',
+                      groupValue: _themeMode,
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Dark mode'),
+                      subtitle: const Text('Low-glare interface for night use.'),
+                      onChanged: (value) => setState(() => _themeMode = value!),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SectionCard(
               title: 'Security',
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: scheme.surface,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE8F5E9)),
-                  boxShadow: const [
+                  border: Border.all(color: scheme.outlineVariant),
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x052E7D32),
+                      color: Colors.black.withValues(
+                        alpha: theme.brightness == Brightness.dark ? 0.18 : 0.02,
+                      ),
                       blurRadius: 8,
                       offset: Offset(0, 2),
                     )
@@ -274,7 +340,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onChanged: (value) => setState(() => _pinEnabled = value),
                     ),
                     if (_pinEnabled) ...[
-                      const Divider(height: 24, color: Color(0xFFE8F5E9)),
+                      Divider(height: 24, color: scheme.outlineVariant),
                       TextFormField(
                         controller: _pinController,
                         obscureText: true,

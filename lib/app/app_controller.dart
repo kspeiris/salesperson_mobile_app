@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -38,6 +39,7 @@ class AppController extends ChangeNotifier {
     defaultSalesperson: 'Bio Care Route Team',
     paymentMethods: ['Cash', 'Bank', 'Cheque'],
     pinEnabled: false,
+    themeMode: 'system',
   );
   File? _lastGeneratedReport;
   ExportBundle? _lastExportBundle;
@@ -52,6 +54,16 @@ class AppController extends ChangeNotifier {
   bool get authenticated => _authenticated;
   String get currentSalesperson => _currentSalesperson;
   AppSettings get settings => _settings;
+  ThemeMode get resolvedThemeMode {
+    switch (_settings.themeMode) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      default:
+        return ThemeMode.system;
+    }
+  }
   String? get profileImagePath => _settings.profileImagePath;
   File? get lastGeneratedReport => _lastGeneratedReport;
   ExportBundle? get lastExportBundle => _lastExportBundle;
@@ -198,6 +210,7 @@ class AppController extends ChangeNotifier {
     required String defaultSalesperson,
     required List<String> paymentMethods,
     required bool pinEnabled,
+    String? themeMode,
     String? rawPin,
     String? profileImagePath,
   }) async {
@@ -235,6 +248,7 @@ class AppController extends ChangeNotifier {
       defaultSalesperson: trimmedSalesperson,
       paymentMethods: normalizedMethods,
       pinEnabled: pinEnabled,
+      themeMode: _normalizeThemeMode(themeMode ?? _settings.themeMode),
       pinHash: pinEnabled ? pinHash : '',
       profileImagePath: profileImagePath ?? _settings.profileImagePath,
     );
@@ -401,6 +415,14 @@ class AppController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateThemeMode(String value) async {
+    final normalized = _normalizeThemeMode(value);
+    if (normalized == _settings.themeMode) return;
+    _settings = _settings.copyWith(themeMode: normalized);
+    await _repository.saveSettings(_settings);
+    notifyListeners();
+  }
+
   void _validateShop(Shop shop) {
     if (shop.name.trim().isEmpty) {
       throw ArgumentError('Shop name is required.');
@@ -466,6 +488,17 @@ class AppController extends ChangeNotifier {
     }
     if (collection.paymentMethod.trim().isEmpty) {
       throw ArgumentError('Payment method is required.');
+    }
+  }
+
+  String _normalizeThemeMode(String value) {
+    switch (value.trim().toLowerCase()) {
+      case 'light':
+        return 'light';
+      case 'dark':
+        return 'dark';
+      default:
+        return 'system';
     }
   }
 }

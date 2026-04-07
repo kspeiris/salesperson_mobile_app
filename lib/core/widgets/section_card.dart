@@ -17,15 +17,17 @@ class SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.of(context).size.width < 640;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFE8F5E9)),
-        boxShadow: const [
+        color: scheme.surface,
+        border: Border.all(color: scheme.outlineVariant),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x052E7D32),
+            color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.18 : 0.02),
             blurRadius: 24,
             offset: Offset(0, 12),
           ),
@@ -97,7 +99,7 @@ class _SectionHeaderText extends StatelessWidget {
           title,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFF1E293B),
+                color: Theme.of(context).colorScheme.onSurface,
                 letterSpacing: -0.2,
               ),
         ),

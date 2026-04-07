@@ -16,6 +16,8 @@ class AppShell extends StatelessWidget {
     this.floatingActionButton,
     this.headerImageAsset,
     this.pageBackgroundAsset,
+    this.showHeaderImage = true,
+    this.showPageBackground = true,
   });
 
   final String title;
@@ -29,6 +31,8 @@ class AppShell extends StatelessWidget {
   final Widget? floatingActionButton;
   final String? headerImageAsset;
   final String? pageBackgroundAsset;
+  final bool showHeaderImage;
+  final bool showPageBackground;
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +61,7 @@ class AppShell extends StatelessWidget {
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
-              image: pageBackgroundAsset == null
+              image: !showPageBackground || pageBackgroundAsset == null
                   ? null
                   : DecorationImage(
                       image: AssetImage(pageBackgroundAsset!),
@@ -89,7 +93,8 @@ class AppShell extends StatelessWidget {
                             subtitle: subtitle,
                             header: header,
                             compact: compact,
-                            headerImageAsset: headerImageAsset,
+                            headerImageAsset:
+                                showHeaderImage ? headerImageAsset : null,
                           ),
                         ),
                       Expanded(child: child),
@@ -122,6 +127,9 @@ class _ShellHeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final hasImage = headerImageAsset != null;
     final imageMinHeight = compact ? 176.0 : 208.0;
     final panelRadius = BorderRadius.circular(24);
@@ -130,17 +138,23 @@ class _ShellHeaderCard extends StatelessWidget {
       constraints: hasImage ? BoxConstraints(minHeight: imageMinHeight) : null,
       decoration: BoxDecoration(
         borderRadius: panelRadius,
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF7FCF7), Color(0xFFEAF5EB)],
+          colors: isDark
+              ? const [Color(0xFF15231B), Color(0xFF1C2E23)]
+              : const [Color(0xFFF7FCF7), Color(0xFFEAF5EB)],
         ),
-        border: Border.all(color: const Color(0xFFD6E7D8)),
-        boxShadow: const [
+        border: Border.all(
+          color: isDark ? scheme.outlineVariant : const Color(0xFFD6E7D8),
+        ),
+        boxShadow: [
           BoxShadow(
             blurRadius: 28,
             offset: Offset(0, 14),
-            color: Color(0x122E7D32),
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.24)
+                : const Color(0x122E7D32),
           ),
         ],
       ),
@@ -170,7 +184,9 @@ class _ShellHeaderCard extends StatelessWidget {
                             const Color(0xFF3E9250).withValues(alpha: 0.58),
                             Colors.white.withValues(alpha: 0.06),
                           ]
-                        : const [Color(0xFFF7FCF7), Color(0xFFEAF5EB)],
+                        : isDark
+                            ? const [Color(0xFF15231B), Color(0xFF1C2E23)]
+                            : const [Color(0xFFF7FCF7), Color(0xFFEAF5EB)],
                   ),
                 ),
               ),
@@ -216,15 +232,17 @@ class _ShellHeaderCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(22),
                         color: Colors.white
-                            .withValues(alpha: hasImage ? 0.18 : 0.72),
+                            .withValues(alpha: hasImage ? 0.18 : (isDark ? 0.08 : 0.72)),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.28),
+                          color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.28),
                         ),
-                        boxShadow: const [
+                        boxShadow: [
                           BoxShadow(
                             blurRadius: 18,
                             offset: Offset(0, 10),
-                            color: Color(0x120F172A),
+                            color: isDark
+                                ? Colors.black.withValues(alpha: 0.26)
+                                : const Color(0x120F172A),
                           ),
                         ],
                       ),

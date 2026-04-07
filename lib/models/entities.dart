@@ -447,6 +447,7 @@ class AppSettings {
     required this.defaultSalesperson,
     required this.paymentMethods,
     required this.pinEnabled,
+    required this.themeMode,
     this.pinHash,
     this.profileImagePath,
   });
@@ -455,6 +456,7 @@ class AppSettings {
   final String defaultSalesperson;
   final List<String> paymentMethods;
   final bool pinEnabled;
+  final String themeMode;
   final String? pinHash;
   final String? profileImagePath;
 
@@ -463,6 +465,7 @@ class AppSettings {
     String? defaultSalesperson,
     List<String>? paymentMethods,
     bool? pinEnabled,
+    String? themeMode,
     String? pinHash,
     String? profileImagePath,
   }) {
@@ -471,6 +474,7 @@ class AppSettings {
       defaultSalesperson: defaultSalesperson ?? this.defaultSalesperson,
       paymentMethods: paymentMethods ?? this.paymentMethods,
       pinEnabled: pinEnabled ?? this.pinEnabled,
+      themeMode: themeMode ?? this.themeMode,
       pinHash: pinHash ?? this.pinHash,
       profileImagePath: profileImagePath ?? this.profileImagePath,
     );

@@ -33,6 +33,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final width = MediaQuery.of(context).size.width;
     final metricCrossAxisCount = width >= 980
         ? 4
@@ -54,7 +56,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             onPressed: () => controller.logout(),
             icon: const Icon(Icons.logout_rounded),
             tooltip: 'Logout',
-            color: const Color(0xFF5E7A67),
+            color: theme.hintColor,
           ),
         ],
       ),
@@ -91,7 +93,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1040),
                   child: DecoratedBox(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       image: DecorationImage(
                         image: AssetImage(AppAssets.pageTexture),
                         fit: BoxFit.cover,
@@ -239,9 +241,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         i++) ...[
                                       _ActivityItem(activity: activities[i]),
                                       if (i < activities.length - 1)
-                                        const Divider(
+                                        Divider(
                                             height: 24,
-                                            color: Color(0xFFF1F4F1)),
+                                            color: scheme.outlineVariant),
                                     ],
                                   ],
                                 ),
@@ -308,6 +310,8 @@ class _ActivityItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final isSale = activity is SaleRecord;
     final String shopName = isSale
         ? (activity as SaleRecord).shopName
@@ -328,12 +332,14 @@ class _ActivityItem extends StatelessWidget {
           width: 42,
           height: 42,
           decoration: BoxDecoration(
-            color: isSale ? const Color(0xFFE8F5E9) : const Color(0xFFFFF3E0),
+            color: isSale
+                ? scheme.primary.withValues(alpha: 0.14)
+                : scheme.secondary.withValues(alpha: 0.16),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
             isSale ? Icons.receipt_long_rounded : Icons.request_quote_rounded,
-            color: isSale ? const Color(0xFF2E7D32) : const Color(0xFFE65100),
+            color: isSale ? scheme.primary : scheme.secondary,
             size: 20,
           ),
         ),
@@ -351,7 +357,7 @@ class _ActivityItem extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 '$dateStr • $timeStr',
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                style: TextStyle(color: theme.hintColor, fontSize: 12),
               ),
             ],
           ),
@@ -378,23 +384,28 @@ class _SmartSuggestionBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final compact = MediaQuery.of(context).size.width < 560;
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFF7FBF3),
-            Color(0xFFE8F3E4),
-          ],
+          colors: theme.brightness == Brightness.dark
+              ? [scheme.surface, scheme.surfaceContainerHighest]
+              : const [
+                  Color(0xFFF7FBF3),
+                  Color(0xFFE8F3E4),
+                ],
         ),
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0xFFD7E9D3)),
-        boxShadow: const [
+        border: Border.all(color: scheme.outlineVariant),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x102E7D32),
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.dark ? 0.18 : 0.06,
+            ),
             blurRadius: 24,
             offset: Offset(0, 12),
           ),
@@ -402,7 +413,8 @@ class _SmartSuggestionBanner extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          Positioned(
+          if (theme.brightness != Brightness.dark)
+            Positioned(
             right: compact ? -24 : -8,
             bottom: compact ? -18 : -8,
             child: IgnorePointer(
@@ -422,17 +434,19 @@ class _SmartSuggestionBanner extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: scheme.surface,
                   borderRadius: BorderRadius.circular(18),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x0A000000),
+                      color: Colors.black.withValues(
+                        alpha: theme.brightness == Brightness.dark ? 0.18 : 0.04,
+                      ),
                       blurRadius: 10,
                     )
                   ],
                 ),
-                child: const Icon(Icons.auto_awesome_rounded,
-                    color: Color(0xFF2E7D32), size: 24),
+                child: Icon(Icons.auto_awesome_rounded,
+                    color: scheme.primary, size: 24),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -445,14 +459,14 @@ class _SmartSuggestionBanner extends StatelessWidget {
                         'Route strategy tip',
                         style: theme.textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: const Color(0xFF1B5E20),
+                          color: scheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         "Review today's sales and collections to decide which shops need follow-up first, then capture the next route action from here.",
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey.shade800,
+                          color: theme.textTheme.bodyMedium?.color,
                           height: 1.5,
                         ),
                       ),
@@ -482,6 +496,17 @@ class _SmartSuggestionBanner extends StatelessWidget {
                             label: const Text('Record Collection'),
                             style: OutlinedButton.styleFrom(
                               minimumSize: Size.zero,
+                              backgroundColor: theme.brightness == Brightness.dark
+                                  ? scheme.surface.withValues(alpha: 0.18)
+                                  : Colors.transparent,
+                              foregroundColor: theme.brightness == Brightness.dark
+                                  ? Colors.white
+                                  : scheme.primary,
+                              side: BorderSide(
+                                color: theme.brightness == Brightness.dark
+                                    ? Colors.white.withValues(alpha: 0.22)
+                                    : scheme.outlineVariant,
+                              ),
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 12),
                               shape: RoundedRectangleBorder(
@@ -542,11 +567,11 @@ class _HeroPanel extends StatelessWidget {
           fit: BoxFit.cover,
           alignment: Alignment.center,
         ),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
             blurRadius: 30,
             offset: Offset(0, 16),
-            color: Color(0x1A1B5E20),
+            color: Colors.black.withValues(alpha: 0.10),
           ),
         ],
       ),
@@ -558,9 +583,9 @@ class _HeroPanel extends StatelessWidget {
             end: Alignment.bottomCenter,
             stops: const [0.0, 0.55, 1.0],
             colors: [
-              const Color(0xFF143C1E).withValues(alpha: 0.75),
-              const Color(0xFF1D5B2B).withValues(alpha: 0.56),
-              const Color(0xFF4CAF50).withValues(alpha: 0.35),
+              const Color(0xFF143C1E).withValues(alpha: 0.58),
+              const Color(0xFF1D5B2B).withValues(alpha: 0.42),
+              const Color(0xFF4CAF50).withValues(alpha: 0.24),
             ],
           ),
         ),
@@ -582,16 +607,18 @@ class _HeroPanel extends StatelessWidget {
                     showPlate: true,
                     alignment: Alignment.centerLeft,
                     plateDecoration: BoxDecoration(
-                      color: const Color(0xFFF7FBF4),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Theme.of(context).colorScheme.surface.withValues(alpha: 0.86)
+                          : const Color(0xFFF7FBF4),
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.75),
+                        color: Theme.of(context).colorScheme.outlineVariant,
                       ),
-                      boxShadow: const [
+                      boxShadow: [
                         BoxShadow(
                           blurRadius: 16,
                           offset: Offset(0, 6),
-                          color: Color(0x16000000),
+                          color: Colors.black.withValues(alpha: 0.12),
                         ),
                       ],
                     ),

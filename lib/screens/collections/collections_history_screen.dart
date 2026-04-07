@@ -36,6 +36,8 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final shopsRevision = context.select<AppController, int>(
       (value) => value.shopsRevision,
     );
@@ -66,7 +68,7 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
             onPressed: _openCreate,
             icon: const Icon(Icons.request_quote_rounded),
             label: const Text('Add Collection'),
-            backgroundColor: const Color(0xFF2E7D32),
+            backgroundColor: scheme.primary,
             foregroundColor: Colors.white,
           ),
           child: FutureBuilder<List<CollectionRecord>>(
@@ -137,9 +139,13 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.82),
+                            color: scheme.surface.withValues(
+                              alpha: theme.brightness == Brightness.dark
+                                  ? 0.94
+                                  : 0.82,
+                            ),
                             borderRadius: BorderRadius.circular(24),
-                            border: Border.all(color: const Color(0xFFDDE6DF)),
+                            border: Border.all(color: scheme.outlineVariant),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -389,11 +395,16 @@ class _HistoryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F3EA),
+        color: theme.brightness == Brightness.dark
+            ? scheme.surfaceContainerHighest
+            : const Color(0xFFF8F3EA),
         borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: scheme.outlineVariant),
       ),
       child: Text(
         label,

@@ -45,6 +45,8 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final compact = MediaQuery.of(context).size.width < 640;
     final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
@@ -93,11 +95,15 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                 : SafeArea(
                     child: Container(
                       padding: const EdgeInsets.all(16),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
+                      decoration: BoxDecoration(
+                        color: scheme.surface,
                         boxShadow: [
                           BoxShadow(
-                            color: Color(0x0F000000),
+                            color: Colors.black.withValues(
+                              alpha: theme.brightness == Brightness.dark
+                                  ? 0.20
+                                  : 0.06,
+                            ),
                             blurRadius: 10,
                             offset: Offset(0, -4),
                           ),
@@ -134,9 +140,9 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                       Container(
                         padding: EdgeInsets.all(compact ? 16 : 18),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: scheme.surface,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFFE8F5E9)),
+                          border: Border.all(color: scheme.outlineVariant),
                         ),
                         child: Column(
                           children: [
@@ -275,9 +281,11 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF8FDF8),
+                          color: theme.brightness == Brightness.dark
+                              ? scheme.surfaceContainerHighest
+                              : const Color(0xFFF8FDF8),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFFE8F5E9)),
+                          border: Border.all(color: scheme.outlineVariant),
                         ),
                         child: Column(
                           children: [
@@ -345,7 +353,7 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
     return Row(
       children: [
         Expanded(
-          child: Text(label, style: const TextStyle(color: Colors.black54)),
+          child: Text(label, style: TextStyle(color: Theme.of(context).hintColor)),
         ),
         Text(value, style: const TextStyle(fontWeight: FontWeight.w700)),
       ],
@@ -370,10 +378,10 @@ class _BalanceMetric extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: scheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: emphasized ? scheme.primary : const Color(0xFFE8F5E9),
+          color: emphasized ? scheme.primary : scheme.outlineVariant,
         ),
         boxShadow: emphasized
             ? [

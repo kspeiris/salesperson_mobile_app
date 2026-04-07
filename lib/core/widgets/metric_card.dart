@@ -16,18 +16,21 @@ class MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final scheme = Theme.of(context).colorScheme;
     final compact = MediaQuery.of(context).size.width < 640;
 
     return Container(
       padding: EdgeInsets.all(compact ? 18 : 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: scheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE8F5E9)),
-        boxShadow: const [
+        border: Border.all(color: scheme.outlineVariant),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x05000000),
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.dark ? 0.18 : 0.03,
+            ),
             blurRadius: 10,
             offset: Offset(0, 4),
           ),
@@ -48,8 +51,8 @@ class MetricCard extends StatelessWidget {
                 ),
                 child: Icon(icon, color: scheme.primary, size: 22),
               ),
-              const Icon(Icons.arrow_outward_rounded,
-                  color: Color(0xFFCFD8DC), size: 18),
+              Icon(Icons.arrow_outward_rounded,
+                  color: scheme.outline, size: 18),
             ],
           ),
           const Spacer(),
@@ -57,7 +60,7 @@ class MetricCard extends StatelessWidget {
             title,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF64748B),
+                  color: theme.textTheme.bodySmall?.color,
                   letterSpacing: 0.2,
                 ),
             maxLines: 2,
@@ -69,7 +72,7 @@ class MetricCard extends StatelessWidget {
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w800,
                   fontSize: 22,
-                  color: const Color(0xFF1E293B),
+                  color: scheme.onSurface,
                 ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,

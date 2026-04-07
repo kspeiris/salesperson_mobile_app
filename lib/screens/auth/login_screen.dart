@@ -63,22 +63,30 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final width = MediaQuery.of(context).size.width;
     final stacked = width < 860;
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFF8FDF8),
-              Color(0xFFF3FAF3),
-              Color(0xFFEFF7FF),
-            ],
+            colors: theme.brightness == Brightness.dark
+                ? [
+                    const Color(0xFF0D1510),
+                    const Color(0xFF122018),
+                    const Color(0xFF18241D),
+                  ]
+                : [
+                    const Color(0xFFF8FDF8),
+                    const Color(0xFFF3FAF3),
+                    const Color(0xFFEFF7FF),
+                  ],
           ),
-          image: DecorationImage(
+          image: const DecorationImage(
             image: AssetImage(AppAssets.pageTexture),
             fit: BoxFit.cover,
             alignment: Alignment.topCenter,
@@ -154,6 +162,8 @@ class _IntroPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     return Container(
@@ -165,11 +175,13 @@ class _IntroPanel extends StatelessWidget {
           fit: BoxFit.cover,
           alignment: Alignment.centerRight,
         ),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
             blurRadius: 36,
             offset: Offset(0, 20),
-            color: Color(0x1C1B5E20),
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.dark ? 0.24 : 0.11,
+            ),
           ),
         ],
       ),
@@ -182,9 +194,15 @@ class _IntroPanel extends StatelessWidget {
               end: Alignment.topRight,
               stops: const [0.0, 0.55, 1.0],
               colors: [
-                const Color(0xFF143B1E).withValues(alpha: 0.90),
-                const Color(0xFF2E7D32).withValues(alpha: 0.64),
-                const Color(0xFF9CCC65).withValues(alpha: 0.20),
+                const Color(0xFF143B1E).withValues(
+                  alpha: theme.brightness == Brightness.dark ? 0.82 : 0.90,
+                ),
+                const Color(0xFF2E7D32).withValues(
+                  alpha: theme.brightness == Brightness.dark ? 0.56 : 0.64,
+                ),
+                const Color(0xFF9CCC65).withValues(
+                  alpha: theme.brightness == Brightness.dark ? 0.16 : 0.20,
+                ),
               ],
             ),
           ),
@@ -203,11 +221,11 @@ class _IntroPanel extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     border:
                         Border.all(color: Colors.white.withValues(alpha: 0.22)),
-                    boxShadow: const [
+                    boxShadow: [
                       BoxShadow(
                         blurRadius: 18,
                         offset: Offset(0, 8),
-                        color: Color(0x14000000),
+                        color: Colors.black.withValues(alpha: 0.08),
                       ),
                     ],
                   ),
@@ -283,11 +301,11 @@ class _Badge extends StatelessWidget {
         color: Colors.white.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
             blurRadius: 18,
             offset: Offset(0, 6),
-            color: Color(0x12000000),
+            color: Colors.black.withValues(alpha: 0.08),
           ),
         ],
       ),
@@ -331,16 +349,22 @@ class _LoginCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.92),
+        color: scheme.surface.withValues(
+          alpha: theme.brightness == Brightness.dark ? 0.92 : 0.92,
+        ),
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.70)),
-        boxShadow: const [
+        border: Border.all(color: scheme.outlineVariant),
+        boxShadow: [
           BoxShadow(
             blurRadius: 34,
             offset: Offset(0, 18),
-            color: Color(0x120F172A),
+            color: Colors.black.withValues(
+              alpha: theme.brightness == Brightness.dark ? 0.24 : 0.07,
+            ),
           ),
         ],
       ),
@@ -367,9 +391,11 @@ class _LoginCard extends StatelessWidget {
                         : salespersonController.text.trim(),
                     imagePath: profileImagePath,
                     size: 48,
-                    backgroundColor: const Color(0xFFEAF6EC),
-                    foregroundColor: const Color(0xFF1B5E20),
-                    borderColor: const Color(0xFFD8E9DA),
+                    backgroundColor: scheme.primary.withValues(
+                      alpha: theme.brightness == Brightness.dark ? 0.18 : 0.10,
+                    ),
+                    foregroundColor: scheme.primary,
+                    borderColor: scheme.outlineVariant,
                   ),
                 ],
               ),
@@ -385,7 +411,7 @@ class _LoginCard extends StatelessWidget {
               Text(
                 'Sign in to access your dashboard and today\'s routes.',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: const Color(0xFF64748B),
+                      color: theme.hintColor,
                       height: 1.45,
                     ),
               ),
@@ -395,10 +421,12 @@ class _LoginCard extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.w500),
                 decoration: InputDecoration(
                   labelText: 'Salesperson ID / Name',
-                  prefixIcon: Container(
-                    margin: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEAF6EC),
+                    prefixIcon: Container(
+                      margin: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                      color: scheme.primary.withValues(
+                        alpha: theme.brightness == Brightness.dark ? 0.18 : 0.10,
+                      ),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(Icons.badge_outlined),
@@ -426,7 +454,9 @@ class _LoginCard extends StatelessWidget {
                     prefixIcon: Container(
                       margin: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEAF6EC),
+                        color: scheme.primary.withValues(
+                          alpha: theme.brightness == Brightness.dark ? 0.18 : 0.10,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.password_rounded),
@@ -456,14 +486,18 @@ class _LoginCard extends StatelessWidget {
                     backgroundColor: Colors.transparent,
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    shadowColor: const Color(0x332E7D32),
+                    shadowColor: Colors.black.withValues(
+                      alpha: theme.brightness == Brightness.dark ? 0.12 : 0.20,
+                    ),
                     padding: EdgeInsets.zero,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18),
                     ),
                   ).copyWith(
                     overlayColor:
-                        const WidgetStatePropertyAll(Color(0x142E7D32)),
+                        WidgetStatePropertyAll(
+                          scheme.primary.withValues(alpha: 0.08),
+                        ),
                     backgroundColor:
                         const WidgetStatePropertyAll(Colors.transparent),
                     shadowColor:
@@ -480,11 +514,14 @@ class _LoginCard extends StatelessWidget {
                         ],
                       ),
                       borderRadius: BorderRadius.circular(18),
-                      boxShadow: const [
+                      boxShadow: [
                         BoxShadow(
                           blurRadius: 18,
                           offset: Offset(0, 10),
-                          color: Color(0x2B2E7D32),
+                          color: Colors.black.withValues(
+                            alpha:
+                                theme.brightness == Brightness.dark ? 0.18 : 0.17,
+                          ),
                         ),
                       ],
                     ),
@@ -515,13 +552,13 @@ class _LoginCard extends StatelessWidget {
                     Icon(
                       Icons.shield_outlined,
                       size: 16,
-                      color: const Color(0xFF94A3B8).withValues(alpha: 0.90),
+                      color: theme.hintColor,
                     ),
                     Text(
                       'End-to-end encrypted local storage',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: const Color(0xFF94A3B8).withValues(alpha: 0.88),
+                        color: theme.hintColor,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),

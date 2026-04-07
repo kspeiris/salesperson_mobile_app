@@ -29,6 +29,8 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final compact = MediaQuery.of(context).size.width < 430;
     final bottomInset = MediaQuery.of(context).padding.bottom;
 
@@ -50,14 +52,18 @@ class _MainLayoutState extends State<MainLayout> {
             filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.86),
+                color: scheme.surface.withValues(
+                  alpha: theme.brightness == Brightness.dark ? 0.92 : 0.86,
+                ),
                 borderRadius: BorderRadius.circular(compact ? 24 : 28),
-                border: Border.all(color: const Color(0xD8E7DADB)),
-                boxShadow: const [
+                border: Border.all(color: scheme.outlineVariant),
+                boxShadow: [
                   BoxShadow(
                     blurRadius: 24,
                     offset: Offset(0, 10),
-                    color: Color(0x122E7D32),
+                    color: Colors.black.withValues(
+                      alpha: theme.brightness == Brightness.dark ? 0.18 : 0.06,
+                    ),
                   ),
                 ],
               ),
@@ -65,7 +71,9 @@ class _MainLayoutState extends State<MainLayout> {
                 height: compact ? 58 : 72,
                 backgroundColor: Colors.transparent,
                 surfaceTintColor: Colors.transparent,
-                indicatorColor: const Color(0x1A2E7D32),
+                indicatorColor: scheme.primary.withValues(
+                  alpha: theme.brightness == Brightness.dark ? 0.22 : 0.10,
+                ),
                 labelBehavior: compact
                     ? NavigationDestinationLabelBehavior.alwaysHide
                     : NavigationDestinationLabelBehavior.alwaysShow,
