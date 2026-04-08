@@ -1,6 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
@@ -42,7 +42,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   Color _getProductColor(String name) {
     final lower = name.toLowerCase();
-    if (lower.contains('aloe')) return const Color(0xFF2E7D32);
+    if (lower.contains('aloe')) return const Color(0xFF93B620);
     if (lower.contains('orange') || lower.contains('fruit')) {
       return Colors.orange.shade700;
     }
@@ -74,7 +74,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       (value) => value.productsRevision,
     );
     final theme = Theme.of(context);
-    final scheme = Theme.of(context).colorScheme;
+    final scheme = theme.colorScheme;
 
     if (_lastRevision != revision) {
       _lastRevision = revision;
@@ -106,7 +106,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
           return ListView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.only(bottom: 24),
+            padding: EdgeInsets.only(bottom: 24.h),
             children: [
               SectionCard(
                 title: 'Workspace',
@@ -132,10 +132,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       ),
                       onChanged: _onSearchChanged,
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: 14.h),
                     Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
+                      spacing: 10.w,
+                      runSpacing: 10.h,
                       children: [
                         if (products != null)
                           _ProductBadge(
@@ -149,31 +149,14 @@ class _ProductsScreenState extends State<ProductsScreen> {
                           ),
                       ],
                     ),
-                    const SizedBox(height: 14),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        OutlinedButton.icon(
-                          onPressed: _openImport,
-                          icon: const Icon(Icons.download_for_offline_outlined),
-                          label: const Text('Import'),
-                        ),
-                        FilledButton.icon(
-                          onPressed: _openCreate,
-                          icon: const Icon(Icons.add_box_outlined),
-                          label: const Text('Add Product'),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               if (!snapshot.hasData)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 32),
-                  child: Center(child: CircularProgressIndicator()),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32.h),
+                  child: const Center(child: CircularProgressIndicator()),
                 )
               else if (products!.isEmpty)
                 const EmptyState(
@@ -189,52 +172,42 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   final iconColor = _getProductColor(product.name);
 
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    padding: EdgeInsets.only(bottom: 12.h),
                     child: Container(
-                      padding: const EdgeInsets.all(18),
+                      padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
                         color: scheme.surface,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(24.r),
                         border: Border.all(color: scheme.outlineVariant),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(
-                              alpha: theme.brightness == Brightness.dark
-                                  ? 0.18
-                                  : 0.02,
-                            ),
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
-                          )
-                        ],
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            width: 50,
-                            height: 50,
+                            width: 48.w,
+                            height: 48.w,
                             decoration: BoxDecoration(
                               color: iconColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(16.r),
                             ),
                             alignment: Alignment.center,
                             child:
-                                Icon(productIcon, color: iconColor, size: 24),
+                                Icon(productIcon, color: iconColor, size: 24.w),
                           ),
-                          const SizedBox(width: 14),
+                          SizedBox(width: 14.w),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(product.name,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium),
-                                const SizedBox(height: 6),
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 16.sp
+                                    )),
+                                SizedBox(height: 8.h),
                                 Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
+                                  spacing: 8.w,
+                                  runSpacing: 8.h,
                                   children: [
                                     _ProductBadge(
                                         icon: Icons.sell_outlined,
@@ -247,24 +220,25 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 12),
+                                SizedBox(height: 16.h),
                                 Text('Unit price',
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall),
-                                const SizedBox(height: 4),
+                                    style: theme.textTheme.labelMedium?.copyWith(
+                                      color: theme.hintColor,
+                                      fontSize: 11.sp
+                                    )),
+                                SizedBox(height: 4.h),
                                 Text(
                                   AppFormatters.currency(product.unitPrice),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge
-                                      ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: scheme.primary),
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 18.sp,
+                                      color: scheme.primary),
                                 ),
                               ],
                             ),
                           ),
                           PopupMenuButton<String>(
+                            padding: EdgeInsets.zero,
                             onSelected: (value) =>
                                 _handleAction(value, product),
                             itemBuilder: (_) => const [
@@ -340,8 +314,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         context: context,
         builder: (context) => AlertDialog(
           scrollable: true,
-          insetPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
           title: const Text('Deactivate product?'),
           content: Text('This will hide ${product.name} from sales entry.'),
           actions: [
@@ -373,25 +346,25 @@ class _ProductBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Theme.of(context).colorScheme.surfaceContainerHighest
+        color: theme.brightness == Brightness.dark
+            ? scheme.surfaceContainerHighest.withValues(alpha: 0.5)
             : const Color(0xFFF8FDF8),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(999.r),
+        border: Border.all(color: scheme.outlineVariant),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: Theme.of(context).colorScheme.onSurface),
-          const SizedBox(width: 6),
+          Icon(icon, size: 12.sp, color: scheme.onSurface),
+          SizedBox(width: 4.w),
           Text(label,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: scheme.onSurface, fontSize: 10.sp),
               overflow: TextOverflow.ellipsis),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
@@ -29,14 +30,14 @@ class MoreScreen extends StatelessWidget {
       pageBackgroundAsset: AppAssets.pageTexture,
       child: ListView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: const EdgeInsets.only(bottom: 32),
+        padding: EdgeInsets.only(bottom: 32.h),
         children: [
           _ProfileHeader(
             salesperson: controller.currentSalesperson,
             companyName: controller.settings.companyName,
             profileImagePath: controller.profileImagePath,
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           SectionCard(
             title: 'Master Data',
             child: Column(
@@ -49,7 +50,7 @@ class MoreScreen extends StatelessWidget {
                   onTap: () => Navigator.push(context,
                       MaterialPageRoute(builder: (_) => const ShopsScreen())),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12.h),
                 _MoreTile(
                   icon: Icons.inventory_2_outlined,
                   title: 'Product Catalog',
@@ -62,7 +63,7 @@ class MoreScreen extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           SectionCard(
             title: 'Import Operations',
             child: Column(
@@ -76,7 +77,7 @@ class MoreScreen extends StatelessWidget {
                       MaterialPageRoute(
                           builder: (_) => const ShopImportScreen())),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12.h),
                 _MoreTile(
                   icon: Icons.upload_file_outlined,
                   title: 'Import Products (CSV)',
@@ -89,7 +90,7 @@ class MoreScreen extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           SectionCard(
             title: 'System & Security',
             child: Column(
@@ -104,7 +105,7 @@ class MoreScreen extends StatelessWidget {
                       MaterialPageRoute(
                           builder: (_) => const DataManagementScreen())),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12.h),
                 _MoreTile(
                   icon: Icons.tune_rounded,
                   title: 'App Settings',
@@ -118,7 +119,7 @@ class MoreScreen extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           SectionCard(
             title: 'About Bio Care',
             child: Column(
@@ -132,8 +133,8 @@ class MoreScreen extends StatelessWidget {
                       context: context,
                       applicationName: 'Bio Care Sales',
                       applicationVersion: '1.1.0',
-                      applicationIcon: const Icon(Icons.eco_rounded,
-                          color: Color(0xFF2E7D32), size: 48),
+                      applicationIcon: Icon(Icons.eco_rounded,
+                          color: const Color(0xFF93B620), size: 48.w),
                       children: [
                         const Text('Pure Health. Trusted Quality.'),
                         const SizedBox(height: 10),
@@ -168,10 +169,10 @@ class _ProfileHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: scheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(24.r),
         border: Border.all(color: scheme.outlineVariant),
       ),
       child: Row(
@@ -179,27 +180,24 @@ class _ProfileHeader extends StatelessWidget {
           SalespersonAvatar(
             name: salesperson,
             imagePath: profileImagePath,
-            size: 64,
+            size: 64.w,
             borderColor: scheme.outlineVariant,
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   salesperson,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge
-                      ?.copyWith(fontWeight: FontWeight.w800),
+                  style: theme.textTheme.titleLarge
+                      ?.copyWith(fontWeight: FontWeight.w800, fontSize: 18.sp),
                 ),
+                SizedBox(height: 2.h),
                 Text(
                   companyName,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(color: theme.hintColor),
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(color: theme.hintColor, fontSize: 13.sp),
                 ),
               ],
             ),
@@ -226,55 +224,54 @@ class _MoreTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final scheme = Theme.of(context).colorScheme;
+    final scheme = theme.colorScheme;
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Ink(
-        padding: const EdgeInsets.all(16),
+      borderRadius: BorderRadius.circular(16.r),
+      child: Container(
+        padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: theme.brightness == Brightness.dark
-              ? scheme.surfaceContainerHighest
+              ? scheme.surfaceContainerHighest.withValues(alpha: 0.5)
               : const Color(0xFFF8FDF8),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16.r),
           border: Border.all(color: scheme.outlineVariant),
         ),
         child: Row(
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 44.w,
+              height: 44.w,
               decoration: BoxDecoration(
                 color: scheme.surface,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(color: scheme.outlineVariant),
               ),
-              child: Icon(icon, color: scheme.primary, size: 22),
+              child: Icon(icon, color: scheme.primary, size: 20.w),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: 14.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 15),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 15.sp),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2.h),
                   Text(
                     subtitle,
-                    style: TextStyle(color: theme.hintColor, fontSize: 13),
+                    style: TextStyle(color: theme.hintColor, fontSize: 12.sp),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: theme.hintColor),
+            Icon(Icons.chevron_right_rounded, color: theme.hintColor, size: 20.w),
           ],
         ),
       ),
     );
   }
 }
-

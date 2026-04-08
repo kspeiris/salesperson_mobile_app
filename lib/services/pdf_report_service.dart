@@ -54,11 +54,11 @@ class PdfReportService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text(companyName, style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32'))),
+        pw.Text(companyName, style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#93B620'))),
         pw.SizedBox(height: 2),
         pw.Text('Panadura, Sri Lanka', style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey700)),
         pw.SizedBox(height: 12),
-        pw.Container(height: 2, color: PdfColor.fromHex('#2E7D32')),
+        pw.Container(height: 2, color: PdfColor.fromHex('#93B620')),
         pw.SizedBox(height: 16),
         pw.Text('Daily Sales Report', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
         pw.SizedBox(height: 8),
@@ -76,7 +76,7 @@ class PdfReportService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('Summary', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32'))),
+        pw.Text('Summary', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#93B620'))),
         pw.SizedBox(height: 8),
         pw.Container(
           padding: const pw.EdgeInsets.all(12),
@@ -116,7 +116,7 @@ class PdfReportService {
       return pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text('Sales Transactions', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32'))),
+          pw.Text('Sales Transactions', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#93B620'))),
           pw.SizedBox(height: 8),
           pw.Text('No sales recorded for the selected date.'),
         ],
@@ -137,14 +137,14 @@ class PdfReportService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('Sales Transactions', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32'))),
+        pw.Text('Sales Transactions', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#93B620'))),
         pw.SizedBox(height: 8),
         pw.TableHelper.fromTextArray(
           headers: const ['Time', 'Shop', 'Payment', 'Total'],
           data: rows,
           headerDecoration: pw.BoxDecoration(color: PdfColor.fromHex('#F8FDF8')),
           cellAlignment: pw.Alignment.centerLeft,
-          headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32')),
+          headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#93B620')),
           cellPadding: const pw.EdgeInsets.all(6),
           border: pw.TableBorder.all(color: PdfColor.fromHex('#E8F5E9')),
         ),
@@ -157,7 +157,7 @@ class PdfReportService {
       return pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text('Collections', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32'))),
+          pw.Text('Collections', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#93B620'))),
           pw.SizedBox(height: 8),
           pw.Text('No collections recorded for the selected date.'),
         ],
@@ -178,14 +178,14 @@ class PdfReportService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('Collections', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32'))),
+        pw.Text('Collections', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#93B620'))),
         pw.SizedBox(height: 8),
         pw.TableHelper.fromTextArray(
           headers: const ['Time', 'Shop', 'Method', 'Amount'],
           data: rows,
           headerDecoration: pw.BoxDecoration(color: PdfColor.fromHex('#F8FDF8')),
           cellAlignment: pw.Alignment.centerLeft,
-          headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32')),
+          headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#93B620')),
           cellPadding: const pw.EdgeInsets.all(6),
           border: pw.TableBorder.all(color: PdfColor.fromHex('#E8F5E9')),
         ),

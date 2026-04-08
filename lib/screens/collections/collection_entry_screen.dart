@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
@@ -47,7 +48,6 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
     final controller = context.watch<AppController>();
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final compact = MediaQuery.of(context).size.width < 640;
     final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return FutureBuilder<List<Shop>>(
@@ -94,7 +94,7 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                 ? null
                 : SafeArea(
                     child: Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
                         color: scheme.surface,
                         boxShadow: [
@@ -105,30 +105,20 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                                   : 0.06,
                             ),
                             blurRadius: 10,
-                            offset: Offset(0, -4),
+                            offset: const Offset(0, -4),
                           ),
                         ],
                       ),
                       child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
                         onPressed: _saveCollection,
                         icon: const Icon(Icons.check_circle_rounded),
-                        label: const Text(
-                          'Confirm Payment',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
+                        label: const Text('Confirm Payment'),
                       ),
                     ),
                   ),
             child: ListView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: const EdgeInsets.only(bottom: 24),
+              padding: EdgeInsets.only(bottom: 24.h),
               children: [
                 SectionCard(
                   title: 'Receipt details',
@@ -138,10 +128,10 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        padding: EdgeInsets.all(compact ? 16 : 18),
+                        padding: EdgeInsets.all(16.w),
                         decoration: BoxDecoration(
                           color: scheme.surface,
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(16.r),
                           border: Border.all(color: scheme.outlineVariant),
                         ),
                         child: Column(
@@ -166,7 +156,7 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                               validator: (value) =>
                                   value == null ? 'Select a shop.' : null,
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16.h),
                             TextFormField(
                               controller: _amountController,
                               keyboardType: const TextInputType.numberWithOptions(
@@ -186,7 +176,7 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                                 return null;
                               },
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16.h),
                             DropdownButtonFormField<String>(
                               initialValue: _paymentMethod,
                               decoration: const InputDecoration(
@@ -204,7 +194,7 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                               onChanged: (value) =>
                                   setState(() => _paymentMethod = value),
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16.h),
                             TextFormField(
                               controller: _referenceController,
                               minLines: 2,
@@ -223,7 +213,7 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
                 SectionCard(
                   title: 'Balance impact',
                   subtitle:
@@ -231,60 +221,35 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final stacked = constraints.maxWidth < 420;
-
-                          if (stacked) {
-                            return Column(
-                              children: [
-                                _BalanceMetric(
-                                  label: 'Outstanding now',
-                                  value: AppFormatters.currency(currentBalance),
-                                ),
-                                const SizedBox(height: 12),
-                                _BalanceMetric(
-                                  label: 'After payment',
-                                  value: AppFormatters.currency(
-                                    balanceAfter < 0 ? 0 : balanceAfter,
-                                  ),
-                                  emphasized: true,
-                                ),
-                              ],
-                            );
-                          }
-
-                          return Row(
-                            children: [
-                              Expanded(
-                                child: _BalanceMetric(
-                                  label: 'Outstanding now',
-                                  value: AppFormatters.currency(currentBalance),
-                                ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _BalanceMetric(
+                              label: 'Outstanding now',
+                              value: AppFormatters.currency(currentBalance),
+                            ),
+                          ),
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: _BalanceMetric(
+                              label: 'After payment',
+                              value: AppFormatters.currency(
+                                balanceAfter < 0 ? 0 : balanceAfter,
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: _BalanceMetric(
-                                  label: 'After payment',
-                                  value: AppFormatters.currency(
-                                    balanceAfter < 0 ? 0 : balanceAfter,
-                                  ),
-                                  emphasized: true,
-                                ),
-                              ),
-                            ],
-                          );
-                        },
+                              emphasized: true,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 14),
+                      SizedBox(height: 14.h),
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16.w),
                         decoration: BoxDecoration(
                           color: theme.brightness == Brightness.dark
                               ? scheme.surfaceContainerHighest
                               : const Color(0xFFF8FDF8),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(16.r),
                           border: Border.all(color: scheme.outlineVariant),
                         ),
                         child: Column(
@@ -293,7 +258,7 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                               'Selected payment method',
                               _paymentMethod ?? '-',
                             ),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10.h),
                             _summary(
                               'Entered amount',
                               AppFormatters.currency(amount),
@@ -304,6 +269,7 @@ class _CollectionEntryScreenState extends State<CollectionEntryScreen> {
                     ],
                   ),
                 ),
+                SizedBox(height: 24.h),
               ],
             ),
           ),
@@ -374,12 +340,13 @@ class _BalanceMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: scheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
           color: emphasized ? scheme.primary : scheme.outlineVariant,
         ),
@@ -398,17 +365,16 @@ class _BalanceMetric extends StatelessWidget {
         children: [
           Text(
             label,
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.copyWith(color: emphasized ? scheme.primary : null),
+            style: theme.textTheme.bodySmall
+                ?.copyWith(color: emphasized ? scheme.primary : null, fontSize: 11.sp),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6.h),
           Text(
             value,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: emphasized ? scheme.primary : null,
+                  fontSize: 18.sp,
                 ),
           ),
         ],
@@ -430,4 +396,3 @@ List<Shop> _distinctShops(List<Shop> shops) {
 
   return unique;
 }
-

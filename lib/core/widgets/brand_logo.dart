@@ -66,13 +66,13 @@ class BrandLogo extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2E7D32).withValues(alpha: 0.1),
+                  color: const Color(0xFF93B620).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(99),
                 ),
                 child: const Text(
                   'PREMIUM',
                   style: TextStyle(
-                    color: Color(0xFF2E7D32),
+                    color: Color(0xFF93B620),
                     fontSize: 8,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0.5,

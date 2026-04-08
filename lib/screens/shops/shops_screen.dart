@@ -1,6 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
@@ -46,7 +46,7 @@ class _ShopsScreenState extends State<ShopsScreen> {
       (value) => value.shopsRevision,
     );
     final theme = Theme.of(context);
-    final scheme = Theme.of(context).colorScheme;
+    final scheme = theme.colorScheme;
 
     if (_lastRevision != revision) {
       _lastRevision = revision;
@@ -79,7 +79,7 @@ class _ShopsScreenState extends State<ShopsScreen> {
 
           return ListView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.only(bottom: 24),
+            padding: EdgeInsets.only(bottom: 24.h),
             children: [
               SectionCard(
                 title: 'Workspace',
@@ -105,10 +105,10 @@ class _ShopsScreenState extends State<ShopsScreen> {
                       ),
                       onChanged: _onSearchChanged,
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: 14.h),
                     Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
+                      spacing: 10.w,
+                      runSpacing: 10.h,
                       children: [
                         if (shops != null)
                           _MiniBadge(
@@ -122,31 +122,14 @@ class _ShopsScreenState extends State<ShopsScreen> {
                           ),
                       ],
                     ),
-                    const SizedBox(height: 14),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        OutlinedButton.icon(
-                          onPressed: _openImport,
-                          icon: const Icon(Icons.download_for_offline_outlined),
-                          label: const Text('Import'),
-                        ),
-                        FilledButton.icon(
-                          onPressed: _openCreate,
-                          icon: const Icon(Icons.add_business_outlined),
-                          label: const Text('Add Shop'),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               if (!snapshot.hasData)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 32),
-                  child: Center(child: CircularProgressIndicator()),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32.h),
+                  child: const Center(child: CircularProgressIndicator()),
                 )
               else if (shops!.isEmpty)
                 const EmptyState(
@@ -159,43 +142,31 @@ class _ShopsScreenState extends State<ShopsScreen> {
               else
                 ...shops.map((shop) {
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    padding: EdgeInsets.only(bottom: 12.h),
                     child: Container(
                       decoration: BoxDecoration(
                         color: scheme.surface,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(24.r),
                         border: Border.all(color: scheme.outlineVariant),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(
-                              alpha: theme.brightness == Brightness.dark
-                                  ? 0.18
-                                  : 0.02,
-                            ),
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
-                          )
-                        ],
                       ),
                       child: Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: EdgeInsets.all(16.w),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  width: 50,
-                                  height: 50,
+                                  width: 48.w,
+                                  height: 48.w,
                                   decoration: BoxDecoration(
-                                    color:
-                                        scheme.primary.withValues(alpha: 0.10),
-                                    borderRadius: BorderRadius.circular(16),
+                                    color: scheme.primary.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(16.r),
                                   ),
                                   child: Icon(Icons.storefront_outlined,
-                                      color: scheme.primary),
+                                      color: scheme.primary, size: 24.w),
                                 ),
-                                const SizedBox(width: 14),
+                                SizedBox(width: 14.w),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -203,16 +174,15 @@ class _ShopsScreenState extends State<ShopsScreen> {
                                     children: [
                                       Text(
                                         shop.name,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
+                                        style: theme.textTheme.titleMedium
                                             ?.copyWith(
-                                                fontWeight: FontWeight.w700),
+                                                fontWeight: FontWeight.w800,
+                                                fontSize: 16.sp),
                                       ),
-                                      const SizedBox(height: 6),
+                                      SizedBox(height: 8.h),
                                       Wrap(
-                                        spacing: 8,
-                                        runSpacing: 8,
+                                        spacing: 8.w,
+                                        runSpacing: 8.h,
                                         children: [
                                           _MiniBadge(
                                               icon: Icons.place_outlined,
@@ -227,6 +197,7 @@ class _ShopsScreenState extends State<ShopsScreen> {
                                   ),
                                 ),
                                 PopupMenuButton<String>(
+                                  padding: EdgeInsets.zero,
                                   onSelected: (value) =>
                                       _handleAction(value, shop),
                                   itemBuilder: (_) => const [
@@ -242,59 +213,32 @@ class _ShopsScreenState extends State<ShopsScreen> {
                           ),
                           Divider(height: 1, color: scheme.outlineVariant),
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                final stacked = constraints.maxWidth < 360;
-
-                                final balanceLabel = Row(
-                                  mainAxisSize: MainAxisSize.min,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16.w, vertical: 12.h),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
                                   children: [
                                     Icon(Icons.account_balance_wallet_outlined,
-                                        size: 16, color: theme.hintColor),
-                                    const SizedBox(width: 6),
+                                        size: 14.w, color: theme.hintColor),
+                                    SizedBox(width: 6.w),
                                     Text('Outstanding credit',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelMedium
-                                            ?.copyWith(color: theme.hintColor)),
+                                        style: theme.textTheme.labelMedium
+                                            ?.copyWith(color: theme.hintColor, fontSize: 11.sp)),
                                   ],
-                                );
-
-                                final balanceValue = Text(
+                                ),
+                                Text(
                                   AppFormatters.currency(shop.balance),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
+                                  style: theme.textTheme.titleMedium
                                       ?.copyWith(
                                           fontWeight: FontWeight.bold,
+                                          fontSize: 15.sp,
                                           color: shop.balance > 0
                                               ? Colors.red.shade700
                                               : scheme.primary),
-                                );
-
-                                if (stacked) {
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      balanceLabel,
-                                      const SizedBox(height: 8),
-                                      balanceValue,
-                                    ],
-                                  );
-                                }
-
-                                return Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    balanceLabel,
-                                    balanceValue,
-                                  ],
-                                );
-                              },
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -361,8 +305,7 @@ class _ShopsScreenState extends State<ShopsScreen> {
         context: context,
         builder: (context) => AlertDialog(
           scrollable: true,
-          insetPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
           title: const Text('Deactivate shop?'),
           content: Text('This will hide ${shop.name} from active entry lists.'),
           actions: [
@@ -394,25 +337,25 @@ class _MiniBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Theme.of(context).colorScheme.surfaceContainerHighest
+        color: theme.brightness == Brightness.dark
+            ? scheme.surfaceContainerHighest.withValues(alpha: 0.5)
             : const Color(0xFFF8FDF8),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(999.r),
+        border: Border.all(color: scheme.outlineVariant),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: Theme.of(context).colorScheme.onSurface),
-          const SizedBox(width: 6),
+          Icon(icon, size: 12.sp, color: scheme.onSurface),
+          SizedBox(width: 4.w),
           Text(label,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: Theme.of(context).colorScheme.onSurface)),
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: scheme.onSurface, fontSize: 10.sp)),
         ],
       ),
     );

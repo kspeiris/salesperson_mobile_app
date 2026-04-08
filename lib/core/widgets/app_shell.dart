@@ -1,6 +1,7 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../theme/app_sizes.dart';
 
 class AppShell extends StatelessWidget {
   const AppShell({
@@ -36,8 +37,6 @@ class AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final compact = width < 560;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final bottomSafeArea = MediaQuery.of(context).padding.bottom;
     final keyboardOpen = bottomInset > 0;
@@ -77,22 +76,21 @@ class AppShell extends StatelessWidget {
                   duration: const Duration(milliseconds: 180),
                   curve: Curves.easeOut,
                   padding: EdgeInsets.fromLTRB(
-                    compact ? 16 : 24,
-                    12,
-                    compact ? 16 : 24,
-                    (compact ? 20 : 28) + bottomSafeArea,
+                    16.w,
+                    12.h,
+                    16.w,
+                    (20.h) + bottomSafeArea,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (showHeaderCard)
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 24),
+                          padding: EdgeInsets.only(bottom: 24.h),
                           child: _ShellHeaderCard(
                             title: title,
                             subtitle: subtitle,
                             header: header,
-                            compact: compact,
                             headerImageAsset:
                                 showHeaderImage ? headerImageAsset : null,
                           ),
@@ -115,14 +113,12 @@ class _ShellHeaderCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.header,
-    required this.compact,
     required this.headerImageAsset,
   });
 
   final String title;
   final String? subtitle;
   final Widget? header;
-  final bool compact;
   final String? headerImageAsset;
 
   @override
@@ -131,8 +127,8 @@ class _ShellHeaderCard extends StatelessWidget {
     final scheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final hasImage = headerImageAsset != null;
-    final imageMinHeight = compact ? 176.0 : 208.0;
-    final panelRadius = BorderRadius.circular(24);
+    final imageMinHeight = 180.h;
+    final panelRadius = BorderRadius.circular(24.r);
 
     return Container(
       constraints: hasImage ? BoxConstraints(minHeight: imageMinHeight) : null,
@@ -151,10 +147,10 @@ class _ShellHeaderCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             blurRadius: 28,
-            offset: Offset(0, 14),
+            offset: const Offset(0, 14),
             color: isDark
                 ? Colors.black.withValues(alpha: 0.24)
-                : const Color(0x122E7D32),
+                : const Color(0x1293B620),
           ),
         ],
       ),
@@ -167,8 +163,7 @@ class _ShellHeaderCard extends StatelessWidget {
                 child: Image.asset(
                   headerImageAsset!,
                   fit: BoxFit.cover,
-                  alignment:
-                      compact ? Alignment.centerRight : Alignment.centerRight,
+                  alignment: Alignment.centerRight,
                 ),
               ),
             Positioned.fill(
@@ -180,8 +175,8 @@ class _ShellHeaderCard extends StatelessWidget {
                     stops: hasImage ? const [0.0, 0.42, 1.0] : null,
                     colors: hasImage
                         ? [
-                            const Color(0xFF1F6A36).withValues(alpha: 0.92),
-                            const Color(0xFF3E9250).withValues(alpha: 0.58),
+                            const Color(0xFF708D18).withValues(alpha: 0.92),
+                            const Color(0xFF93B620).withValues(alpha: 0.58),
                             Colors.white.withValues(alpha: 0.06),
                           ]
                         : isDark
@@ -192,11 +187,11 @@ class _ShellHeaderCard extends StatelessWidget {
               ),
             ),
             Positioned(
-              right: compact ? -30 : -12,
-              top: compact ? -20 : -12,
+              right: -30.w,
+              top: -20.h,
               child: Container(
-                width: compact ? 108 : 140,
-                height: compact ? 108 : 140,
+                width: 110.w,
+                height: 110.w,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white.withValues(alpha: 0.14),
@@ -204,42 +199,42 @@ class _ShellHeaderCard extends StatelessWidget {
               ),
             ),
             Positioned(
-              left: compact ? -22 : -10,
-              bottom: compact ? -42 : -54,
+              left: -20.w,
+              bottom: -40.h,
               child: Container(
-                width: compact ? 88 : 120,
-                height: compact ? 88 : 120,
+                width: 90.w,
+                height: 90.w,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF9FD9A9).withValues(alpha: 0.14),
+                  color: const Color(0xFFD6E68F).withValues(alpha: 0.14),
                 ),
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(compact ? 14 : 18),
+              padding: EdgeInsets.all(16.w),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(22),
+                  borderRadius: BorderRadius.circular(22.r),
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
                     child: Container(
                       constraints: BoxConstraints(
-                        maxWidth:
-                            hasImage ? (compact ? 280 : 420) : double.infinity,
+                        maxWidth: hasImage ? 280.w : double.infinity,
                       ),
-                      padding: EdgeInsets.all(compact ? 16 : 20),
+                      padding: EdgeInsets.all(16.w),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(22),
-                        color: Colors.white
-                            .withValues(alpha: hasImage ? 0.18 : (isDark ? 0.08 : 0.72)),
+                        borderRadius: BorderRadius.circular(22.r),
+                        color: Colors.white.withValues(
+                            alpha: hasImage ? 0.18 : (isDark ? 0.08 : 0.72)),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: isDark ? 0.12 : 0.28),
+                          color: Colors.white
+                              .withValues(alpha: isDark ? 0.12 : 0.28),
                         ),
                         boxShadow: [
                           BoxShadow(
                             blurRadius: 18,
-                            offset: Offset(0, 10),
+                            offset: const Offset(0, 10),
                             color: isDark
                                 ? Colors.black.withValues(alpha: 0.26)
                                 : const Color(0x120F172A),
@@ -253,32 +248,32 @@ class _ShellHeaderCard extends StatelessWidget {
                         children: [
                           Text(
                             title,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith(
-                                  height: 1.05,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                ),
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              height: 1.05,
+                              fontWeight: FontWeight.w800,
+                              color: hasImage || isDark
+                                  ? Colors.white
+                                  : theme.primaryColor,
+                              fontSize: 22.sp,
+                            ),
                           ),
                           if (subtitle != null) ...[
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8.h),
                             Text(
                               subtitle!,
-                              maxLines: compact ? 4 : 3,
+                              maxLines: 4,
                               overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.84),
-                                    height: 1.35,
-                                  ),
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: hasImage || isDark
+                                    ? Colors.white.withValues(alpha: 0.84)
+                                    : theme.textTheme.bodyMedium?.color,
+                                height: 1.35,
+                                fontSize: 13.sp,
+                              ),
                             ),
                           ],
                           if (header != null) ...[
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16.h),
                             header!,
                           ],
                         ],

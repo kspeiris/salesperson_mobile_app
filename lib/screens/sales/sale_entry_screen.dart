@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
@@ -63,8 +64,7 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
   Widget build(BuildContext context) {
     final controller = context.read<AppController>();
     final theme = Theme.of(context);
-    final scheme = Theme.of(context).colorScheme;
-    final compact = MediaQuery.of(context).size.width < 640;
+    final scheme = theme.colorScheme;
 
     return FutureBuilder<List<dynamic>>(
       future: Future.wait<dynamic>(
@@ -116,7 +116,7 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
             pageBackgroundAsset: AppAssets.pageTexture,
             child: ListView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: const EdgeInsets.only(bottom: 24),
+              padding: EdgeInsets.only(bottom: 24.h),
               children: [
                 SectionCard(
                   title: 'Select Shop',
@@ -146,7 +146,7 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
                 SectionCard(
                   title: 'Add Products',
                   subtitle:
@@ -175,9 +175,9 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                                 },
                         ),
                         if (index < _lines.length - 1)
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12.h),
                       ],
-                      const SizedBox(height: 14),
+                      SizedBox(height: 14.h),
                       OutlinedButton.icon(
                         onPressed: () =>
                             setState(() => _lines.add(_LineDraft())),
@@ -187,7 +187,7 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
                 SectionCard(
                   title: 'Payment Details',
                   subtitle:
@@ -196,8 +196,8 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Payment method',
-                          style: Theme.of(context).textTheme.labelMedium),
-                      const SizedBox(height: 10),
+                          style: theme.textTheme.labelMedium),
+                      SizedBox(height: 10.h),
                       SegmentedButton<String>(
                         segments: const [
                           ButtonSegment(
@@ -224,10 +224,10 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                           side: BorderSide(
                               color: scheme.primary.withValues(alpha: 0.2)),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
+                              borderRadius: BorderRadius.circular(12.r)),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16.h),
                       TextFormField(
                         controller: _discountController,
                         keyboardType: const TextInputType.numberWithOptions(
@@ -238,7 +238,7 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                         ),
                         onChanged: (_) => setState(() {}),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16.h),
                       TextFormField(
                         controller: _noteController,
                         minLines: 2,
@@ -253,63 +253,39 @@ class _SaleEntryScreenState extends State<SaleEntryScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
                 SectionCard(
                   title: 'Review & Save',
                   subtitle:
                       'Confirm the total before saving this sale to the device.',
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final stacked = constraints.maxWidth < 380;
-
-                      final totalBlock = Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('Grand total',
-                              style: Theme.of(context).textTheme.labelMedium),
-                          const SizedBox(height: 2),
+                              style: theme.textTheme.labelMedium),
                           Text(
                             AppFormatters.currency(_grandTotal),
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith(
-                                  color: scheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              color: scheme.primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22.sp,
+                            ),
                           ),
                         ],
-                      );
-
-                      final saveButton = ElevatedButton.icon(
+                      ),
+                      SizedBox(height: 16.h),
+                      ElevatedButton.icon(
                         onPressed: () => _saveSale(),
                         icon: const Icon(Icons.check_circle_rounded),
                         label: const Text('Save Record'),
-                      );
-
-                      if (stacked) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            totalBlock,
-                            const SizedBox(height: 14),
-                            saveButton,
-                          ],
-                        );
-                      }
-
-                      return Row(
-                        children: [
-                          totalBlock,
-                          const SizedBox(width: 24),
-                          Expanded(child: saveButton),
-                        ],
-                      );
-                    },
+                      ),
+                    ],
                   ),
                 ),
-                if (!compact) const SizedBox(height: 8),
+                SizedBox(height: 16.h),
               ],
             ),
           ),
@@ -455,107 +431,109 @@ class _SaleLineCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final scheme = Theme.of(context).colorScheme;
+    final scheme = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: scheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: scheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Line item ${index + 1}',
-            style: Theme.of(context).textTheme.labelMedium,
-          ),
-          const SizedBox(height: 12),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: DropdownButtonFormField<Product>(
-                  initialValue: line.product,
-                  isExpanded: true,
-                  items: products
-                      .map((product) => DropdownMenuItem<Product>(
-                            value: product,
-                            child: Text(product.name),
-                          ))
-                      .toList(),
-                  decoration: const InputDecoration(
-                    labelText: 'Product',
-                    prefixIcon: Icon(Icons.local_drink_rounded),
-                  ),
-                  onChanged: (value) {
-                    line.product = value;
-                    if (value != null) {
-                      line.priceController.text =
-                          value.unitPrice.toStringAsFixed(2);
-                    }
-                    onChanged();
-                  },
-                  validator: (value) => value == null ? 'Required' : null,
-                ),
+              Text(
+                'Line item ${index + 1}',
+                style: theme.textTheme.labelMedium,
               ),
               if (onRemove != null)
                 IconButton(
                   onPressed: onRemove,
                   icon: Icon(Icons.close_rounded, color: theme.hintColor),
+                  constraints: const BoxConstraints(),
+                  padding: EdgeInsets.zero,
                 ),
             ],
           ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            crossAxisAlignment: WrapCrossAlignment.center,
+          SizedBox(height: 12.h),
+          DropdownButtonFormField<Product>(
+            initialValue: line.product,
+            isExpanded: true,
+            items: products
+                .map((product) => DropdownMenuItem<Product>(
+                      value: product,
+                      child: Text(product.name),
+                    ))
+                .toList(),
+            decoration: const InputDecoration(
+              labelText: 'Product',
+              prefixIcon: Icon(Icons.local_drink_rounded),
+            ),
+            onChanged: (value) {
+              line.product = value;
+              if (value != null) {
+                line.priceController.text =
+                    value.unitPrice.toStringAsFixed(2);
+              }
+              onChanged();
+            },
+            validator: (value) => value == null ? 'Required' : null,
+          ),
+          SizedBox(height: 16.h),
+          Row(
             children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Qty', style: Theme.of(context).textTheme.labelMedium),
-                  const SizedBox(width: 12),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: theme.brightness == Brightness.dark
-                          ? scheme.surfaceContainerHighest
-                          : const Color(0xFFF8FDF8),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: scheme.outlineVariant),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove_rounded),
-                          onPressed: () {
-                            if (line.quantity > 1) {
-                              line.qty = line.quantity - 1;
+              Expanded(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Qty', style: theme.textTheme.labelMedium),
+                    SizedBox(height: 8.h),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: theme.brightness == Brightness.dark
+                            ? scheme.surfaceContainerHighest
+                            : const Color(0xFFF8FDF8),
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(color: scheme.outlineVariant),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.remove_rounded),
+                            onPressed: () {
+                              if (line.quantity > 1) {
+                                line.qty = line.quantity - 1;
+                                onChanged();
+                              }
+                            },
+                            color: scheme.primary,
+                          ),
+                          Text('${line.quantity}',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16.sp)),
+                          IconButton(
+                            icon: const Icon(Icons.add_rounded),
+                            onPressed: () {
+                              line.qty = line.quantity + 1;
                               onChanged();
-                            }
-                          },
-                          color: scheme.primary,
-                        ),
-                        Text('${line.quantity}',
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16)),
-                        IconButton(
-                          icon: const Icon(Icons.add_rounded),
-                          onPressed: () {
-                            line.qty = line.quantity + 1;
-                            onChanged();
-                          },
-                          color: scheme.primary,
-                        ),
-                      ],
+                            },
+                            color: scheme.primary,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              SizedBox(
-                width: 220,
+              SizedBox(width: 12.w),
+              Expanded(
+                flex: 3,
                 child: TextFormField(
                   controller: line.priceController,
                   keyboardType:
@@ -569,12 +547,12 @@ class _SaleLineCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Align(
             alignment: Alignment.centerRight,
             child: Text(
               'Total: ${AppFormatters.currency(line.total)}',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w800, color: scheme.primary),
             ),
           ),
@@ -622,4 +600,3 @@ class _LineDraft {
     priceController.dispose();
   }
 }
-

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SectionCard extends StatelessWidget {
   const SectionCard({
@@ -16,65 +17,38 @@ class SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final compact = MediaQuery.of(context).size.width < 640;
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(24.r),
         color: scheme.surface,
         border: Border.all(color: scheme.outlineVariant),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.18 : 0.02),
-            blurRadius: 24,
-            offset: Offset(0, 12),
-          ),
-        ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(compact ? 20 : 24),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final stackHeader = trailing != null && constraints.maxWidth < 520;
-
-            return Column(
+        padding: EdgeInsets.all(20.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (stackHeader) ...[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _SectionHeaderText(title: title, subtitle: subtitle),
-                      const SizedBox(height: 12),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: trailing!,
-                      ),
-                    ],
+                Expanded(
+                  child: _SectionHeaderText(
+                    title: title,
+                    subtitle: subtitle,
                   ),
-                ] else
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: _SectionHeaderText(
-                          title: title,
-                          subtitle: subtitle,
-                        ),
-                      ),
-                      if (trailing != null) ...[
-                        const SizedBox(width: 12),
-                        trailing!,
-                      ],
-                    ],
-                  ),
-                SizedBox(height: compact ? 16 : 18),
-                child,
+                ),
+                if (trailing != null) ...[
+                  SizedBox(width: 12.w),
+                  trailing!,
+                ],
               ],
-            );
-          },
+            ),
+            SizedBox(height: 16.h),
+            child,
+          ],
         ),
       ),
     );
@@ -92,22 +66,24 @@ class _SectionHeaderText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: Theme.of(context).colorScheme.onSurface,
+                color: theme.colorScheme.onSurface,
+                fontSize: 16.sp,
                 letterSpacing: -0.2,
               ),
         ),
         if (subtitle != null) ...[
-          const SizedBox(height: 4),
+          SizedBox(height: 4.h),
           Text(
             subtitle!,
-            style: Theme.of(context).textTheme.bodySmall,
+            style: theme.textTheme.bodySmall?.copyWith(fontSize: 12.sp),
           ),
         ],
       ],

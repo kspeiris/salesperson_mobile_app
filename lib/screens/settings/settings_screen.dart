@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
@@ -101,12 +102,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: AppShell(
         title: 'Profile & Settings',
         subtitle:
-            'Update company details, payment methods, profile photo, and local device security from one place.',
+            'Update company details, payment methods, profile photo, and local device security.',
         headerImageAsset: AppAssets.settingsHero,
         pageBackgroundAsset: AppAssets.pageTexture,
         child: ListView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          padding: const EdgeInsets.only(bottom: 24),
+          padding: EdgeInsets.only(bottom: 24.h),
           children: [
             Center(
               child: Column(
@@ -116,261 +117,178 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ? controller.currentSalesperson
                         : _salespersonController.text.trim(),
                     imagePath: currentImagePath,
-                    size: 104,
-                    borderColor: const Color(0xFFE8F5E9),
+                    size: 96.w,
+                    borderColor: scheme.outlineVariant,
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
                   Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
+                    spacing: 12.w,
+                    runSpacing: 12.h,
                     alignment: WrapAlignment.center,
                     children: [
                       OutlinedButton.icon(
                         onPressed: _pickProfileImage,
-                        icon: const Icon(Icons.photo_camera_back_outlined),
-                        label: const Text('Upload Photo'),
+                        icon: Icon(Icons.photo_camera_back_outlined, size: 18.w),
+                        label: const Text('Update Photo'),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: Size.zero,
+                          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                        ),
                       ),
                       if ((currentImagePath ?? '').isNotEmpty)
                         TextButton.icon(
                           onPressed: _removeProfileImage,
-                          icon: const Icon(Icons.delete_outline_rounded),
+                          icon: Icon(Icons.delete_outline_rounded, size: 18.w),
                           label: const Text('Remove'),
+                          style: TextButton.styleFrom(
+                            minimumSize: Size.zero,
+                            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                          ),
                         ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Bio Care Sales App',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge
-                        ?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Text('v2.0 Premium Edition',
-                      style: TextStyle(color: Theme.of(context).hintColor)),
                 ],
               ),
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 24.h),
             SectionCard(
-              title: 'Data Management',
-              child: Container(
-                decoration: BoxDecoration(
-                  color: scheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: scheme.outlineVariant),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(
-                        alpha: theme.brightness == Brightness.dark ? 0.18 : 0.02,
-                      ),
-                      blurRadius: 8,
-                      offset: Offset(0, 2),
-                    )
-                  ],
-                ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(16),
-                  leading: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: theme.brightness == Brightness.dark
-                          ? scheme.surfaceContainerHighest
-                          : const Color(0xFFF8FDF8),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(Icons.settings_backup_restore_rounded,
-                        color: scheme.primary),
+              title: 'Master Data Management',
+              child: ListTile(
+                contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                leading: Container(
+                  padding: EdgeInsets.all(10.w),
+                  decoration: BoxDecoration(
+                    color: scheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
-                  title: const Text('Import / Export Data',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: const Text('Manage masters and system backups.'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const DataManagementScreen())),
+                  child: Icon(Icons.settings_backup_restore_rounded,
+                      color: scheme.primary, size: 22.w),
                 ),
+                title: Text('Database Tools',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp)),
+                subtitle: Text('Manage system backups and master data.', style: TextStyle(fontSize: 12.sp)),
+                trailing: Icon(Icons.chevron_right_rounded, size: 20.w),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const DataManagementScreen())),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             SectionCard(
-              title: 'App Profile',
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: scheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: scheme.outlineVariant),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(
-                        alpha: theme.brightness == Brightness.dark ? 0.18 : 0.02,
-                      ),
-                      blurRadius: 8,
-                      offset: Offset(0, 2),
-                    )
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _companyController,
-                      decoration: const InputDecoration(
-                        labelText: 'Company Name',
-                        prefixIcon: Icon(Icons.business_rounded),
-                      ),
-                      validator: (value) =>
-                          (value == null || value.trim().isEmpty)
-                              ? 'Company name is required.'
-                              : null,
+              title: 'Company Profile',
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _companyController,
+                    decoration: const InputDecoration(
+                      labelText: 'Company Name',
+                      prefixIcon: Icon(Icons.business_rounded),
                     ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _salespersonController,
-                      decoration: const InputDecoration(
-                        labelText: 'Salesperson Name',
-                        prefixIcon: Icon(Icons.badge_rounded),
-                      ),
-                      validator: (value) =>
-                          (value == null || value.trim().isEmpty)
-                              ? 'Name is required.'
-                              : null,
+                    validator: (value) =>
+                        (value == null || value.trim().isEmpty)
+                            ? 'Company name is required.'
+                            : null,
+                  ),
+                  SizedBox(height: 16.h),
+                  TextFormField(
+                    controller: _salespersonController,
+                    decoration: const InputDecoration(
+                      labelText: 'Salesperson Name',
+                      prefixIcon: Icon(Icons.badge_rounded),
                     ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _paymentMethodsController,
-                      decoration: const InputDecoration(
-                        labelText: 'Payment Methods',
-                        hintText: 'Cash, Bank, Cheque',
-                        prefixIcon: Icon(Icons.payments_rounded),
-                      ),
-                      validator: (value) =>
-                          (value == null || value.trim().isEmpty)
-                              ? 'At least one payment method is required.'
-                              : null,
+                    validator: (value) =>
+                        (value == null || value.trim().isEmpty)
+                            ? 'Name is required.'
+                            : null,
+                  ),
+                  SizedBox(height: 16.h),
+                  TextFormField(
+                    controller: _paymentMethodsController,
+                    decoration: const InputDecoration(
+                      labelText: 'Payment Methods',
+                      hintText: 'Cash, Bank, Cheque',
+                      prefixIcon: Icon(Icons.payments_rounded),
                     ),
-                  ],
-                ),
+                    validator: (value) =>
+                        (value == null || value.trim().isEmpty)
+                            ? 'Required.'
+                            : null,
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             SectionCard(
               title: 'Appearance',
-              subtitle:
-                  'Choose how the app looks on this device. System mode follows the phone setting automatically.',
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: scheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: scheme.outlineVariant),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(
-                        alpha: theme.brightness == Brightness.dark ? 0.18 : 0.02,
-                      ),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    )
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    RadioListTile<String>(
-                      value: 'system',
-                      groupValue: _themeMode,
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('System default'),
-                      subtitle:
-                          const Text('Match the phone light or dark appearance.'),
-                      onChanged: (value) => setState(() => _themeMode = value!),
-                    ),
-                    Divider(color: scheme.outlineVariant),
-                    RadioListTile<String>(
-                      value: 'light',
-                      groupValue: _themeMode,
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Light mode'),
-                      subtitle: const Text('Bright professional workspace.'),
-                      onChanged: (value) => setState(() => _themeMode = value!),
-                    ),
-                    Divider(color: scheme.outlineVariant),
-                    RadioListTile<String>(
-                      value: 'dark',
-                      groupValue: _themeMode,
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Dark mode'),
-                      subtitle: const Text('Low-glare interface for night use.'),
-                      onChanged: (value) => setState(() => _themeMode = value!),
-                    ),
-                  ],
-                ),
+              child: Column(
+                children: [
+                  RadioListTile<String>(
+                    value: 'system',
+                    groupValue: _themeMode,
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('System default'),
+                    onChanged: (value) => setState(() => _themeMode = value!),
+                  ),
+                  RadioListTile<String>(
+                    value: 'light',
+                    groupValue: _themeMode,
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Light mode'),
+                    onChanged: (value) => setState(() => _themeMode = value!),
+                  ),
+                  RadioListTile<String>(
+                    value: 'dark',
+                    groupValue: _themeMode,
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Dark mode'),
+                    onChanged: (value) => setState(() => _themeMode = value!),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             SectionCard(
               title: 'Security',
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: scheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: scheme.outlineVariant),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(
-                        alpha: theme.brightness == Brightness.dark ? 0.18 : 0.02,
+              child: Column(
+                children: [
+                  SwitchListTile.adaptive(
+                    value: _pinEnabled,
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Enable local PIN',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    onChanged: (value) => setState(() => _pinEnabled = value),
+                  ),
+                  if (_pinEnabled) ...[
+                    SizedBox(height: 12.h),
+                    TextFormField(
+                      controller: _pinController,
+                      obscureText: true,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'New PIN',
+                        hintText: 'Leave blank to keep same',
+                        prefixIcon: Icon(Icons.lock_outline_rounded),
                       ),
-                      blurRadius: 8,
-                      offset: Offset(0, 2),
-                    )
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    SwitchListTile.adaptive(
-                      value: _pinEnabled,
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Enable local PIN',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle:
-                          const Text('Protect app access on this device.'),
-                      onChanged: (value) => setState(() => _pinEnabled = value),
+                      validator: (value) {
+                        if (!_pinEnabled) return null;
+                        if (value == null || value.isEmpty) return null;
+                        if (value.trim().length < 4) {
+                          return 'PIN must be 4+ digits.';
+                        }
+                        return null;
+                      },
                     ),
-                    if (_pinEnabled) ...[
-                      Divider(height: 24, color: scheme.outlineVariant),
-                      TextFormField(
-                        controller: _pinController,
-                        obscureText: true,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'New PIN',
-                          hintText: 'Leave blank to keep current PIN',
-                          prefixIcon: Icon(Icons.lock_outline_rounded),
-                        ),
-                        validator: (value) {
-                          if (!_pinEnabled) return null;
-                          if (value == null || value.isEmpty) return null;
-                          if (value.trim().length < 4) {
-                            return 'PIN must be at least 4 digits.';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
                   ],
-                ),
+                ],
               ),
             ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
+            SizedBox(height: 32.h),
+            ElevatedButton(
               onPressed: _save,
-              icon: const Icon(Icons.check_circle_rounded),
-              label: const Text('SAVE PROFILE'),
+              child: const Text('SAVE PROFILE'),
             ),
-            const SizedBox(height: 48),
+            SizedBox(height: 48.h),
           ],
         ),
       ),

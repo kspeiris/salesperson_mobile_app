@@ -1,6 +1,6 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
@@ -35,17 +35,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final controller = context.watch<AppController>();
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final width = MediaQuery.of(context).size.width;
-    final metricCrossAxisCount = width >= 980
-        ? 4
-        : width >= 640
-            ? 2
-            : 1;
-    final metricAspectRatio = width >= 980
-        ? 1.36
-        : width >= 640
-            ? 1.32
-            : 1.54;
 
     return Scaffold(
       appBar: AppBar(
@@ -104,7 +93,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: ListView(
                       keyboardDismissBehavior:
                           ScrollViewKeyboardDismissBehavior.onDrag,
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+                      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 32.h),
                       children: [
                         _HeroPanel(
                           salesperson: controller.currentSalesperson,
@@ -117,120 +106,107 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           onNewSale: _openSaleEntry,
                           onNewCollection: _openCollectionEntry,
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24.h),
                         _SmartSuggestionBanner(
                           onNewSale: _openSaleEntry,
                           onNewCollection: _openCollectionEntry,
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20.h),
                         SectionCard(
                           title: 'Today at a glance',
-                          child: Column(
-                            children: [
-                              GridView.count(
-                                crossAxisCount: metricCrossAxisCount,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                                childAspectRatio: metricAspectRatio,
-                                children: [
-                                  MetricCard(
-                                    title: 'Sales value',
-                                    value: AppFormatters.currency(
-                                        summary.totalSales),
-                                    subtitle:
-                                        '${summary.salesCount} orders captured',
-                                    icon: Icons.trending_up_rounded,
-                                  ),
-                                  MetricCard(
-                                    title: 'Collections',
-                                    value: AppFormatters.currency(
-                                        summary.totalCollections),
-                                    subtitle:
-                                        '${summary.collectionCount} receipts logged',
-                                    icon: Icons.account_balance_wallet_outlined,
-                                  ),
-                                  MetricCard(
-                                    title: 'Cash sales',
-                                    value: AppFormatters.currency(
-                                        summary.cashSales),
-                                    subtitle:
-                                        '${cashShare.toStringAsFixed(0)}% of today\'s sales',
-                                    icon: Icons.payments_rounded,
-                                  ),
-                                  MetricCard(
-                                    title: 'Credit balance',
-                                    value: AppFormatters.currency(
-                                        summary.creditSales),
-                                    subtitle: 'Pending from recorded orders',
-                                    icon: Icons.receipt_long_outlined,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 18),
-                              LayoutBuilder(
-                                builder: (context, constraints) {
-                                  final stacked = constraints.maxWidth < 720;
-                                  if (stacked) {
-                                    return Column(
-                                      children: [
-                                        _InsightCard(
-                                          title: 'Collection coverage',
-                                          value:
-                                              '${collectionCoverage.toStringAsFixed(0)}%',
-                                          description:
-                                              'A quick comparison of collections against today\'s sales value.',
-                                          icon: Icons.ssid_chart_rounded,
-                                        ),
-                                        const SizedBox(height: 12),
-                                        _InsightCard(
-                                          title: 'Route activity',
-                                          value: '$totalOrders actions',
-                                          description:
-                                              'Combined orders and receipts captured for the selected date.',
-                                          icon: Icons.route_rounded,
-                                        ),
-                                      ],
-                                    );
-                                  }
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              final availableWidth = constraints.maxWidth;
+                              final metricCrossAxisCount =
+                                  availableWidth < 260 ? 1 : 2;
+                              final metricMainAxisExtent = availableWidth < 360
+                                  ? 172.h
+                                  : availableWidth < 460
+                                      ? 184.h
+                                      : 196.h;
 
-                                  return Row(
+                              return Column(
+                                children: [
+                                  GridView(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: metricCrossAxisCount,
+                                      crossAxisSpacing: 12.w,
+                                      mainAxisSpacing: 12.h,
+                                      mainAxisExtent: metricMainAxisExtent,
+                                    ),
                                     children: [
-                                      Expanded(
-                                        child: _InsightCard(
-                                          title: 'Collection coverage',
-                                          value:
-                                              '${collectionCoverage.toStringAsFixed(0)}%',
-                                          description:
-                                              'A quick comparison of collections against today\'s sales value.',
-                                          icon: Icons.ssid_chart_rounded,
-                                        ),
+                                      MetricCard(
+                                        title: 'Sales value',
+                                        value: AppFormatters.currency(
+                                            summary.totalSales),
+                                        subtitle:
+                                            '${summary.salesCount} orders captured',
+                                        icon: Icons.trending_up_rounded,
                                       ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: _InsightCard(
-                                          title: 'Route activity',
-                                          value: '$totalOrders actions',
-                                          description:
-                                              'Combined orders and receipts captured for the selected date.',
-                                          icon: Icons.route_rounded,
-                                        ),
+                                      MetricCard(
+                                        title: 'Collections',
+                                        value: AppFormatters.currency(
+                                            summary.totalCollections),
+                                        subtitle:
+                                            '${summary.collectionCount} receipts logged',
+                                        icon: Icons
+                                            .account_balance_wallet_outlined,
+                                      ),
+                                      MetricCard(
+                                        title: 'Cash sales',
+                                        value: AppFormatters.currency(
+                                            summary.cashSales),
+                                        subtitle:
+                                            '${cashShare.toStringAsFixed(0)}% of today\'s sales',
+                                        icon: Icons.payments_rounded,
+                                      ),
+                                      MetricCard(
+                                        title: 'Credit balance',
+                                        value: AppFormatters.currency(
+                                            summary.creditSales),
+                                        subtitle:
+                                            'Pending from recorded orders',
+                                        icon: Icons.receipt_long_outlined,
                                       ),
                                     ],
-                                  );
-                                },
-                              ),
-                            ],
+                                  ),
+                                  SizedBox(height: 18.h),
+                                  Column(
+                                    children: [
+                                      _InsightCard(
+                                        title: 'Collection coverage',
+                                        value:
+                                            '${collectionCoverage.toStringAsFixed(0)}%',
+                                        description:
+                                            'A quick comparison of collections against today\'s sales value.',
+                                        icon: Icons.ssid_chart_rounded,
+                                      ),
+                                      SizedBox(height: 12.h),
+                                      _InsightCard(
+                                        title: 'Route activity',
+                                        value: '$totalOrders actions',
+                                        description:
+                                            'Combined orders and receipts captured for the selected date.',
+                                        icon: Icons.route_rounded,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20.h),
                         SectionCard(
                           title: 'Recent activity',
                           child: activities.isEmpty
-                              ? const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 32),
-                                  child: Center(
+                              ? Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 32.h),
+                                  child: const Center(
                                       child:
                                           Text('No recorded activity found.')),
                                 )
@@ -242,7 +218,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       _ActivityItem(activity: activities[i]),
                                       if (i < activities.length - 1)
                                         Divider(
-                                            height: 24,
+                                            height: 24.h,
                                             color: scheme.outlineVariant),
                                     ],
                                   ],
@@ -329,21 +305,21 @@ class _ActivityItem extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 42,
-          height: 42,
+          width: 42.w,
+          height: 42.w,
           decoration: BoxDecoration(
             color: isSale
                 ? scheme.primary.withValues(alpha: 0.14)
                 : scheme.secondary.withValues(alpha: 0.16),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.r),
           ),
           child: Icon(
             isSale ? Icons.receipt_long_rounded : Icons.request_quote_rounded,
             color: isSale ? scheme.primary : scheme.secondary,
-            size: 20,
+            size: 20.w,
           ),
         ),
-        const SizedBox(width: 14),
+        SizedBox(width: 14.w),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -357,7 +333,7 @@ class _ActivityItem extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 '$dateStr • $timeStr',
-                style: TextStyle(color: theme.hintColor, fontSize: 12),
+                style: TextStyle(color: theme.hintColor, fontSize: 12.sp),
               ),
             ],
           ),
@@ -382,12 +358,11 @@ class _SmartSuggestionBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final compact = MediaQuery.of(context).size.width < 560;
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -399,7 +374,7 @@ class _SmartSuggestionBanner extends StatelessWidget {
                   Color(0xFFE8F3E4),
                 ],
         ),
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(28.r),
         border: Border.all(color: scheme.outlineVariant),
         boxShadow: [
           BoxShadow(
@@ -407,120 +382,103 @@ class _SmartSuggestionBanner extends StatelessWidget {
               alpha: theme.brightness == Brightness.dark ? 0.18 : 0.06,
             ),
             blurRadius: 24,
-            offset: Offset(0, 12),
+            offset: const Offset(0, 12),
           ),
         ],
       ),
-      child: Stack(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (theme.brightness != Brightness.dark)
-            Positioned(
-            right: compact ? -24 : -8,
-            bottom: compact ? -18 : -8,
-            child: IgnorePointer(
-              child: Opacity(
-                opacity: 0.28,
-                child: Image.asset(
-                  AppAssets.reportsHero,
-                  width: compact ? 108 : 150,
-                  fit: BoxFit.contain,
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(18.r),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: theme.brightness == Brightness.dark ? 0.18 : 0.04,
+                  ),
+                  blurRadius: 10,
                 ),
-              ),
+              ],
+            ),
+            child: Icon(
+              Icons.auto_awesome_rounded,
+              color: scheme.primary,
+              size: 24.w,
             ),
           ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: scheme.surface,
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(
-                        alpha: theme.brightness == Brightness.dark ? 0.18 : 0.04,
-                      ),
-                      blurRadius: 10,
-                    )
-                  ],
-                ),
-                child: Icon(Icons.auto_awesome_rounded,
-                    color: scheme.primary, size: 24),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(right: compact ? 56 : 96),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Route strategy tip',
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: scheme.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Review today's sales and collections to decide which shops need follow-up first, then capture the next route action from here.",
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.textTheme.bodyMedium?.color,
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: [
-                          FilledButton.icon(
-                            onPressed: onNewSale,
-                            icon: const Icon(Icons.add_shopping_cart_rounded,
-                                size: 18),
-                            label: const Text('New Sale'),
-                            style: FilledButton.styleFrom(
-                              minimumSize: Size.zero,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                          ),
-                          OutlinedButton.icon(
-                            onPressed: onNewCollection,
-                            icon: const Icon(Icons.request_quote_outlined,
-                                size: 18),
-                            label: const Text('Record Collection'),
-                            style: OutlinedButton.styleFrom(
-                              minimumSize: Size.zero,
-                              backgroundColor: theme.brightness == Brightness.dark
-                                  ? scheme.surface.withValues(alpha: 0.18)
-                                  : Colors.transparent,
-                              foregroundColor: theme.brightness == Brightness.dark
-                                  ? Colors.white
-                                  : scheme.primary,
-                              side: BorderSide(
-                                color: theme.brightness == Brightness.dark
-                                    ? Colors.white.withValues(alpha: 0.22)
-                                    : scheme.outlineVariant,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+          SizedBox(width: 16.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Route strategy tip',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: scheme.onSurface,
                   ),
                 ),
-              ),
-            ],
+                SizedBox(height: 8.h),
+                Text(
+                  "Review today's sales and collections to decide which shops need follow-up first, then capture the next route action from here.",
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.textTheme.bodyMedium?.color,
+                    height: 1.5,
+                  ),
+                ),
+                SizedBox(height: 18.h),
+                Wrap(
+                  spacing: 10.w,
+                  runSpacing: 10.h,
+                  children: [
+                    FilledButton.icon(
+                      onPressed: onNewSale,
+                      icon: Icon(Icons.add_shopping_cart_rounded, size: 18.w),
+                      label: const Text('New Sale'),
+                      style: FilledButton.styleFrom(
+                        minimumSize: Size.zero,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 12.h,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16.r),
+                        ),
+                      ),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: onNewCollection,
+                      icon: Icon(Icons.request_quote_outlined, size: 18.w),
+                      label: const Text('Record Collection'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: Size.zero,
+                        backgroundColor: theme.brightness == Brightness.dark
+                            ? scheme.surface.withValues(alpha: 0.18)
+                            : Colors.transparent,
+                        foregroundColor: theme.brightness == Brightness.dark
+                            ? Colors.white
+                            : scheme.primary,
+                        side: BorderSide(
+                          color: theme.brightness == Brightness.dark
+                              ? Colors.white.withValues(alpha: 0.22)
+                              : scheme.outlineVariant,
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 12.h,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16.r),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -553,15 +511,14 @@ class _HeroPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final width = MediaQuery.of(context).size.width;
-    final compact = width < 620;
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
     final greeting = _greetingForHour(DateTime.now().hour);
 
     return Container(
-      constraints: BoxConstraints(minHeight: compact ? 346 : 400),
+      constraints: BoxConstraints(minHeight: 320.h),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(26.r),
         image: const DecorationImage(
           image: AssetImage(AppAssets.dashboardHero),
           fit: BoxFit.cover,
@@ -570,14 +527,14 @@ class _HeroPanel extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             blurRadius: 30,
-            offset: Offset(0, 16),
+            offset: const Offset(0, 16),
             color: Colors.black.withValues(alpha: 0.10),
           ),
         ],
       ),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(26),
+          borderRadius: BorderRadius.circular(26.r),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomCenter,
@@ -590,34 +547,34 @@ class _HeroPanel extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.all(compact ? 22 : 30),
+          padding: EdgeInsets.all(20.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Wrap(
-                spacing: 12,
-                runSpacing: 12,
+                spacing: 12.w,
+                runSpacing: 12.h,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   BrandLogo(
-                    height: compact ? 26 : 34,
+                    height: 28.h,
                     padding: EdgeInsets.symmetric(
-                        horizontal: compact ? 12 : 14,
-                        vertical: compact ? 8 : 10),
+                        horizontal: 12.w,
+                        vertical: 8.h),
                     showPlate: true,
                     alignment: Alignment.centerLeft,
                     plateDecoration: BoxDecoration(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Theme.of(context).colorScheme.surface.withValues(alpha: 0.86)
+                      color: theme.brightness == Brightness.dark
+                          ? theme.colorScheme.surface.withValues(alpha: 0.86)
                           : const Color(0xFFF7FBF4),
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(18.r),
                       border: Border.all(
-                        color: Theme.of(context).colorScheme.outlineVariant,
+                        color: theme.colorScheme.outlineVariant,
                       ),
                       boxShadow: [
                         BoxShadow(
                           blurRadius: 16,
-                          offset: Offset(0, 6),
+                          offset: const Offset(0, 6),
                           color: Colors.black.withValues(alpha: 0.12),
                         ),
                       ],
@@ -626,108 +583,86 @@ class _HeroPanel extends StatelessWidget {
                   _HeroDateChip(
                     label: AppFormatters.date(selectedDate),
                     onTap: onDateTap,
-                    compact: compact,
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SalespersonAvatar(
                     name: salesperson,
                     imagePath: profileImagePath,
-                    size: compact ? 48 : 56,
+                    size: 48.w,
                     backgroundColor: Colors.white.withValues(alpha: 0.16),
                     foregroundColor: Colors.white,
                     borderColor: Colors.white.withValues(alpha: 0.32),
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14.w),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           '$greeting, $salesperson',
-                          style: (compact
-                                  ? textTheme.headlineSmall
-                                  : textTheme.headlineMedium)
-                              ?.copyWith(
+                          style: textTheme.headlineSmall?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.5,
+                            fontSize: 20.sp,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: 4.h),
                         Text(
                           companyName,
                           style: textTheme.bodyLarge?.copyWith(
                               color: Colors.white.withValues(alpha: 0.86),
-                              fontWeight: FontWeight.w500),
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14.sp),
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               Text(
                 'Your daily route summary and next best actions.',
                 style: textTheme.bodyMedium?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.78), height: 1.5),
+                    color: Colors.white.withValues(alpha: 0.78),
+                    height: 1.5,
+                    fontSize: 13.sp),
               ),
-              const SizedBox(height: 16),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  if (compact) {
-                    return Column(
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _HeroStatChip(
-                                label: '$totalOrders actions',
-                                icon: Icons.sync_alt_rounded,
-                                compact: true,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            const Expanded(
-                              child: _HeroStatChip(
-                                label: 'Offline ready',
-                                icon: Icons.wifi_off_rounded,
-                                compact: true,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        _HeroStatChip(
-                          label: '${AppFormatters.currency(todaySales)} today',
-                          icon: Icons.payments_outlined,
-                          compact: true,
+              SizedBox(height: 16.h),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _HeroStatChip(
+                          label: '$totalOrders actions',
+                          icon: Icons.sync_alt_rounded,
                           fullWidth: true,
                         ),
-                      ],
-                    );
-                  }
-
-                  return Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      _HeroStatChip(
-                          label: '$totalOrders actions',
-                          icon: Icons.sync_alt_rounded),
-                      const _HeroStatChip(
-                          label: 'Offline ready', icon: Icons.wifi_off_rounded),
-                      _HeroStatChip(
-                        label: '${AppFormatters.currency(todaySales)} today',
-                        icon: Icons.payments_outlined,
+                      ),
+                      SizedBox(width: 10.w),
+                      const Expanded(
+                        child: _HeroStatChip(
+                          label: 'Offline ready',
+                          icon: Icons.wifi_off_rounded,
+                          fullWidth: true,
+                        ),
                       ),
                     ],
-                  );
-                },
+                  ),
+                  SizedBox(height: 10.h),
+                  _HeroStatChip(
+                    label: '${AppFormatters.currency(todaySales)} today',
+                    icon: Icons.payments_outlined,
+                    fullWidth: true,
+                  ),
+                ],
               ),
             ],
           ),
@@ -747,12 +682,10 @@ class _HeroDateChip extends StatelessWidget {
   const _HeroDateChip({
     required this.label,
     required this.onTap,
-    this.compact = false,
   });
 
   final String label;
   final VoidCallback onTap;
-  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -761,20 +694,18 @@ class _HeroDateChip extends StatelessWidget {
       borderRadius: BorderRadius.circular(999),
       child: _HeroGlassBadge(
         child: Ink(
-          padding: EdgeInsets.symmetric(
-              horizontal: compact ? 12 : 14, vertical: compact ? 10 : 12),
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.calendar_today_outlined,
-                  size: compact ? 16 : 18, color: Colors.white),
-              SizedBox(width: compact ? 6 : 8),
+              Icon(Icons.calendar_today_outlined, size: 16.w, color: Colors.white),
+              SizedBox(width: 6.w),
               Text(
                 label,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
-                  fontSize: compact ? 14 : 16,
+                  fontSize: 14.sp,
                 ),
               ),
             ],
@@ -789,13 +720,11 @@ class _HeroStatChip extends StatelessWidget {
   const _HeroStatChip({
     required this.label,
     required this.icon,
-    this.compact = false,
     this.fullWidth = false,
   });
 
   final String label;
   final IconData icon;
-  final bool compact;
   final bool fullWidth;
 
   @override
@@ -804,15 +733,14 @@ class _HeroStatChip extends StatelessWidget {
       width: fullWidth ? double.infinity : null,
       child: _HeroGlassBadge(
         child: Padding(
-          padding:
-              EdgeInsets.symmetric(horizontal: compact ? 12 : 14, vertical: 10),
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
           child: Row(
             mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
             mainAxisAlignment:
                 fullWidth ? MainAxisAlignment.center : MainAxisAlignment.start,
             children: [
-              Icon(icon, size: compact ? 16 : 18, color: Colors.white),
-              SizedBox(width: compact ? 6 : 8),
+              Icon(icon, size: 16.w, color: Colors.white),
+              SizedBox(width: 6.w),
               Flexible(
                 child: Text(
                   label,
@@ -820,7 +748,7 @@ class _HeroStatChip extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
-                    fontSize: compact ? 14 : 15,
+                    fontSize: 13.sp,
                   ),
                 ),
               ),
@@ -871,12 +799,13 @@ class _InsightCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18.w),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         color: scheme.primary.withValues(alpha: 0.05),
         border: Border.all(color: scheme.primary.withValues(alpha: 0.10)),
       ),
@@ -884,30 +813,31 @@ class _InsightCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 44.w,
+            height: 44.w,
             decoration: BoxDecoration(
               color: scheme.primary,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
             ),
-            child: Icon(icon, color: Colors.white),
+            child: Icon(icon, color: Colors.white, size: 24.w),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 6),
+                Text(title, style: theme.textTheme.titleMedium?.copyWith(fontSize: 14.sp)),
+                SizedBox(height: 6.h),
                 Text(
                   value,
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineSmall
-                      ?.copyWith(fontWeight: FontWeight.w800),
+                  style: theme.textTheme.headlineSmall
+                      ?.copyWith(fontWeight: FontWeight.w800, fontSize: 20.sp),
                 ),
-                const SizedBox(height: 6),
-                Text(description),
+                SizedBox(height: 6.h),
+                Text(
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(fontSize: 11.sp),
+                ),
               ],
             ),
           ),
@@ -916,4 +846,5 @@ class _InsightCard extends StatelessWidget {
     );
   }
 }
+
 

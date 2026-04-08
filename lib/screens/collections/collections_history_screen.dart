@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
@@ -61,15 +62,13 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
         return AppShell(
           title: 'Collections History',
           subtitle:
-              'Track every payment received from shops, review the payment method used, and void incorrect entries when needed.',
+              'Track every payment received from shops and review the payment method handled for each receipt.',
           headerImageAsset: AppAssets.collectionsHero,
           pageBackgroundAsset: AppAssets.pageTexture,
           floatingActionButton: FloatingActionButton.extended(
             onPressed: _openCreate,
             icon: const Icon(Icons.request_quote_rounded),
             label: const Text('Add Collection'),
-            backgroundColor: scheme.primary,
-            foregroundColor: Colors.white,
           ),
           child: FutureBuilder<List<CollectionRecord>>(
             future: _collectionsFuture,
@@ -79,7 +78,7 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
               return ListView(
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: const EdgeInsets.only(bottom: 96),
+                padding: EdgeInsets.only(bottom: 96.h),
                 children: [
                   SectionCard(
                     title: 'Filters',
@@ -88,41 +87,59 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        InkWell(
-                          borderRadius: BorderRadius.circular(18),
-                          onTap: _pickDate,
-                          child: InputDecorator(
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.calendar_month_outlined),
-                              labelText: 'Date',
+                        _FilterField(
+                          label: 'Date',
+                          icon: Icons.calendar_month_rounded,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(18.r),
+                            onTap: _pickDate,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 2.h),
+                              child: Text(
+                                AppFormatters.date(_selectedDate),
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16.sp,
+                                ),
+                              ),
                             ),
-                            child: Text(AppFormatters.date(_selectedDate)),
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<int?>(
-                          initialValue: _shopId,
-                          isExpanded: true,
-                          decoration: const InputDecoration(
-                            prefixIcon: Icon(Icons.storefront_outlined),
-                            labelText: 'Shop filter',
+                        SizedBox(height: 12.h),
+                        _FilterField(
+                          label: 'Shop filter',
+                          icon: Icons.storefront_outlined,
+                          trailing: Icon(Icons.keyboard_arrow_down_rounded, color: theme.hintColor),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<int?>(
+                              value: _shopId,
+                              isExpanded: true,
+                              dropdownColor: scheme.surface,
+                              borderRadius: BorderRadius.circular(18.r),
+                              icon: const SizedBox.shrink(),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: scheme.onSurface,
+                                fontSize: 16.sp,
+                              ),
+                              items: [
+                                const DropdownMenuItem<int?>(
+                                    value: null, child: Text('All shops')),
+                                ...shops.map((shop) => DropdownMenuItem<int?>(
+                                    value: shop.id, child: Text(shop.name))),
+                              ],
+                              onChanged: _updateShopFilter,
+                            ),
                           ),
-                          items: [
-                            const DropdownMenuItem<int?>(
-                                value: null, child: Text('All shops')),
-                            ...shops.map((shop) => DropdownMenuItem<int?>(
-                                value: shop.id, child: Text(shop.name))),
-                          ],
-                          onChanged: _updateShopFilter,
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 20.h),
                   if (!snapshot.hasData)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 32),
-                      child: Center(child: CircularProgressIndicator()),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 32.h),
+                      child: const Center(child: CircularProgressIndicator()),
                     )
                   else if (collections!.isEmpty)
                     const EmptyState(
@@ -135,118 +152,11 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
                   else
                     ...collections.map((entry) {
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: scheme.surface.withValues(
-                              alpha: theme.brightness == Brightness.dark
-                                  ? 0.94
-                                  : 0.82,
-                            ),
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(color: scheme.outlineVariant),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary
-                                          .withValues(alpha: 0.12),
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Icon(Icons.request_quote_outlined,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary),
-                                  ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(entry.shopName,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium),
-                                        const SizedBox(height: 6),
-                                        Wrap(
-                                          spacing: 8,
-                                          runSpacing: 8,
-                                          children: [
-                                            _HistoryChip(
-                                                label: entry.isVoided
-                                                    ? 'Voided'
-                                                    : entry.paymentMethod),
-                                            _HistoryChip(
-                                                label: AppFormatters.time(
-                                                    entry.createdAt)),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  PopupMenuButton<String>(
-                                    enabled: !entry.isVoided,
-                                    onSelected: (value) {
-                                      if (value == 'edit') {
-                                        _openEdit(entry);
-                                      }
-                                      if (value == 'void') {
-                                        _voidCollection(entry);
-                                      }
-                                    },
-                                    itemBuilder: (_) => const [
-                                      PopupMenuItem(
-                                          value: 'edit',
-                                          child: Text('Edit collection')),
-                                      PopupMenuItem(
-                                          value: 'void',
-                                          child: Text('Void collection')),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 14),
-                              Text('Collected amount',
-                                  style:
-                                      Theme.of(context).textTheme.labelMedium),
-                              const SizedBox(height: 4),
-                              Text(
-                                AppFormatters.currency(entry.amount),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(fontWeight: FontWeight.w800),
-                              ),
-                              if (entry.referenceNote.isNotEmpty) ...[
-                                const SizedBox(height: 12),
-                                Text(entry.referenceNote,
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium),
-                              ],
-                              if (entry.voidReason != null &&
-                                  entry.voidReason!.isNotEmpty) ...[
-                                const SizedBox(height: 12),
-                                Text(
-                                  'Reason: ${entry.voidReason}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(fontWeight: FontWeight.w600),
-                                ),
-                              ],
-                            ],
-                          ),
+                        padding: EdgeInsets.only(bottom: 16.h),
+                        child: _CollectionHistoryCard(
+                          collection: entry,
+                          onEdit: entry.isVoided ? null : () => _openEdit(entry),
+                          onVoid: entry.isVoided ? null : () => _voidCollection(entry),
                         ),
                       );
                     }),
@@ -298,7 +208,7 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
       context: context,
       builder: (context) => AlertDialog(
         scrollable: true,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
         title: const Text('Void collection'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -307,7 +217,7 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
             const Text(
               'Add a short reason so this void stays clear in the audit trail.',
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             TextField(
               controller: reasonController,
               autofocus: true,
@@ -388,30 +298,284 @@ List<Shop> _distinctShops(List<Shop> shops) {
   return unique;
 }
 
-class _HistoryChip extends StatelessWidget {
-  const _HistoryChip({required this.label});
+class _FilterField extends StatelessWidget {
+  const _FilterField({
+    required this.label,
+    required this.icon,
+    required this.child,
+    this.trailing,
+  });
 
   final String label;
+  final IconData icon;
+  final Widget child;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       decoration: BoxDecoration(
         color: theme.brightness == Brightness.dark
             ? scheme.surfaceContainerHighest
-            : const Color(0xFFF8F3EA),
-        borderRadius: BorderRadius.circular(999),
+            : const Color(0xFFF3FAF4),
+        borderRadius: BorderRadius.circular(22.r),
         border: Border.all(color: scheme.outlineVariant),
       ),
-      child: Text(
-        label,
-        style: Theme.of(context)
-            .textTheme
-            .bodySmall
-            ?.copyWith(fontWeight: FontWeight.w700),
+      child: Row(
+        children: [
+          Container(
+            width: 42.w,
+            height: 42.w,
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(14.r),
+            ),
+            child: Icon(icon, color: scheme.primary, size: 20.w),
+          ),
+          SizedBox(width: 14.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.hintColor,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 11.sp,
+                      ),
+                ),
+                SizedBox(height: 4.h),
+                child,
+              ],
+            ),
+          ),
+          if (trailing != null) ...[
+            SizedBox(width: 12.w),
+            trailing!,
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _CollectionHistoryCard extends StatelessWidget {
+  const _CollectionHistoryCard({
+    required this.collection,
+    required this.onEdit,
+    required this.onVoid,
+  });
+
+  final CollectionRecord collection;
+  final VoidCallback? onEdit;
+  final VoidCallback? onVoid;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final isVoided = collection.isVoided;
+
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24.r),
+        color: scheme.surface,
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 48.w,
+                height: 48.w,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16.r),
+                  color: isVoided
+                      ? scheme.error.withValues(alpha: 0.1)
+                      : scheme.secondary.withValues(alpha: 0.1),
+                ),
+                child: Icon(
+                  Icons.request_quote_rounded,
+                  color: isVoided ? scheme.error : scheme.secondary,
+                  size: 24.w,
+                ),
+              ),
+              SizedBox(width: 14.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      collection.shopName,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: scheme.onSurface,
+                        fontSize: 16.sp,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Wrap(
+                      spacing: 8.w,
+                      runSpacing: 8.h,
+                      children: [
+                        _StatusChip(
+                          label: isVoided ? 'Voided' : collection.paymentMethod,
+                          icon: isVoided
+                              ? Icons.block_rounded
+                              : Icons.account_balance_rounded,
+                          accentColor: isVoided
+                              ? const Color(0xFFF9ECEC)
+                              : scheme.secondary.withValues(alpha: 0.1),
+                          textColor: isVoided
+                              ? const Color(0xFF9A4B4B)
+                              : scheme.secondary,
+                        ),
+                        _StatusChip(
+                          label: AppFormatters.time(collection.createdAt),
+                          icon: Icons.schedule_rounded,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              if (!isVoided)
+                PopupMenuButton<String>(
+                  color: scheme.surface,
+                  padding: EdgeInsets.zero,
+                  onSelected: (value) {
+                    if (value == 'edit' && onEdit != null) onEdit!();
+                    if (value == 'void' && onVoid != null) onVoid!();
+                  },
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Text('Edit collection'),
+                    ),
+                    PopupMenuItem(
+                      value: 'void',
+                      child: Text('Void collection'),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+          SizedBox(height: 16.h),
+          Divider(height: 1, color: scheme.outlineVariant),
+          SizedBox(height: 16.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Collected amount',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.hintColor,
+                      fontSize: 11.sp,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    AppFormatters.currency(collection.amount),
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 18.sp,
+                      color: scheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          if (collection.referenceNote.isNotEmpty) ...[
+            SizedBox(height: 12.h),
+            Text(
+              collection.referenceNote,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.hintColor,
+                fontSize: 13.sp,
+              ),
+            ),
+          ],
+          if (isVoided && collection.voidReason != null) ...[
+            SizedBox(height: 12.h),
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: scheme.error.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: scheme.error.withValues(alpha: 0.1)),
+              ),
+              child: Text(
+                'Audit reason: ${collection.voidReason}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: scheme.error,
+                  fontSize: 11.sp,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({
+    required this.label,
+    this.icon,
+    this.accentColor,
+    this.textColor,
+  });
+
+  final String label;
+  final IconData? icon;
+  final Color? accentColor;
+  final Color? textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final color = textColor ?? theme.hintColor;
+    final bg = accentColor ?? scheme.surfaceContainerHighest.withValues(alpha: 0.4);
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999.r),
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 12.sp, color: color),
+            SizedBox(width: 4.w),
+          ],
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: color,
+              fontSize: 10.sp,
+            ),
+          ),
+        ],
       ),
     );
   }

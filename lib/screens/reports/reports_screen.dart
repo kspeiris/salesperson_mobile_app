@@ -1,6 +1,6 @@
-﻿import 'dart:io';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/app_controller.dart';
@@ -31,8 +31,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AppController>();
-    final scheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     _lastFile = controller.lastGeneratedReport ?? _lastFile;
 
     return AppShell(
@@ -43,7 +43,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       pageBackgroundAsset: AppAssets.pageTexture,
       child: ListView(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         children: [
           SectionCard(
             title: 'Report Date',
@@ -54,14 +54,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
               onTap: _pickDate,
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
           FutureBuilder(
             future: controller.reportPreview(_selectedDate),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 32),
-                  child: Center(child: CircularProgressIndicator()),
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32.h),
+                  child: const Center(child: CircularProgressIndicator()),
                 );
               }
 
@@ -77,32 +77,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       collectionsTotal: preview.dashboard.totalCollections,
                     ),
                   ),
-                  const SizedBox(height: 18),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
+                  SizedBox(height: 20.h),
+                  Row(
                     children: [
-                      SizedBox(
-                        width: 220,
+                      Expanded(
                         child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            elevation: 0,
-                            backgroundColor: scheme.primary,
-                            shadowColor: Colors.black.withValues(
-                              alpha: theme.brightness == Brightness.dark
-                                  ? 0.12
-                                  : 0.10,
-                            ),
-                          ),
                           onPressed: _isGenerating ? null : _generateReport,
                           icon: _isGenerating
-                              ? const SizedBox.square(
-                                  dimension: 18,
-                                  child: CircularProgressIndicator(
+                              ? SizedBox.square(
+                                  dimension: 18.w,
+                                  child: const CircularProgressIndicator(
                                     strokeWidth: 2,
                                     color: Colors.white,
                                   ),
@@ -111,22 +95,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
                           label: const Text('Generate PDF'),
                         ),
                       ),
-                      SizedBox(
-                        width: 220,
+                      SizedBox(width: 12.w),
+                      Expanded(
                         child: OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                          ),
                           onPressed: _isExporting ? null : _exportBundle,
                           icon: _isExporting
                               ? SizedBox.square(
-                                  dimension: 18,
+                                  dimension: 18.w,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: theme.colorScheme.primary,
+                                    color: scheme.primary,
                                   ),
                                 )
                               : const Icon(Icons.upload_file_outlined),
@@ -139,15 +117,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
               );
             },
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: 20.h),
           if (_lastFile != null)
             SectionCard(
               title: 'Latest PDF',
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _PathCard(path: _lastFile!.path, label: 'Saved file'),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 16.h),
                   FilledButton.icon(
                     onPressed: _shareLastReport,
                     icon: const Icon(Icons.share_outlined),
@@ -157,44 +135,46 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
             ),
           if (controller.lastExportBundle != null) ...[
-            const SizedBox(height: 18),
+            SizedBox(height: 20.h),
             SectionCard(
               title: 'Latest export bundle',
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _PathCard(
                     path: controller.lastExportBundle!.csvFile,
                     label: 'CSV file',
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10.h),
                   _PathCard(
                     path: controller.lastExportBundle!.jsonFile,
                     label: 'JSON file',
                   ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+                  SizedBox(height: 16.h),
+                  FilledButton.icon(
+                    onPressed: _shareExportBundle,
+                    icon: const Icon(Icons.share_outlined),
+                    label: const Text('Share all files'),
+                  ),
+                  SizedBox(height: 10.h),
+                  Row(
                     children: [
-                      FilledButton.icon(
-                        onPressed: _shareExportBundle,
-                        icon: const Icon(Icons.share_outlined),
-                        label: const Text('Share files'),
-                      ),
-                      OutlinedButton.icon(
-                        onPressed: () => _saveExportCopy(
-                          controller.lastExportBundle!.csvFile,
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => _saveExportCopy(
+                            controller.lastExportBundle!.csvFile,
+                          ),
+                          child: const Text('Save CSV'),
                         ),
-                        icon: const Icon(Icons.save_alt_outlined),
-                        label: const Text('Save CSV copy'),
                       ),
-                      OutlinedButton.icon(
-                        onPressed: () => _saveExportCopy(
-                          controller.lastExportBundle!.jsonFile,
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => _saveExportCopy(
+                            controller.lastExportBundle!.jsonFile,
+                          ),
+                          child: const Text('Save JSON'),
                         ),
-                        icon: const Icon(Icons.code_outlined),
-                        label: const Text('Save JSON copy'),
                       ),
                     ],
                   ),
@@ -202,6 +182,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
             ),
           ],
+          SizedBox(height: 32.h),
         ],
       ),
     );
@@ -230,7 +211,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       });
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('PDF saved to ${file.path}')));
+      ).showSnackBar(SnackBar(content: Text('PDF saved: ${file.path.split('/').last}')));
     } catch (error) {
       if (!mounted) return;
       setState(() => _isGenerating = false);
@@ -250,7 +231,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Exported ${bundle.csvFile.split('/').last} and ${bundle.jsonFile.split('/').last}',
+            'Exported ${bundle.csvFile.split('/').last} and JSON',
           ),
         ),
       );
@@ -269,7 +250,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content:
-              Text(savedPath == null ? 'Save cancelled.' : 'Saved to $savedPath'),
+              Text(savedPath == null ? 'Save cancelled.' : 'Saved successfully.'),
         ),
       );
     } catch (error) {
@@ -300,48 +281,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
   }
 }
 
-class _HeaderChip extends StatelessWidget {
-  const _HeaderChip({
-    required this.icon,
-    required this.label,
-  });
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-      decoration: BoxDecoration(
-        color: theme.brightness == Brightness.dark
-            ? scheme.surfaceContainerHighest
-            : const Color(0xFFEAF5EC).withValues(alpha: 0.82),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: scheme.outlineVariant),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: scheme.primary),
-          const SizedBox(width: 7),
-          Text(
-            label,
-            style: TextStyle(
-              color: scheme.primary,
-              fontWeight: FontWeight.w700,
-              fontSize: 13,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _ReportsDateCard extends StatelessWidget {
   const _ReportsDateCard({
     required this.selectedDate,
@@ -356,107 +295,61 @@ class _ReportsDateCard extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: scheme.surface.withValues(
-          alpha: theme.brightness == Brightness.dark ? 0.94 : 0.88,
+    return InkWell(
+      borderRadius: BorderRadius.circular(22.r),
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: theme.brightness == Brightness.dark
+              ? scheme.surfaceContainerHighest
+              : const Color(0xFFF5FBF6),
+          borderRadius: BorderRadius.circular(22.r),
+          border: Border.all(color: scheme.outlineVariant),
         ),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: scheme.outlineVariant),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 22,
-            offset: Offset(0, 12),
-            color: Colors.black.withValues(
-              alpha: theme.brightness == Brightness.dark ? 0.2 : 0.06,
-            ),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: theme.brightness == Brightness.dark
-                      ? scheme.surfaceContainerHighest
-                      : const Color(0xFFF1F8F2),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(
-                  Icons.event_note_rounded,
-                  color: scheme.primary,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Select Report Date',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          InkWell(
-            borderRadius: BorderRadius.circular(22),
-            onTap: onTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Row(
+          children: [
+            Container(
+              width: 44.w,
+              height: 44.w,
               decoration: BoxDecoration(
-                color: theme.brightness == Brightness.dark
-                    ? scheme.surfaceContainerHighest
-                    : const Color(0xFFF5FBF6),
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: scheme.outlineVariant),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 16,
-                    offset: Offset(0, 8),
-                    color: Colors.black.withValues(
-                      alpha: theme.brightness == Brightness.dark ? 0.18 : 0.03,
-                    ),
-                  ),
-                ],
+                color: scheme.surface,
+                borderRadius: BorderRadius.circular(14.r),
               ),
-              child: Row(
+              child: Icon(
+                Icons.calendar_month_rounded,
+                color: scheme.primary,
+                size: 22.w,
+              ),
+            ),
+            SizedBox(width: 14.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: scheme.surface,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      Icons.calendar_month_rounded,
-                      color: scheme.primary,
-                    ),
+                  Text(
+                    'Daily records for',
+                    style: theme.textTheme.labelMedium?.copyWith(fontSize: 11.sp),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      AppFormatters.date(selectedDate),
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: scheme.onSurface,
-                      ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    AppFormatters.date(selectedDate),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: scheme.onSurface,
+                      fontSize: 16.sp,
                     ),
-                  ),
-                  Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: theme.hintColor,
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: theme.hintColor,
+              size: 24.w,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -477,71 +370,26 @@ class _ReportsSummaryCard extends StatelessWidget {
     final scheme = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            scheme.surface,
-            theme.brightness == Brightness.dark
-                ? scheme.surfaceContainerHighest
-                : const Color(0xFFF5FBF6),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(28),
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(24.r),
         border: Border.all(color: scheme.outlineVariant),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 24,
-            offset: Offset(0, 14),
-            color: Colors.black.withValues(
-              alpha: theme.brightness == Brightness.dark ? 0.2 : 0.06,
-            ),
-          ),
-        ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: theme.brightness == Brightness.dark
-                      ? scheme.surfaceContainerHighest
-                      : const Color(0xFFF1F8F2),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(
-                  Icons.insert_chart_outlined_rounded,
-                  color: scheme.primary,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Daily Summary',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
           _SummaryMetric(
-            label: 'Sales',
+            label: 'Total Sales',
             value: AppFormatters.currency(salesTotal),
-            accent: const Color(0xFF2E7D32),
+            accent: const Color(0xFF93B620),
             icon: Icons.trending_up_rounded,
           ),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 14),
+            padding: EdgeInsets.symmetric(vertical: 14.h),
             child: Divider(height: 1, color: scheme.outlineVariant),
           ),
           _SummaryMetric(
-            label: 'Collections',
+            label: 'Total Collections',
             value: AppFormatters.currency(collectionsTotal),
             accent: const Color(0xFF5A8B68),
             icon: Icons.account_balance_wallet_rounded,
@@ -569,63 +417,46 @@ class _SummaryMetric extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final iconCard = Container(
-      width: 42,
-      height: 42,
-      decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Icon(icon, color: accent),
-    );
-
-    final textBlock = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Text(
-          label,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.hintColor,
+        Container(
+          width: 42.w,
+          height: 42.w,
+          decoration: BoxDecoration(
+            color: accent.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(14.r),
           ),
+          child: Icon(icon, color: accent, size: 20.w),
         ),
-        const SizedBox(height: 4),
-        FittedBox(
-          alignment: Alignment.centerLeft,
-          fit: BoxFit.scaleDown,
-          child: Text(
-            value,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              fontSize: 28,
-              letterSpacing: -0.6,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
+        SizedBox(width: 14.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.hintColor,
+                  fontSize: 12.sp,
+                ),
+              ),
+              SizedBox(height: 2.h),
+              FittedBox(
+                alignment: Alignment.centerLeft,
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  value,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 22.sp,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
-    );
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < 360) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              iconCard,
-              const SizedBox(height: 12),
-              textBlock,
-            ],
-          );
-        }
-
-        return Row(
-          children: [
-            iconCard,
-            const SizedBox(width: 14),
-            Expanded(child: textBlock),
-          ],
-        );
-      },
     );
   }
 }
@@ -645,26 +476,27 @@ class _PathCard extends StatelessWidget {
     final scheme = theme.colorScheme;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: theme.brightness == Brightness.dark
             ? scheme.surfaceContainerHighest
             : const Color(0xFFF4F8F5),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: scheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: Theme.of(context).textTheme.bodySmall),
-          const SizedBox(height: 6),
-          SelectableText(
+          Text(label, style: theme.textTheme.labelSmall?.copyWith(fontSize: 10.sp)),
+          SizedBox(height: 6.h),
+          Text(
             path,
-            style: Theme.of(context).textTheme.bodySmall,
+            style: theme.textTheme.bodySmall?.copyWith(fontSize: 10.sp),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
     );
   }
 }
-
