@@ -131,7 +131,7 @@ class MoreScreen extends StatelessWidget {
                   onTap: () {
                     showAboutDialog(
                       context: context,
-                      applicationName: 'Bio Care Sales',
+                      applicationName: 'Bio Care Consumers Sales App',
                       applicationVersion: '1.1.0',
                       applicationIcon: Icon(Icons.eco_rounded,
                           color: const Color(0xFF93B620), size: 48.w),

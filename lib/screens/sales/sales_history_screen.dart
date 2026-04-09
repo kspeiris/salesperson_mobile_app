@@ -36,7 +36,6 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.read<AppController>();
     final shopsRevision = context.select<AppController, int>(
       (value) => value.shopsRevision,
     );
@@ -250,9 +249,7 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
     }
     reasonController.dispose();
   }
-}
 
-extension on _SalesHistoryScreenState {
   Future<List<Shop>> _loadShops() {
     return context.read<AppController>().fetchShops();
   }

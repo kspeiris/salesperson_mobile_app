@@ -1,7 +1,6 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppSizes {
-  // Mobile responsive helpers
   static double get h1 => 32.sp;
   static double get h2 => 28.sp;
   static double get h3 => 24.sp;
@@ -12,14 +11,12 @@ class AppSizes {
   static double get labelLarge => 15.sp;
   static double get labelMedium => 12.sp;
 
-  // Spacing
   static double get paddingXS => 4.w;
   static double get paddingSmall => 8.w;
   static double get paddingMedium => 16.w;
   static double get paddingLarge => 24.w;
   static double get paddingXL => 32.w;
 
-  // Component sizes
   static double get buttonHeight => 54.h;
   static double get inputHeight => 56.h;
   static double get iconSizeSmall => 18.w;

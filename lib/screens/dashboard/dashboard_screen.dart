@@ -38,7 +38,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bio Care Hub'),
+        title: const Text('Bio Care Consumers'),
         centerTitle: false,
         actions: [
           IconButton(
@@ -75,7 +75,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ? 0
                   : (summary.totalCollections / summary.totalSales) * 100;
 
-              // Combined activity, limited to 5
               final activities = _combineActivity(sales, collections);
 
               return Center(

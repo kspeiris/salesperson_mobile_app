@@ -248,9 +248,7 @@ class _CollectionsHistoryScreenState extends State<CollectionsHistoryScreen> {
     }
     reasonController.dispose();
   }
-}
 
-extension on _CollectionsHistoryScreenState {
   Future<List<Shop>> _loadShops() {
     return context.read<AppController>().fetchShops();
   }

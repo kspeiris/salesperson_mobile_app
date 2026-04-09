@@ -208,7 +208,7 @@ class _IntroPanel extends StatelessWidget {
               ),
               SizedBox(height: 18.h),
               Text(
-                'Bio Care Sales App',
+                'Bio Care Consumers Sales App',
                 style: textTheme.headlineSmall?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w800,

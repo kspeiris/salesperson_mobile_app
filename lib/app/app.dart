@@ -19,7 +19,7 @@ class SalespersonApp extends StatelessWidget {
       builder: (context, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Bio Care Sales',
+          title: 'Bio Care Consumers Sales App',
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: context.select<AppController, ThemeMode>(
