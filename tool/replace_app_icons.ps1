@@ -1,7 +1,7 @@
-Add-Type -AssemblyName System.Drawing
+﻿Add-Type -AssemblyName System.Drawing
 
 $root = Split-Path -Parent $PSScriptRoot
-$sourcePath = Join-Path $root 'Green bio care sales icon.png'
+$sourcePath = Join-Path $root 'assets/branding/Green bio care sales icon.png'
 
 if (!(Test-Path $sourcePath)) {
   throw "Source icon not found: $sourcePath"
@@ -60,3 +60,6 @@ try {
 finally {
   $source.Dispose()
 }
+
+
+

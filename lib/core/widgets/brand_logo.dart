@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class BrandLogo extends StatelessWidget {
   const BrandLogo({
@@ -16,8 +16,8 @@ class BrandLogo extends StatelessWidget {
   final Alignment alignment;
   final BoxDecoration? plateDecoration;
 
-  static const String lightAssetPath = 'biocare logo1.png';
-  static const String darkAssetPath = 'biocare logo1_dark.png';
+  static const String lightAssetPath = 'assets/branding/biocare logo1.png';
+  static const String darkAssetPath = 'assets/branding/biocare logo1_dark.png';
 
   @override
   Widget build(BuildContext context) {
@@ -94,3 +94,5 @@ class BrandLogo extends StatelessWidget {
     );
   }
 }
+
+

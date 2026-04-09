@@ -1,4 +1,4 @@
-name: salesperson_daily_recorder
+﻿name: salesperson_daily_recorder
 version: 1.1.0+2
 publish_to: 'none'
 description: Offline sales and collections recorder with SQLite, local repositories, validation, and PDF reporting.
@@ -31,15 +31,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - biocare logo1.png
-    - biocare logo1_dark.png
-    - Login hero.png
-    - Dashboard background.png
-    - Sales module image.png
-    - Collections module image.png
-    - Reports screen image.png
-    - Shops_customer management.png
-    - Products_catalog.png
-    - Settings_security.png
-    - Empty state for sales or collections.png
-    - Subtle reusable background texture.png
+    - assets/branding/
+    - assets/heroes/
+    - assets/screenshots/
+    - assets/misc/
+
+

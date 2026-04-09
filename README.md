@@ -1,11 +1,11 @@
-# 🌿 Bio Care Consumers Sales App
+﻿# ðŸŒ¿ Bio Care Consumers Sales App
 
 <p align="center">
-  <img src="./biocare%20logo1_dark.png" alt="Bio Care Consumers Sales App Logo" width="140" />
+  <img src="./assets/branding/biocare%20logo1_dark.png" alt="Bio Care Consumers Sales App Logo" width="140" />
 </p>
 
 <p align="center">
-  <img src="./Bio%20Care%20Consumers%20Sales%20App%20banner.png" alt="Bio Care Consumers Sales App Banner" width="100%" />
+  <img src="./assets/branding/Bio%20Care%20Consumers%20Sales%20App%20banner.png" alt="Bio Care Consumers Sales App Banner" width="100%" />
 </p>
 
 
@@ -23,13 +23,13 @@
 
 ---
 
-## 📖 Overview
+## ðŸ“– Overview
 
 Bio Care Consumers Sales App is a polished route-sales recorder built with Flutter and local SQLite storage. It helps a salesperson or route team manage shops, products, sales, collections, daily reports, exports, and backups directly on-device without depending on a live internet connection.
 
 The app starts fast, seeds demo data for first-time use, stores business data locally, and provides reporting/export flows for desktop-side processing.
 
-## ✨ Key Highlights
+## âœ¨ Key Highlights
 
 - Offline-first workflow with local SQLite persistence
 - Secure local login with optional PIN protection
@@ -45,7 +45,7 @@ The app starts fast, seeds demo data for first-time use, stores business data lo
 - CSV/TXT import flows for shops and products
 - Theme mode, profile photo, and local settings management
 
-## 🧰 Tech Stack
+## ðŸ§° Tech Stack
 
 | Layer | Tools |
 |---|---|
@@ -58,30 +58,30 @@ The app starts fast, seeds demo data for first-time use, stores business data lo
 | Scanning | `mobile_scanner` |
 | Formatting | `intl` |
 
-## 🗂️ Main Features
+## ðŸ—‚ï¸ Main Features
 
-### 🔐 Authentication
+### ðŸ” Authentication
 - Login screen with salesperson name/ID
 - Optional local PIN validation using SHA-256 hash storage
 - Profile image support for a more personalized workspace
 
-### 📊 Dashboard
+### ðŸ“Š Dashboard
 - Daily sales, collections, cash sales, and credit sales metrics
 - Recent route activity feed
 - Quick actions for creating a sale or recording a collection
 - Date-based summary view
 
-### 🏪 Shop Management
+### ðŸª Shop Management
 - Create, edit, search, and deactivate shops
 - Track area, phone, owner/contact, credit limit, and balance
 - Bulk import shop master data from CSV/TXT files
 
-### 📦 Product Management
+### ðŸ“¦ Product Management
 - Create, edit, search, and deactivate products
 - Maintain SKU, barcode, description, and pricing
 - Bulk import product master data from CSV/TXT files
 
-### 🧾 Sales
+### ðŸ§¾ Sales
 - Create and edit offline sales
 - Add multiple line items per sale
 - Cash or credit sale support
@@ -89,26 +89,26 @@ The app starts fast, seeds demo data for first-time use, stores business data lo
 - Void recorded sales with a reason
 - Automatic shop balance updates for credit sales
 
-### 💰 Collections
+### ðŸ’° Collections
 - Record and edit received payments
 - Support configurable payment methods
 - Preview the outstanding balance after payment
 - Void collections with a reason
 - Automatic shop balance adjustments
 
-### 📁 Reports, Export, and Backup
+### ðŸ“ Reports, Export, and Backup
 - Generate daily PDF reports
 - Export CSV and JSON bundles for desktop import
 - Share generated report/export files
 - Create and restore SQLite backups
 
-### ⚙️ Settings
+### âš™ï¸ Settings
 - Update company name and default salesperson
 - Configure payment methods
 - Enable or disable PIN protection
 - Switch between system, light, and dark theme modes
 
-## 🏛️ Architecture
+## ðŸ›ï¸ Architecture
 
 The project follows a clean, practical local-first structure:
 
@@ -120,7 +120,7 @@ The project follows a clean, practical local-first structure:
 - `screens/` contains feature-focused UI modules
 - `models/entities.dart` holds the core data models
 
-## 🧭 Architecture Diagram
+## ðŸ§­ Architecture Diagram
 
 ```mermaid
 flowchart TD
@@ -147,7 +147,7 @@ flowchart TD
     C --> Q[Settings]
 ```
 
-## 🗃️ Data Model Snapshot
+## ðŸ—ƒï¸ Data Model Snapshot
 
 The local database includes these primary tables:
 
@@ -168,7 +168,7 @@ Notable behaviors already implemented in the repository layer:
 - CSV/TXT import parsing for shops and products
 - Daily summary/report aggregation
 
-## 📂 Project Structure
+## ðŸ“‚ Project Structure
 
 ```text
 lib/
@@ -202,7 +202,7 @@ lib/
     backup_service.dart
 ```
 
-## 🚀 Getting Started
+## ðŸš€ Getting Started
 
 ### Prerequisites
 
@@ -226,7 +226,7 @@ flutter build apk
 flutter build windows
 ```
 
-## 🧪 First-Run Behavior
+## ðŸ§ª First-Run Behavior
 
 On first launch, the app:
 
@@ -237,7 +237,7 @@ On first launch, the app:
 
 This makes the project demo-friendly and easier to review immediately.
 
-## 📝 Import Formats
+## ðŸ“ Import Formats
 
 ### Shops Import
 
@@ -257,7 +257,7 @@ name,sku,unit_price,description,barcode
 
 The import logic accepts comma-separated or tab-separated text and can update existing records or replace current master data depending on the chosen flow.
 
-## 📤 Output Locations
+## ðŸ“¤ Output Locations
 
 Generated files are stored inside the app documents directory:
 
@@ -265,89 +265,90 @@ Generated files are stored inside the app documents directory:
 - `exports/` for CSV and JSON export bundles
 - `backups/` for SQLite backup files
 
-## 🖼️ Screenshots
+## ðŸ–¼ï¸ Screenshots
 
 <table>
   <tr>
     <td width="50%" valign="top">
-      <h3>🔑 Login</h3>
-      <img src="./Login.png" alt="Login Screen" />
+      <h3>ðŸ”‘ Login</h3>
+      <img src="./assets/screenshots/Login.png" alt="Login Screen" />
     </td>
     <td width="50%" valign="top">
-      <h3>🌙 Dark Theme</h3>
-      <img src="./Dark.png" alt="Dark Theme Preview" />
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <h3>📈 Dashboard</h3>
-      <img src="./Dashboard%201.png" alt="Dashboard Screen 1" />
-      <br />
-      <br />
-      <img src="./Dashboard%202.png" alt="Dashboard Screen 2" />
-    </td>
-    <td width="50%" valign="top">
-      <h3>🧾 Sales Module</h3>
-      <img src="./Sales%20Module%201.png" alt="Sales Module Screen 1" />
-      <br />
-      <br />
-      <img src="./Sales%20Module%202.png" alt="Sales Module Screen 2" />
+      <h3>ðŸŒ™ Dark Theme</h3>
+      <img src="./assets/screenshots/Dark.png" alt="Dark Theme Preview" />
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
-      <h3>💵 Collections Module</h3>
-      <img src="./Collections%20Module%201.png" alt="Collections Module Screen 1" />
+      <h3>ðŸ“ˆ Dashboard</h3>
+      <img src="./assets/screenshots/Dashboard%201.png" alt="Dashboard Screen 1" />
       <br />
       <br />
-      <img src="./Collections%20Module%202.png" alt="Collections Module Screen 2" />
+      <img src="./assets/screenshots/Dashboard%202.png" alt="Dashboard Screen 2" />
     </td>
     <td width="50%" valign="top">
-      <h3>📦 Product Catalog</h3>
-      <img src="./Product%20Catalog.png" alt="Product Catalog Screen" />
+      <h3>ðŸ§¾ Sales Module</h3>
+      <img src="./assets/screenshots/Sales%20Module%201.png" alt="Sales Module Screen 1" />
+      <br />
+      <br />
+      <img src="./assets/screenshots/Sales%20Module%202.png" alt="Sales Module Screen 2" />
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
-      <h3>📊 Reports</h3>
-      <img src="./Reports.png" alt="Reports Screen" />
+      <h3>ðŸ’µ Collections Module</h3>
+      <img src="./assets/screenshots/Collections%20Module%201.png" alt="Collections Module Screen 1" />
+      <br />
+      <br />
+      <img src="./assets/screenshots/Collections%20Module%202.png" alt="Collections Module Screen 2" />
     </td>
     <td width="50%" valign="top">
-      <h3>⚙️ Settings</h3>
-      <img src="./Settings.png" alt="Settings Screen" />
+      <h3>ðŸ“¦ Product Catalog</h3>
+      <img src="./assets/screenshots/Product%20Catalog.png" alt="Product Catalog Screen" />
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
-      <h3>🏪 Shops Management</h3>
-      <img src="./Shops%20Management.png" alt="Shops Management Screen" />
+      <h3>ðŸ“Š Reports</h3>
+      <img src="./assets/screenshots/Reports.png" alt="Reports Screen" />
     </td>
     <td width="50%" valign="top">
-      <h3>🌿 Bio Care Visuals</h3>
-      <img src="./biocare%20logo1.png" alt="Bio Care Consumers Sales App Logo" />
+      <h3>âš™ï¸ Settings</h3>
+      <img src="./assets/screenshots/Settings.png" alt="Settings Screen" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>ðŸª Shops Management</h3>
+      <img src="./assets/screenshots/Shops%20Management.png" alt="Shops Management Screen" />
+    </td>
+    <td width="50%" valign="top">
+      <h3>ðŸŒ¿ Bio Care Visuals</h3>
+      <img src="./assets/branding/biocare%20logo1.png" alt="Bio Care Consumers Sales App Logo" />
     </td>
   </tr>
 </table>
 
-## 🔍 Notable UX Details
+## ðŸ” Notable UX Details
 
 - Responsive sizing through `flutter_screenutil`
 - Custom visual identity using bundled Bio Care image assets
 - Dedicated hero art for login, dashboard, sales, collections, reports, shops, products, and settings
 - Reusable cards and shell components for consistent layout and presentation
 
-## 🛡️ Local Security Notes
+## ðŸ›¡ï¸ Local Security Notes
 
 - PIN protection is optional and stored locally
 - PIN values are hashed before persistence
 - Data is designed for local/offline operation rather than cloud sync
 
-## 📌 Current Repository Notes
+## ðŸ“Œ Current Repository Notes
 
 - The app is mobile-focused but includes Flutter platform folders for Android, iOS, web, Windows, Linux, and macOS
 - A PowerShell tool folder is included for icon generation/replacement tasks
 - The repository already contains branded screenshots and artwork suitable for product presentation
 
-## 📄 License
+## ðŸ“„ License
 
 No license file is currently included in this repository. Add one if you plan to distribute or open-source the project.
+
