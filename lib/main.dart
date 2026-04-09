@@ -4,10 +4,14 @@ import 'package:provider/provider.dart';
 import 'app/app.dart';
 import 'app/app_controller.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  
   final controller = AppController();
-  await controller.initialize();
+  
+  // Start initialization without blocking the app startup
+  controller.initialize();
+
   runApp(
     ChangeNotifierProvider<AppController>.value(
       value: controller,

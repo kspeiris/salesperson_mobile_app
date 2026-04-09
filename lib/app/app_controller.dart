@@ -64,6 +64,7 @@ class AppController extends ChangeNotifier {
         return ThemeMode.system;
     }
   }
+
   String? get profileImagePath => _settings.profileImagePath;
   File? get lastGeneratedReport => _lastGeneratedReport;
   ExportBundle? get lastExportBundle => _lastExportBundle;
@@ -80,17 +81,16 @@ class AppController extends ChangeNotifier {
   }
 
   Future<void> initialize() async {
-    await _repository.initialize();
-    _settings = await _repository.getSettings();
-    final seededImagePath = p.join(Directory.current.path, 'My Image.jpeg');
-    if ((_settings.profileImagePath ?? '').trim().isEmpty &&
-        await File(seededImagePath).exists()) {
-      _settings = _settings.copyWith(profileImagePath: seededImagePath);
-      await _repository.saveSettings(_settings);
+    try {
+      await _repository.initialize();
+      _settings = await _repository.getSettings();
+      _currentSalesperson = _settings.defaultSalesperson;
+    } catch (e) {
+      debugPrint('Initialization error: $e');
+    } finally {
+      _initialized = true;
+      notifyListeners();
     }
-    _currentSalesperson = _settings.defaultSalesperson;
-    _initialized = true;
-    notifyListeners();
   }
 
   String? login({required String salesperson, String pin = ''}) {
@@ -122,7 +122,10 @@ class AppController extends ChangeNotifier {
   Future<Product?> findProductByBarcode(String barcode) =>
       _repository.getProductByBarcode(barcode);
   Future<List<SaleRecord>> fetchSales(
-          {DateTime? start, DateTime? end, int? shopId, bool activeOnly = true}) =>
+          {DateTime? start,
+          DateTime? end,
+          int? shopId,
+          bool activeOnly = true}) =>
       _repository.getSales(
           start: start, end: end, shopId: shopId, activeOnly: activeOnly);
   Future<List<CollectionRecord>> fetchCollections(
@@ -276,7 +279,8 @@ class AppController extends ChangeNotifier {
     final file = _lastGeneratedReport;
     if (file == null) return;
     if (!await file.exists()) {
-      throw FileSystemException('The generated PDF could not be found.', file.path);
+      throw FileSystemException(
+          'The generated PDF could not be found.', file.path);
     }
     await Share.shareXFiles([XFile(file.path)],
         text: 'Daily report from ${_settings.companyName}');
@@ -299,7 +303,7 @@ class AppController extends ChangeNotifier {
     if (bundle == null) return;
     if (!await File(bundle.csvFile).exists() ||
         !await File(bundle.jsonFile).exists()) {
-      throw FileSystemException(
+      throw const FileSystemException(
           'One or more export files could not be found.');
     }
     await Share.shareXFiles(
